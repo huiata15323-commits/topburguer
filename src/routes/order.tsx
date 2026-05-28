@@ -158,9 +158,10 @@ function OrderPage() {
                 <p className="text-sm text-neutral-400 italic py-4 text-center">Carrinho vazio</p>
               )}
               {items.map((i) => (
-                <div key={i.menuId} className="flex items-center justify-between text-sm animate-in fade-in slide-in-from-right-2">
-                  <span>
-                    <span className="font-semibold">{i.quantity}×</span> {i.emoji} {i.name}
+                <div key={i.menuId} className="flex items-center gap-2 text-sm animate-in fade-in slide-in-from-right-2">
+                  <img src={i.image} alt="" className="w-10 h-10 rounded-md object-cover flex-shrink-0" />
+                  <span className="flex-1 min-w-0 truncate">
+                    <span className="font-semibold">{i.quantity}×</span> {i.name}
                   </span>
                   <span className="font-medium">R$ {(i.price * i.quantity).toFixed(2)}</span>
                 </div>
