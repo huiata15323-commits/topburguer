@@ -33,7 +33,7 @@ function OrderPage() {
         .filter(([, q]) => q > 0)
         .map(([id, q]) => {
           const m = MENU.find((x) => x.id === id)!;
-          return { menuId: m.id, name: m.name, emoji: m.emoji, price: m.price, quantity: q };
+          return { menuId: m.id, name: m.name, emoji: m.emoji, image: m.image, price: m.price, quantity: q };
         }),
     [cart]
   );
