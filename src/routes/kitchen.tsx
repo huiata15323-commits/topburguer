@@ -143,11 +143,12 @@ function OrderCard({ order, onStatus }: { order: Order; onStatus: (s: OrderStatu
         </div>
       </div>
 
-      <ul className="space-y-1 flex-1">
+      <ul className="space-y-2 flex-1">
         {order.items.map((i) => (
-          <li key={i.menuId} className="flex gap-2 text-base">
+          <li key={i.menuId} className="flex items-center gap-2 text-base">
+            <img src={i.image} alt="" className="w-12 h-12 rounded-lg object-cover flex-shrink-0 border border-white/10" />
             <span className="font-black text-yellow-400 w-6">{i.quantity}×</span>
-            <span>{i.emoji} {i.name}</span>
+            <span className="flex-1 min-w-0 truncate">{i.name}</span>
           </li>
         ))}
       </ul>

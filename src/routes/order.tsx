@@ -33,7 +33,7 @@ function OrderPage() {
         .filter(([, q]) => q > 0)
         .map(([id, q]) => {
           const m = MENU.find((x) => x.id === id)!;
-          return { menuId: m.id, name: m.name, emoji: m.emoji, price: m.price, quantity: q };
+          return { menuId: m.id, name: m.name, emoji: m.emoji, image: m.image, price: m.price, quantity: q };
         }),
     [cart]
   );
@@ -92,38 +92,45 @@ function OrderPage() {
                   return (
                     <div
                       key={m.id}
-                      className="group rounded-2xl bg-white p-4 border border-neutral-200 hover:border-red-300 hover:shadow-md transition-all"
+                      className="group rounded-2xl bg-white border border-neutral-200 hover:border-red-300 hover:shadow-lg transition-all overflow-hidden flex flex-col"
                     >
-                      <div className="flex items-start gap-3">
-                        <div className="text-4xl">{m.emoji}</div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-neutral-900">{m.name}</h3>
-                          {m.description && (
-                            <p className="text-xs text-neutral-500 mt-0.5 line-clamp-2">{m.description}</p>
-                          )}
-                          <p className="text-red-600 font-bold mt-1">R$ {m.price.toFixed(2)}</p>
-                        </div>
+                      <div className="aspect-[4/3] bg-neutral-100 overflow-hidden">
+                        <img
+                          src={m.image}
+                          alt={m.name}
+                          loading="lazy"
+                          width={512}
+                          height={384}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
                       </div>
-                      <div className="mt-3 flex items-center justify-end gap-2">
-                        {q > 0 && (
-                          <>
-                            <button
-                              onClick={() => dec(m.id)}
-                              className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 font-bold"
-                              aria-label="Remover"
-                            >
-                              −
-                            </button>
-                            <span className="w-6 text-center font-bold">{q}</span>
-                          </>
+                      <div className="p-4 flex-1 flex flex-col">
+                        <h3 className="font-semibold text-neutral-900">{m.emoji} {m.name}</h3>
+                        {m.description && (
+                          <p className="text-xs text-neutral-500 mt-0.5 line-clamp-2">{m.description}</p>
                         )}
-                        <button
-                          onClick={() => inc(m.id)}
-                          className="w-8 h-8 rounded-full bg-red-600 text-white hover:bg-red-700 font-bold transition-transform active:scale-90"
-                          aria-label="Adicionar"
-                        >
-                          +
-                        </button>
+                        <p className="text-red-600 font-bold mt-1">R$ {m.price.toFixed(2)}</p>
+                        <div className="mt-3 flex items-center justify-end gap-2">
+                          {q > 0 && (
+                            <>
+                              <button
+                                onClick={() => dec(m.id)}
+                                className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 font-bold"
+                                aria-label="Remover"
+                              >
+                                −
+                              </button>
+                              <span className="w-6 text-center font-bold">{q}</span>
+                            </>
+                          )}
+                          <button
+                            onClick={() => inc(m.id)}
+                            className="w-8 h-8 rounded-full bg-red-600 text-white hover:bg-red-700 font-bold transition-transform active:scale-90"
+                            aria-label="Adicionar"
+                          >
+                            +
+                          </button>
+                        </div>
                       </div>
                     </div>
                   );
@@ -151,9 +158,10 @@ function OrderPage() {
                 <p className="text-sm text-neutral-400 italic py-4 text-center">Carrinho vazio</p>
               )}
               {items.map((i) => (
-                <div key={i.menuId} className="flex items-center justify-between text-sm animate-in fade-in slide-in-from-right-2">
-                  <span>
-                    <span className="font-semibold">{i.quantity}×</span> {i.emoji} {i.name}
+                <div key={i.menuId} className="flex items-center gap-2 text-sm animate-in fade-in slide-in-from-right-2">
+                  <img src={i.image} alt="" className="w-10 h-10 rounded-md object-cover flex-shrink-0" />
+                  <span className="flex-1 min-w-0 truncate">
+                    <span className="font-semibold">{i.quantity}×</span> {i.name}
                   </span>
                   <span className="font-medium">R$ {(i.price * i.quantity).toFixed(2)}</span>
                 </div>

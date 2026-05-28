@@ -8,6 +8,7 @@ export type OrderItem = {
   menuId: string;
   name: string;
   emoji: string;
+  image: string;
   price: number;
   quantity: number;
 };
