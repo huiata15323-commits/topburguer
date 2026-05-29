@@ -23,6 +23,7 @@ export type Order = {
   total: number;
   status: OrderStatus;
   createdAt: number;
+  doneAt?: number;
 };
 
 const STORAGE_KEY = "fast-order:orders";
