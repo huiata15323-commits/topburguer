@@ -184,7 +184,8 @@ function Landing() {
       </section>
 
       <footer className="relative z-10 border-t border-white/5 py-6 text-center text-xs text-white/40">
-        Top Burguer · Fast Order — feito pra hamburgueria que voa.
+        <div>Top Burguer · Fast Order — feito pra hamburgueria que voa.</div>
+        <div className="mt-1 text-white/25">Criado por Erick Matheus, Bruno Abraão e Hitallo Gabriel</div>
       </footer>
     </main>
   );
