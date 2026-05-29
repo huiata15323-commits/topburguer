@@ -182,6 +182,13 @@ function StatusPage() {
                   <span className="text-muted-foreground">Total</span>
                   <span className="text-2xl font-black text-ember">R$ {order.total.toFixed(2)}</span>
                 </div>
+                <Link
+                  to="/receipt"
+                  search={{ n: order.number }}
+                  className="mt-4 flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-charcoal text-white font-bold hover:brightness-110 transition"
+                >
+                  🧾 Ver recibo para retirada
+                </Link>
               </div>
             </motion.div>
           )}

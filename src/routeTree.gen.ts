@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StatusRouteImport } from './routes/status'
+import { Route as ReceiptRouteImport } from './routes/receipt'
 import { Route as OrderRouteImport } from './routes/order'
 import { Route as KitchenRouteImport } from './routes/kitchen'
 import { Route as IndexRouteImport } from './routes/index'
@@ -17,6 +18,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const StatusRoute = StatusRouteImport.update({
   id: '/status',
   path: '/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReceiptRoute = ReceiptRouteImport.update({
+  id: '/receipt',
+  path: '/receipt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrderRoute = OrderRouteImport.update({
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/kitchen': typeof KitchenRoute
   '/order': typeof OrderRoute
+  '/receipt': typeof ReceiptRoute
   '/status': typeof StatusRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/kitchen': typeof KitchenRoute
   '/order': typeof OrderRoute
+  '/receipt': typeof ReceiptRoute
   '/status': typeof StatusRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/kitchen': typeof KitchenRoute
   '/order': typeof OrderRoute
+  '/receipt': typeof ReceiptRoute
   '/status': typeof StatusRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/kitchen' | '/order' | '/status'
+  fullPaths: '/' | '/kitchen' | '/order' | '/receipt' | '/status'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/kitchen' | '/order' | '/status'
-  id: '__root__' | '/' | '/kitchen' | '/order' | '/status'
+  to: '/' | '/kitchen' | '/order' | '/receipt' | '/status'
+  id: '__root__' | '/' | '/kitchen' | '/order' | '/receipt' | '/status'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   KitchenRoute: typeof KitchenRoute
   OrderRoute: typeof OrderRoute
+  ReceiptRoute: typeof ReceiptRoute
   StatusRoute: typeof StatusRoute
 }
 
@@ -76,6 +86,13 @@ declare module '@tanstack/react-router' {
       path: '/status'
       fullPath: '/status'
       preLoaderRoute: typeof StatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/receipt': {
+      id: '/receipt'
+      path: '/receipt'
+      fullPath: '/receipt'
+      preLoaderRoute: typeof ReceiptRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/order': {
@@ -106,6 +123,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   KitchenRoute: KitchenRoute,
   OrderRoute: OrderRoute,
+  ReceiptRoute: ReceiptRoute,
   StatusRoute: StatusRoute,
 }
 export const routeTree = rootRouteImport
