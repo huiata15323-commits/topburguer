@@ -163,11 +163,24 @@ function KitchenPage() {
                 Limpar concluídos
               </button>
             )}
+            <button
+              onClick={() => setAutoBrightness((v) => !v)}
+              title="Ajuste automático de brilho"
+              className={`px-3 py-2 text-xs rounded-lg transition ${autoBrightness ? "bg-amber-warm/20 text-amber-warm border border-amber-warm/40" : "bg-white/10 hover:bg-white/20"}`}
+            >
+              {autoBrightness ? "☀ Auto" : "☼ Manual"} <span className="opacity-60 ml-1">{Math.round(brightness * 100)}%</span>
+            </button>
+            <button
+              onClick={toggleTv}
+              className="px-3 py-2 text-xs rounded-lg bg-gradient-ember text-charcoal font-bold transition hover:brightness-110"
+            >
+              {tvMode ? "⤬ Sair TV" : "⛶ Modo TV"}
+            </button>
           </div>
         </div>
       </header>
 
-      <div className="p-6">
+      <div className={tvMode ? "p-4" : "p-6"}>
         {list.length === 0 ? (
           <div className="text-center py-32">
             <motion.div
