@@ -96,7 +96,11 @@ export function useOrders() {
 
   const updateStatus = useCallback(
     (id: string, status: OrderStatus) => {
-      const next = read().map((o) => (o.id === id ? { ...o, status } : o));
+      const next = read().map((o) =>
+        o.id === id
+          ? { ...o, status, doneAt: status === "done" ? Date.now() : o.doneAt }
+          : o
+      );
       write(next);
       setOrders(next);
       broadcast();
