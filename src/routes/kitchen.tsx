@@ -26,16 +26,60 @@ const STATUS_LABEL: Record<OrderStatus, string> = {
   done: "Pronto",
 };
 
+type LuxSensor = EventTarget & { illuminance?: number; start: () => void; stop: () => void };
+type LuxSensorCtor = new (opts?: { frequency?: number }) => LuxSensor;
+
 function KitchenPage() {
   const { orders, updateStatus, clearDone } = useOrders();
   const [, force] = useState(0);
   const prevIdsRef = useRef<Set<string>>(new Set());
   const [filter, setFilter] = useState<"all" | OrderStatus>("all");
+  const [tvMode, setTvMode] = useState(false);
+  const [autoBrightness, setAutoBrightness] = useState(true);
+  const [brightness, setBrightness] = useState(1);
+  const containerRef = useRef<HTMLElement>(null);
 
+  // Optimized tick: only update when there are active orders (saves CPU/GPU on TVs)
   useEffect(() => {
+    const hasActive = orders.some((o) => o.status !== "done");
+    if (!hasActive) return;
     const i = setInterval(() => force((n) => n + 1), 1000);
     return () => clearInterval(i);
-  }, []);
+  }, [orders]);
+
+  // Auto brightness: ambient light sensor when available, else time of day
+  useEffect(() => {
+    if (!autoBrightness) return;
+    let sensor: LuxSensor | null = null;
+    const computeFromHour = () => {
+      const h = new Date().getHours();
+      // Night dim (22h–7h): 0.7; Daytime peak (10–17h): 1.05; transitions: 0.85
+      if (h >= 22 || h < 7) return 0.7;
+      if (h >= 10 && h < 17) return 1.05;
+      return 0.88;
+    };
+    setBrightness(computeFromHour());
+    const interval = setInterval(() => setBrightness(computeFromHour()), 60_000);
+
+    const SensorCtor = (window as unknown as { AmbientLightSensor?: LuxSensorCtor }).AmbientLightSensor;
+    if (SensorCtor) {
+      try {
+        sensor = new SensorCtor({ frequency: 0.2 });
+        const handler = () => {
+          const lux = sensor?.illuminance ?? 0;
+          // Map 0–800 lux → 0.55–1.15
+          const b = Math.min(1.15, Math.max(0.55, 0.55 + (lux / 800) * 0.6));
+          setBrightness(b);
+        };
+        sensor.addEventListener("reading", handler);
+        sensor.start();
+      } catch {}
+    }
+    return () => {
+      clearInterval(interval);
+      try { sensor?.stop(); } catch {}
+    };
+  }, [autoBrightness]);
 
   // Beep on new orders
   useEffect(() => {
@@ -58,6 +102,29 @@ function KitchenPage() {
     prevIdsRef.current = current;
   }, [orders]);
 
+  // Track fullscreen exit (Esc)
+  useEffect(() => {
+    const onChange = () => {
+      if (!document.fullscreenElement) setTvMode(false);
+    };
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
+  }, []);
+
+  const toggleTv = async () => {
+    try {
+      if (!document.fullscreenElement) {
+        await containerRef.current?.requestFullscreen?.();
+        setTvMode(true);
+      } else {
+        await document.exitFullscreen?.();
+        setTvMode(false);
+      }
+    } catch {
+      setTvMode((v) => !v);
+    }
+  };
+
   const pending = orders.filter((o) => o.status === "pending");
   const preparing = orders.filter((o) => o.status === "preparing");
   const done = orders.filter((o) => o.status === "done");
@@ -65,7 +132,11 @@ function KitchenPage() {
   const list = filter === "all" ? active : orders.filter((o) => o.status === filter);
 
   return (
-    <main className="min-h-screen bg-neutral-950 text-white">
+    <main
+      ref={containerRef}
+      style={{ filter: `brightness(${brightness.toFixed(2)})` }}
+      className={`min-h-screen bg-neutral-950 text-white transition-[filter] duration-700 ${tvMode ? "tv-mode" : ""}`}
+    >
       <header className="border-b border-white/10 bg-black/80 backdrop-blur sticky top-0 z-10">
         <div className="px-6 py-4 flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-4">
@@ -92,11 +163,24 @@ function KitchenPage() {
                 Limpar concluídos
               </button>
             )}
+            <button
+              onClick={() => setAutoBrightness((v) => !v)}
+              title="Ajuste automático de brilho"
+              className={`px-3 py-2 text-xs rounded-lg transition ${autoBrightness ? "bg-amber-warm/20 text-amber-warm border border-amber-warm/40" : "bg-white/10 hover:bg-white/20"}`}
+            >
+              {autoBrightness ? "☀ Auto" : "☼ Manual"} <span className="opacity-60 ml-1">{Math.round(brightness * 100)}%</span>
+            </button>
+            <button
+              onClick={toggleTv}
+              className="px-3 py-2 text-xs rounded-lg bg-gradient-ember text-charcoal font-bold transition hover:brightness-110"
+            >
+              {tvMode ? "⤬ Sair TV" : "⛶ Modo TV"}
+            </button>
           </div>
         </div>
       </header>
 
-      <div className="p-6">
+      <div className={tvMode ? "p-4" : "p-6"}>
         {list.length === 0 ? (
           <div className="text-center py-32">
             <motion.div
@@ -110,7 +194,7 @@ function KitchenPage() {
             <p className="mt-2 text-sm text-white/30">Abra <code className="text-amber-warm">/order</code> em outra aba para testar.</p>
           </div>
         ) : (
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+          <div className={`grid gap-4 ${tvMode ? "grid-cols-2 md:grid-cols-3 xl:grid-cols-4 text-lg" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"}`}>
             <AnimatePresence mode="popLayout">
               {list.map((o) => (
                 <OrderCard key={o.id} order={o} onStatus={(s) => updateStatus(o.id, s)} />
