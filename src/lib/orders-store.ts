@@ -127,5 +127,12 @@ export function useOrders() {
     broadcast();
   }, [broadcast]);
 
-  return { orders, addOrder, updateStatus, markNotified, clearDone };
+  const clearAll = useCallback(() => {
+    write([]);
+    localStorage.removeItem(COUNTER_KEY);
+    setOrders([]);
+    broadcast();
+  }, [broadcast]);
+
+  return { orders, addOrder, updateStatus, markNotified, clearDone, clearAll };
 }

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useOrders } from "@/lib/orders-store";
 import { useExpenses, CATEGORY_LABEL, type ExpenseCategory } from "@/lib/expenses-store";
+import { generateReportPDF } from "@/lib/report-pdf";
 
 export const Route = createFileRoute("/finance")({
   head: () => ({
@@ -23,7 +24,7 @@ type Range = "today" | "7d" | "30d" | "all";
 
 function FinancePage() {
   const { orders } = useOrders();
-  const { expenses, addExpense, removeExpense } = useExpenses();
+  const { expenses, addExpense, removeExpense, clearAll } = useExpenses();
   const [range, setRange] = useState<Range>("today");
 
   // form
@@ -95,6 +96,23 @@ function FinancePage() {
     toast.success("CSV exportado");
   };
 
+  const exportPDF = () => {
+    const label = range === "today" ? "Hoje" : range === "7d" ? "Últimos 7 dias" : range === "30d" ? "Últimos 30 dias" : "Histórico completo";
+    generateReportPDF({
+      orders: filteredOrders,
+      expenses: filteredExpenses,
+      range: { label, from: fromTs, to: Date.now() },
+    });
+    toast.success("Relatório PDF gerado");
+  };
+
+  const resetFinance = () => {
+    if (!confirm("Zerar TODAS as despesas registradas? Esta ação não pode ser desfeita.")) return;
+    clearAll();
+    toast.success("Financeiro zerado");
+  };
+
+
   return (
     <main className="min-h-screen bg-neutral-950 text-white">
       <header className="border-b border-white/10 bg-black/80 backdrop-blur sticky top-0 z-10">
@@ -123,10 +141,23 @@ function FinancePage() {
               </button>
             ))}
             <button
+              onClick={exportPDF}
+              className="px-3 py-2 text-xs rounded-lg bg-ember/20 text-ember border border-ember/40 hover:bg-ember/30 font-bold transition"
+            >
+              📄 Relatório PDF
+            </button>
+            <button
               onClick={exportCSV}
               className="px-3 py-2 text-xs rounded-lg bg-white/10 hover:bg-white/20 font-bold transition"
             >
-              ⬇ Exportar CSV
+              ⬇ CSV
+            </button>
+            <button
+              onClick={resetFinance}
+              className="px-3 py-2 text-xs rounded-lg bg-red-500/15 text-red-300 hover:bg-red-500/25 border border-red-500/30 font-bold transition"
+              title="Zerar todas as despesas"
+            >
+              🗑 Zerar
             </button>
             <Link to="/dashboard" className="px-3 py-2 text-xs rounded-lg bg-white/10 hover:bg-white/20 font-bold transition">
               Dashboard →

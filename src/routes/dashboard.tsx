@@ -1,26 +1,29 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
+import {
+  ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
+  PieChart, Pie, Cell, BarChart, Bar, Legend,
+} from "recharts";
 import { useOrders, type Order } from "@/lib/orders-store";
+import { useExpenses } from "@/lib/expenses-store";
+import { generateReportPDF } from "@/lib/report-pdf";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
     meta: [
       { title: "Dashboard — Top Burguer" },
-      { name: "description", content: "Histórico diário, métricas e itens mais vendidos." },
+      { name: "description", content: "Painel interativo com métricas, gráficos e relatórios." },
     ],
   }),
   component: DashboardPage,
 });
 
-function startOfDay(d: Date) {
-  const c = new Date(d);
-  c.setHours(0, 0, 0, 0);
-  return c.getTime();
-}
-function fmtBRL(v: number) {
-  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
+type Range = "today" | "7d" | "30d" | "all";
+
+function startOfDay(d: Date) { const c = new Date(d); c.setHours(0, 0, 0, 0); return c.getTime(); }
+function fmtBRL(v: number) { return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }); }
 function fmtMin(ms: number) {
   if (!Number.isFinite(ms) || ms <= 0) return "—";
   const s = Math.round(ms / 1000);
@@ -29,25 +32,51 @@ function fmtMin(ms: number) {
   return m > 0 ? `${m}m ${String(r).padStart(2, "0")}s` : `${r}s`;
 }
 
-function DashboardPage() {
-  const { orders } = useOrders();
-  const [range, setRange] = useState<"today" | "7d" | "all">("today");
+const PIE_COLORS = ["#ff8a3d", "#ffa826", "#10b981", "#6366f1", "#ec4899", "#06b6d4", "#f43f5e", "#a855f7"];
 
-  const filtered = useMemo(() => {
+function DashboardPage() {
+  const { orders, clearAll } = useOrders();
+  const { expenses } = useExpenses();
+  const [range, setRange] = useState<Range>("today");
+  const [statusFilter, setStatusFilter] = useState<"all" | Order["status"]>("all");
+  const [selectedItem, setSelectedItem] = useState<string | null>(null);
+
+  const fromTs = useMemo(() => {
     const now = Date.now();
-    if (range === "today") {
-      const start = startOfDay(new Date());
-      return orders.filter((o) => o.createdAt >= start);
-    }
-    if (range === "7d") {
-      const start = now - 7 * 24 * 60 * 60 * 1000;
-      return orders.filter((o) => o.createdAt >= start);
-    }
-    return orders;
-  }, [orders, range]);
+    if (range === "today") return startOfDay(new Date());
+    if (range === "7d") return now - 7 * 86400000;
+    if (range === "30d") return now - 30 * 86400000;
+    return 0;
+  }, [range]);
+
+  const filtered = useMemo(
+    () => orders.filter((o) => o.createdAt >= fromTs && (statusFilter === "all" || o.status === statusFilter)),
+    [orders, fromTs, statusFilter]
+  );
+  const filteredExpenses = useMemo(() => expenses.filter((e) => e.createdAt >= fromTs), [expenses, fromTs]);
 
   const stats = useMemo(() => computeStats(filtered), [filtered]);
-  const hourly = useMemo(() => computeHourly(filtered), [filtered]);
+  const trend = useMemo(() => computeTrend(filtered, range), [filtered, range]);
+  const expenseTotal = filteredExpenses.reduce((a, e) => a + e.amount, 0);
+  const profit = stats.revenue - expenseTotal;
+
+  const pieData = stats.topItems.map((it) => ({ name: it.name, value: it.qty }));
+
+  const exportPDF = () => {
+    const label = range === "today" ? "Hoje" : range === "7d" ? "Últimos 7 dias" : range === "30d" ? "Últimos 30 dias" : "Histórico completo";
+    generateReportPDF({
+      orders: filtered,
+      expenses: filteredExpenses,
+      range: { label, from: fromTs, to: Date.now() },
+    });
+    toast.success("Relatório PDF gerado");
+  };
+
+  const resetOrders = () => {
+    if (!confirm("Zerar TODOS os pedidos e reiniciar o contador? Esta ação não pode ser desfeita.")) return;
+    clearAll();
+    toast.success("Pedidos zerados");
+  };
 
   return (
     <main className="min-h-screen bg-neutral-950 text-white">
@@ -64,111 +93,181 @@ function DashboardPage() {
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <RangeChip active={range === "today"} onClick={() => setRange("today")}>Hoje</RangeChip>
-            <RangeChip active={range === "7d"} onClick={() => setRange("7d")}>7 dias</RangeChip>
-            <RangeChip active={range === "all"} onClick={() => setRange("all")}>Tudo</RangeChip>
-            <Link to="/kitchen" className="ml-2 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-bold transition">
-              Cozinha →
+          <div className="flex items-center gap-2 flex-wrap">
+            {(["today","7d","30d","all"] as Range[]).map((r) => (
+              <Chip key={r} active={range === r} onClick={() => setRange(r)}>
+                {r === "today" ? "Hoje" : r === "7d" ? "7 dias" : r === "30d" ? "30 dias" : "Tudo"}
+              </Chip>
+            ))}
+            <button
+              onClick={exportPDF}
+              className="px-3 py-2 text-xs rounded-lg bg-ember/20 text-ember border border-ember/40 hover:bg-ember/30 font-bold transition"
+            >
+              📄 Relatório PDF
+            </button>
+            <button
+              onClick={resetOrders}
+              className="px-3 py-2 text-xs rounded-lg bg-red-500/15 text-red-300 hover:bg-red-500/25 border border-red-500/30 font-bold transition"
+              title="Zerar pedidos"
+            >
+              🗑 Zerar
+            </button>
+            <Link to="/finance" className="px-3 py-2 text-xs rounded-lg bg-white/10 hover:bg-white/20 font-bold transition">
+              Financeiro →
             </Link>
           </div>
         </div>
       </header>
 
       <div className="p-6 space-y-6 max-w-7xl mx-auto">
-        {/* KPI cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <KpiCard label="Pedidos" value={String(stats.count)} sub={`${stats.done} concluídos`} accent="ember" />
-          <KpiCard label="Faturamento" value={fmtBRL(stats.revenue)} sub={`Ticket médio ${fmtBRL(stats.avgTicket)}`} accent="emerald" />
-          <KpiCard label="Tempo médio" value={fmtMin(stats.avgPrepMs)} sub="do pedido à entrega" accent="amber" />
-          <KpiCard label="Itens vendidos" value={String(stats.itemsSold)} sub={`${stats.uniqueItems} produtos`} accent="violet" />
+        {/* KPIs clicáveis */}
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+          <KpiCard label="Pedidos" value={String(stats.count)} sub={`${stats.done} concluídos`} accent="ember"
+            active={statusFilter === "all"} onClick={() => setStatusFilter("all")} />
+          <KpiCard label="Novos" value={String(stats.pending)} sub="aguardando" accent="amber"
+            active={statusFilter === "pending"} onClick={() => setStatusFilter("pending")} />
+          <KpiCard label="Preparando" value={String(stats.preparing)} sub="em produção" accent="ember"
+            active={statusFilter === "preparing"} onClick={() => setStatusFilter("preparing")} />
+          <KpiCard label="Faturamento" value={fmtBRL(stats.revenue)} sub={`Ticket ${fmtBRL(stats.avgTicket)}`} accent="emerald" />
+          <KpiCard label="Lucro" value={fmtBRL(profit)} sub={`Despesas ${fmtBRL(expenseTotal)}`} accent={profit >= 0 ? "violet" : "red"} />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Top items */}
-          <section className="lg:col-span-2 rounded-2xl bg-neutral-900 border border-white/10 p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-black text-lg">🔥 Mais vendidos</h2>
-              <span className="text-xs text-white/40">Top 8</span>
+        {/* Trend line chart */}
+        <section className="rounded-2xl bg-neutral-900 border border-white/10 p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-black text-lg">📈 Receita ao longo do tempo</h2>
+            <span className="text-xs text-white/40">{trend.bucketLabel}</span>
+          </div>
+          {trend.data.every((d) => d.revenue === 0) ? (
+            <EmptyHint label="Sem dados no período." />
+          ) : (
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={trend.data}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
+                  <XAxis dataKey="label" stroke="#ffffff60" fontSize={11} />
+                  <YAxis stroke="#ffffff60" fontSize={11} tickFormatter={(v) => `R$${v}`} />
+                  <Tooltip
+                    contentStyle={{ background: "#0a0a0a", border: "1px solid #ffffff20", borderRadius: 8, fontSize: 12 }}
+                    labelStyle={{ color: "#ffa826" }}
+                    formatter={(v: number) => fmtBRL(v)}
+                  />
+                  <Line type="monotone" dataKey="revenue" stroke="#ffa826" strokeWidth={2.5} dot={{ fill: "#ff8a3d", r: 4 }} activeDot={{ r: 6 }} />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
-            {stats.topItems.length === 0 ? (
-              <EmptyHint label="Sem vendas no período." />
+          )}
+        </section>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Pie + Bar */}
+          <section className="rounded-2xl bg-neutral-900 border border-white/10 p-5">
+            <h2 className="font-black text-lg mb-3">🥧 Distribuição de itens</h2>
+            {pieData.length === 0 ? (
+              <EmptyHint label="Sem vendas." />
             ) : (
-              <ul className="space-y-3">
-                {stats.topItems.map((it, idx) => {
-                  const pct = stats.topItems[0].qty > 0 ? (it.qty / stats.topItems[0].qty) * 100 : 0;
-                  return (
-                    <motion.li
-                      key={it.menuId}
-                      initial={{ opacity: 0, x: -8 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: idx * 0.04 }}
-                      className="flex items-center gap-3"
+              <div className="h-64">
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie
+                      data={pieData} dataKey="value" nameKey="name"
+                      innerRadius={50} outerRadius={90} paddingAngle={2}
+                      onClick={(d: { name: string }) => setSelectedItem((cur) => (cur === d.name ? null : d.name))}
                     >
-                      <div className="w-6 text-center text-xs font-mono text-white/40">{idx + 1}</div>
-                      <img src={it.image} alt="" className="w-12 h-12 rounded-lg object-cover border border-white/10" />
-                      <div className="flex-1 min-w-0">
-                        <div className="flex justify-between text-sm">
-                          <span className="font-bold truncate">{it.name}</span>
-                          <span className="font-mono text-amber-warm">{it.qty}×</span>
-                        </div>
-                        <div className="h-1.5 mt-1.5 rounded-full bg-white/5 overflow-hidden">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${pct}%` }}
-                            transition={{ duration: 0.6, delay: idx * 0.04 }}
-                            className="h-full bg-gradient-ember"
-                          />
-                        </div>
-                      </div>
-                      <div className="text-xs text-white/50 font-mono w-20 text-right">{fmtBRL(it.revenue)}</div>
-                    </motion.li>
-                  );
-                })}
-              </ul>
+                      {pieData.map((_, i) => (
+                        <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]}
+                          stroke={selectedItem === pieData[i].name ? "#fff" : "transparent"}
+                          strokeWidth={2}
+                          style={{ cursor: "pointer", opacity: selectedItem && selectedItem !== pieData[i].name ? 0.4 : 1 }}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{ background: "#0a0a0a", border: "1px solid #ffffff20", borderRadius: 8, fontSize: 12 }}
+                      formatter={(v: number, n: string) => [`${v} un.`, n]}
+                    />
+                    <Legend wrapperStyle={{ fontSize: 11, color: "#ffffff80" }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+            {selectedItem && (
+              <p className="text-xs text-amber-warm mt-2">Selecionado: <b>{selectedItem}</b> (clique novamente para limpar)</p>
             )}
           </section>
 
-          {/* Hourly chart */}
+          {/* Hourly bar */}
           <section className="rounded-2xl bg-neutral-900 border border-white/10 p-5">
-            <h2 className="font-black text-lg mb-4">⏱ Por horário</h2>
-            {hourly.every((h) => h === 0) ? (
-              <EmptyHint label="Aguardando pedidos." />
-            ) : (
-              <div className="flex items-end gap-1 h-48">
-                {hourly.map((v, h) => {
-                  const max = Math.max(...hourly, 1);
-                  const pct = (v / max) * 100;
-                  return (
-                    <div key={h} className="flex-1 flex flex-col items-center gap-1">
-                      <div className="w-full bg-white/5 rounded-t-md relative h-full flex items-end">
-                        <motion.div
-                          initial={{ height: 0 }}
-                          animate={{ height: `${pct}%` }}
-                          transition={{ duration: 0.5, delay: h * 0.01 }}
-                          className={`w-full rounded-t-md ${v > 0 ? "bg-gradient-ember" : ""}`}
-                          title={`${v} pedido(s) às ${h}h`}
-                        />
-                      </div>
-                      {h % 3 === 0 && (
-                        <div className="text-[9px] text-white/40 font-mono">{String(h).padStart(2, "0")}</div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-            <div className="mt-3 text-xs text-white/40">
+            <h2 className="font-black text-lg mb-3">⏱ Pedidos por horário</h2>
+            <div className="h-64">
+              <ResponsiveContainer>
+                <BarChart data={stats.hourlyData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" />
+                  <XAxis dataKey="hour" stroke="#ffffff60" fontSize={11} />
+                  <YAxis stroke="#ffffff60" fontSize={11} allowDecimals={false} />
+                  <Tooltip
+                    contentStyle={{ background: "#0a0a0a", border: "1px solid #ffffff20", borderRadius: 8, fontSize: 12 }}
+                    labelFormatter={(h) => `${String(h).padStart(2, "0")}h`}
+                    formatter={(v: number) => [`${v} pedido(s)`, "Total"]}
+                  />
+                  <Bar dataKey="count" fill="#ff8a3d" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="mt-2 text-xs text-white/40">
               Pico: <span className="text-amber-warm font-bold">{stats.peakHour !== null ? `${String(stats.peakHour).padStart(2, "0")}h` : "—"}</span>
             </div>
           </section>
         </div>
 
+        {/* Top items list */}
+        <section className="rounded-2xl bg-neutral-900 border border-white/10 p-5">
+          <h2 className="font-black text-lg mb-4">🔥 Mais vendidos</h2>
+          {stats.topItems.length === 0 ? (
+            <EmptyHint label="Sem vendas no período." />
+          ) : (
+            <ul className="space-y-3">
+              {stats.topItems.map((it, idx) => {
+                const pct = stats.topItems[0].qty > 0 ? (it.qty / stats.topItems[0].qty) * 100 : 0;
+                const isSel = selectedItem === it.name;
+                return (
+                  <motion.li
+                    key={it.menuId}
+                    initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: idx * 0.04 }}
+                    onClick={() => setSelectedItem(isSel ? null : it.name)}
+                    className={`flex items-center gap-3 cursor-pointer rounded-lg p-1.5 -m-1.5 transition ${isSel ? "bg-amber-warm/10" : "hover:bg-white/[0.03]"}`}
+                  >
+                    <div className="w-6 text-center text-xs font-mono text-white/40">{idx + 1}</div>
+                    <img src={it.image} alt="" className="w-12 h-12 rounded-lg object-cover border border-white/10" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between text-sm">
+                        <span className="font-bold truncate">{it.name}</span>
+                        <span className="font-mono text-amber-warm">{it.qty}×</span>
+                      </div>
+                      <div className="h-1.5 mt-1.5 rounded-full bg-white/5 overflow-hidden">
+                        <motion.div
+                          initial={{ width: 0 }} animate={{ width: `${pct}%` }}
+                          transition={{ duration: 0.6, delay: idx * 0.04 }}
+                          className="h-full bg-gradient-ember"
+                        />
+                      </div>
+                    </div>
+                    <div className="text-xs text-white/50 font-mono w-20 text-right">{fmtBRL(it.revenue)}</div>
+                  </motion.li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+
         {/* History table */}
         <section className="rounded-2xl bg-neutral-900 border border-white/10 overflow-hidden">
-          <div className="p-5 flex items-center justify-between">
+          <div className="p-5 flex items-center justify-between flex-wrap gap-2">
             <h2 className="font-black text-lg">📋 Histórico</h2>
-            <span className="text-xs text-white/40">{filtered.length} pedidos</span>
+            <span className="text-xs text-white/40">
+              {filtered.length} pedidos · filtro: {statusFilter === "all" ? "todos" : statusFilter}
+            </span>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -176,6 +275,7 @@ function DashboardPage() {
                 <tr>
                   <th className="text-left px-5 py-3">#</th>
                   <th className="text-left px-3 py-3">Cliente</th>
+                  <th className="text-left px-3 py-3">Telefone</th>
                   <th className="text-left px-3 py-3">Itens</th>
                   <th className="text-left px-3 py-3">Status</th>
                   <th className="text-right px-3 py-3">Tempo</th>
@@ -184,19 +284,18 @@ function DashboardPage() {
               </thead>
               <tbody>
                 {filtered.length === 0 ? (
-                  <tr><td colSpan={6} className="text-center py-10 text-white/40">Nenhum pedido no período.</td></tr>
+                  <tr><td colSpan={7} className="text-center py-10 text-white/40">Nenhum pedido no período.</td></tr>
                 ) : (
-                  filtered.slice(0, 50).map((o) => {
+                  filtered.slice(0, 100).map((o) => {
                     const prep = o.doneAt ? o.doneAt - o.createdAt : null;
                     const qty = o.items.reduce((a, b) => a + b.quantity, 0);
                     return (
                       <tr key={o.id} className="border-b border-white/5 hover:bg-white/[0.03]">
                         <td className="px-5 py-3 font-black">#{o.number}</td>
-                        <td className="px-3 py-3 truncate max-w-[180px]">{o.customer}</td>
+                        <td className="px-3 py-3 truncate max-w-[160px]">{o.customer}</td>
+                        <td className="px-3 py-3 text-xs text-white/50 font-mono">{o.phone ? "📱" : "—"}</td>
                         <td className="px-3 py-3 text-white/60">{qty} item(ns)</td>
-                        <td className="px-3 py-3">
-                          <StatusPill status={o.status} />
-                        </td>
+                        <td className="px-3 py-3"><StatusPill status={o.status} /></td>
                         <td className="px-3 py-3 text-right font-mono text-white/70">{prep ? fmtMin(prep) : "—"}</td>
                         <td className="px-5 py-3 text-right font-bold text-amber-warm">{fmtBRL(o.total)}</td>
                       </tr>
@@ -213,34 +312,38 @@ function DashboardPage() {
 }
 
 function KpiCard({
-  label, value, sub, accent,
+  label, value, sub, accent, active, onClick,
 }: {
   label: string; value: string; sub: string;
-  accent: "ember" | "emerald" | "amber" | "violet";
+  accent: "ember" | "emerald" | "amber" | "violet" | "red";
+  active?: boolean; onClick?: () => void;
 }) {
   const accentCls = {
     ember: "from-ember/30 to-transparent",
     emerald: "from-emerald-500/30 to-transparent",
     amber: "from-amber-warm/30 to-transparent",
     violet: "from-violet-500/30 to-transparent",
+    red: "from-red-500/30 to-transparent",
   }[accent];
+  const Comp = onClick ? "button" : "div";
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className={`relative rounded-2xl border border-white/10 bg-neutral-900 p-5 overflow-hidden`}
+      initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+      className={`relative rounded-2xl border bg-neutral-900 p-4 overflow-hidden text-left transition ${active ? "border-amber-warm/60 shadow-tv-glow" : "border-white/10"}`}
     >
-      <div className={`absolute inset-0 bg-gradient-to-br ${accentCls} opacity-60 pointer-events-none`} />
-      <div className="relative">
-        <div className="text-[10px] uppercase tracking-widest text-white/50">{label}</div>
-        <div className="text-3xl font-black mt-1 tabular-nums">{value}</div>
-        <div className="text-xs text-white/50 mt-1">{sub}</div>
-      </div>
+      <Comp onClick={onClick} className="block w-full text-left">
+        <div className={`absolute inset-0 bg-gradient-to-br ${accentCls} opacity-60 pointer-events-none`} />
+        <div className="relative">
+          <div className="text-[10px] uppercase tracking-widest text-white/50">{label}</div>
+          <div className="text-2xl font-black mt-1 tabular-nums">{value}</div>
+          <div className="text-[11px] text-white/50 mt-1">{sub}</div>
+        </div>
+      </Comp>
     </motion.div>
   );
 }
 
-function RangeChip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
     <button
       onClick={onClick}
@@ -268,6 +371,8 @@ function EmptyHint({ label }: { label: string }) {
 
 function computeStats(orders: Order[]) {
   const done = orders.filter((o) => o.status === "done");
+  const pending = orders.filter((o) => o.status === "pending").length;
+  const preparing = orders.filter((o) => o.status === "preparing").length;
   const revenue = orders.reduce((a, o) => a + o.total, 0);
   const prepTimes = done.filter((o) => o.doneAt).map((o) => o.doneAt! - o.createdAt);
   const avgPrepMs = prepTimes.length ? prepTimes.reduce((a, b) => a + b, 0) / prepTimes.length : 0;
@@ -289,10 +394,13 @@ function computeStats(orders: Order[]) {
   let peakHour: number | null = null;
   let peak = 0;
   hourly.forEach((v, h) => { if (v > peak) { peak = v; peakHour = h; } });
+  const hourlyData = hourly.map((count, hour) => ({ hour: String(hour).padStart(2, "0"), count }));
 
   return {
     count: orders.length,
     done: done.length,
+    pending,
+    preparing,
     revenue,
     avgTicket: orders.length ? revenue / orders.length : 0,
     avgPrepMs,
@@ -300,11 +408,32 @@ function computeStats(orders: Order[]) {
     uniqueItems: itemMap.size,
     topItems,
     peakHour,
+    hourlyData,
   };
 }
 
-function computeHourly(orders: Order[]): number[] {
-  const arr = new Array(24).fill(0) as number[];
-  for (const o of orders) arr[new Date(o.createdAt).getHours()]++;
-  return arr;
+function computeTrend(orders: Order[], range: Range) {
+  // today / 7d / 30d → diferentes granularidades
+  if (range === "today") {
+    // por hora (24 buckets)
+    const buckets = Array.from({ length: 24 }, (_, h) => ({ label: `${String(h).padStart(2, "0")}h`, revenue: 0, count: 0 }));
+    for (const o of orders) {
+      const h = new Date(o.createdAt).getHours();
+      buckets[h].revenue += o.total;
+      buckets[h].count++;
+    }
+    return { data: buckets, bucketLabel: "por hora" };
+  }
+  const days = range === "7d" ? 7 : range === "30d" ? 30 : 30;
+  const today = startOfDay(new Date());
+  const buckets = Array.from({ length: days }, (_, i) => {
+    const day = today - (days - 1 - i) * 86400000;
+    return { ts: day, label: new Date(day).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }), revenue: 0, count: 0 };
+  });
+  for (const o of orders) {
+    const day = startOfDay(new Date(o.createdAt));
+    const b = buckets.find((x) => x.ts === day);
+    if (b) { b.revenue += o.total; b.count++; }
+  }
+  return { data: buckets, bucketLabel: range === "all" ? "últimos 30 dias" : "por dia" };
 }
