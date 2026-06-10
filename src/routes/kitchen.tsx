@@ -256,6 +256,9 @@ function OrderCard({ order, onStatus, onNotified }: { order: Order; onStatus: (s
         <div>
           <div className="text-3xl font-black">#{order.number}</div>
           <div className="text-sm text-white/70 truncate max-w-[180px]">{order.customer}</div>
+          {order.phone && (
+            <div className="text-[11px] text-emerald-400/80 font-mono mt-0.5">📱 {formatPhoneBR(order.phone.replace(/^55/, ""))}</div>
+          )}
         </div>
         <div className="text-right">
           <div className={`text-xs font-bold uppercase ${
