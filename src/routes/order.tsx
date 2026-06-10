@@ -271,9 +271,10 @@ function OrderPage() {
 }
 
 function CartCard({
-  customer, setCustomer, notes, setNotes, items, total, submitting, onSubmit, embedded,
+  customer, setCustomer, phone, setPhone, notes, setNotes, items, total, submitting, onSubmit, embedded,
 }: {
   customer: string; setCustomer: (s: string) => void;
+  phone: string; setPhone: (s: string) => void;
   notes: string; setNotes: (s: string) => void;
   items: OrderItem[]; total: number; submitting: boolean; onSubmit: () => void;
   embedded?: boolean;
@@ -288,6 +289,18 @@ function CartCard({
         onChange={(e) => setCustomer(e.target.value)}
         maxLength={50}
         placeholder="Como te chamamos?"
+        className="w-full px-3 py-2.5 rounded-xl border border-border focus:border-ember focus:outline-none mb-3 bg-background"
+      />
+
+      <label className="block text-xs font-medium text-muted-foreground mb-1">
+        WhatsApp <span className="text-muted-foreground/60">(opcional — avisamos quando ficar pronto)</span>
+      </label>
+      <input
+        value={phone}
+        onChange={(e) => setPhone(formatPhoneBR(e.target.value))}
+        inputMode="tel"
+        maxLength={16}
+        placeholder="(11) 91234-5678"
         className="w-full px-3 py-2.5 rounded-xl border border-border focus:border-ember focus:outline-none mb-3 bg-background"
       />
 
