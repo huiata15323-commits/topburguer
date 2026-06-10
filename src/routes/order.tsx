@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { MENU, type MenuItem } from "@/lib/menu";
 import { useOrders, type OrderItem } from "@/lib/orders-store";
+import { formatPhoneBR, normalizePhoneBR } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/order")({
   head: () => ({
