@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useOrders } from "@/lib/orders-store";
 import { useExpenses, CATEGORY_LABEL, type ExpenseCategory } from "@/lib/expenses-store";
+import { generateReportPDF } from "@/lib/report-pdf";
 
 export const Route = createFileRoute("/finance")({
   head: () => ({
