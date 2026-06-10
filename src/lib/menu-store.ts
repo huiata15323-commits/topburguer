@@ -5,7 +5,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { MENU as SEED, type MenuItem } from "./menu";
 
-export type EditableMenuItem = MenuItem & { soldOut?: boolean };
+export type EditableMenuItem = MenuItem & {
+  soldOut?: boolean;
+  /** Estoque disponível hoje. `undefined` = sem controle (ilimitado). */
+  stock?: number;
+};
 
 const STORAGE_KEY = "fast-order:menu";
 const CHANNEL = "fast-order:menu-channel";
@@ -100,11 +104,56 @@ export function useMenu() {
     [persist]
   );
 
+  const setStock = useCallback(
+    (id: string, stock: number | undefined) => {
+      persist(
+        read().map((m) =>
+          m.id === id
+            ? {
+                ...m,
+                stock,
+                // Se definir estoque > 0, sai de esgotado; se 0, marca esgotado.
+                soldOut: stock === undefined ? m.soldOut : stock <= 0,
+              }
+            : m
+        )
+      );
+    },
+    [persist]
+  );
+
+  /** Decrementa estoque dos itens vendidos. Marca soldOut quando chega a 0.
+   *  Não-bloqueante: itens sem controle de estoque (stock === undefined) são ignorados. */
+  const decrementStock = useCallback(
+    (sold: { menuId: string; quantity: number }[]) => {
+      const current = read();
+      let changed = false;
+      const next = current.map((m) => {
+        const s = sold.find((x) => x.menuId === m.id);
+        if (!s || m.stock === undefined) return m;
+        changed = true;
+        const newStock = Math.max(0, m.stock - s.quantity);
+        return { ...m, stock: newStock, soldOut: newStock <= 0 ? true : m.soldOut };
+      });
+      if (changed) persist(next);
+    },
+    [persist]
+  );
+
   const resetToDefaults = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY);
     setItems(SEED);
     broadcast();
   }, [broadcast]);
 
-  return { items, addItem, updateItem, removeItem, toggleSoldOut, resetToDefaults };
+  return {
+    items,
+    addItem,
+    updateItem,
+    removeItem,
+    toggleSoldOut,
+    setStock,
+    decrementStock,
+    resetToDefaults,
+  };
 }
