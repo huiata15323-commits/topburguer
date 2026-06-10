@@ -7,6 +7,7 @@ import { type MenuItem } from "@/lib/menu";
 import { useMenu } from "@/lib/menu-store";
 import { useOrders, estimateWaitMinutes, type OrderItem } from "@/lib/orders-store";
 import { formatPhoneBR, normalizePhoneBR } from "@/lib/whatsapp";
+import { PaymentModal } from "@/components/PaymentModal";
 
 const search = z.object({
   mesa: z.coerce.number().int().positive().max(999).optional().catch(undefined),
