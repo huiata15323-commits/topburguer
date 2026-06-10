@@ -252,6 +252,17 @@ function StatusPage() {
                 </div>
               </div>
 
+              {/* Avaliação pós-retirada (somente quando pronto) */}
+              {order.status === "done" && (
+                <RatingCard
+                  order={order}
+                  onRate={(stars, review) => {
+                    rateOrder(order.id, stars, review);
+                    toast.success("Obrigado pela avaliação! ⭐");
+                  }}
+                />
+              )}
+
               {/* Items */}
               <div className="rounded-3xl bg-card border border-border p-6 shadow-card-soft">
                 <h3 className="font-bold mb-4">Seu pedido</h3>
