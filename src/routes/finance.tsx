@@ -24,7 +24,7 @@ type Range = "today" | "7d" | "30d" | "all";
 
 function FinancePage() {
   const { orders } = useOrders();
-  const { expenses, addExpense, removeExpense } = useExpenses();
+  const { expenses, addExpense, removeExpense, clearAll } = useExpenses();
   const [range, setRange] = useState<Range>("today");
 
   // form
