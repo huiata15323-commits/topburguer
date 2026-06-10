@@ -50,6 +50,16 @@ function PainelPage() {
   const lastReadyIds = useRef<Set<string>>(new Set());
   const lastWaiterIds = useRef<Set<string>>(new Set());
   const [, force] = useState(0);
+  const [voiceOn, setVoiceOn] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    return localStorage.getItem("painel.voice") !== "off";
+  });
+
+  useEffect(() => { initVoice(); }, []);
+  useEffect(() => {
+    if (typeof window !== "undefined")
+      localStorage.setItem("painel.voice", voiceOn ? "on" : "off");
+  }, [voiceOn]);
 
   // tick para timer
   useEffect(() => {
@@ -76,9 +86,18 @@ function PainelPage() {
           o.stop(ctx.currentTime + i * 0.16 + 0.18);
         });
       } catch {}
+      // Anúncio por voz logo após o sino
+      if (voiceOn) {
+        const newOrders = newOnes
+          .map((id) => orders.find((o) => o.id === id))
+          .filter((o): o is Order => !!o);
+        newOrders.forEach((o, i) => {
+          setTimeout(() => announceReady(o.number, o.tableNumber, o.customer), 700 + i * 2200);
+        });
+      }
     }
     lastReadyIds.current = readyIds;
-  }, [orders]);
+  }, [orders, voiceOn]);
 
   // Som distinto quando alguém chama o atendente
   const waiterCalls = useMemo(
@@ -102,9 +121,17 @@ function PainelPage() {
           o.stop(ctx.currentTime + i * 0.22 + 0.2);
         });
       } catch {}
+      if (voiceOn) {
+        const news = newOnes
+          .map((id) => waiterCalls.find((o) => o.id === id))
+          .filter((o): o is Order => !!o);
+        news.forEach((o, i) => {
+          setTimeout(() => announceWaiter(o.tableNumber), 500 + i * 2000);
+        });
+      }
     }
     lastWaiterIds.current = ids;
-  }, [waiterCalls]);
+  }, [waiterCalls, voiceOn]);
 
   const ready = useMemo(
     () => orders.filter((o) => o.status === "done").sort((a, b) => (b.doneAt ?? 0) - (a.doneAt ?? 0)),
