@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { z } from "zod";
 import { useOrders, type Order } from "@/lib/orders-store";
 import { useMenu, type EditableMenuItem } from "@/lib/menu-store";
+import { initVoice, announceReady, announceWaiter, speak } from "@/lib/voice";
 
 const search = z.object({
   view: z.enum(["all", "ready", "preparing"]).optional().default("all").catch("all"),
@@ -49,6 +50,16 @@ function PainelPage() {
   const lastReadyIds = useRef<Set<string>>(new Set());
   const lastWaiterIds = useRef<Set<string>>(new Set());
   const [, force] = useState(0);
+  const [voiceOn, setVoiceOn] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    return localStorage.getItem("painel.voice") !== "off";
+  });
+
+  useEffect(() => { initVoice(); }, []);
+  useEffect(() => {
+    if (typeof window !== "undefined")
+      localStorage.setItem("painel.voice", voiceOn ? "on" : "off");
+  }, [voiceOn]);
 
   // tick para timer
   useEffect(() => {
@@ -75,9 +86,18 @@ function PainelPage() {
           o.stop(ctx.currentTime + i * 0.16 + 0.18);
         });
       } catch {}
+      // Anúncio por voz logo após o sino
+      if (voiceOn) {
+        const newOrders = newOnes
+          .map((id) => orders.find((o) => o.id === id))
+          .filter((o): o is Order => !!o);
+        newOrders.forEach((o, i) => {
+          setTimeout(() => announceReady(o.number, o.tableNumber, o.customer), 700 + i * 2200);
+        });
+      }
     }
     lastReadyIds.current = readyIds;
-  }, [orders]);
+  }, [orders, voiceOn]);
 
   // Som distinto quando alguém chama o atendente
   const waiterCalls = useMemo(
@@ -101,9 +121,17 @@ function PainelPage() {
           o.stop(ctx.currentTime + i * 0.22 + 0.2);
         });
       } catch {}
+      if (voiceOn) {
+        const news = newOnes
+          .map((id) => waiterCalls.find((o) => o.id === id))
+          .filter((o): o is Order => !!o);
+        news.forEach((o, i) => {
+          setTimeout(() => announceWaiter(o.tableNumber), 500 + i * 2000);
+        });
+      }
     }
     lastWaiterIds.current = ids;
-  }, [waiterCalls]);
+  }, [waiterCalls, voiceOn]);
 
   const ready = useMemo(
     () => orders.filter((o) => o.status === "done").sort((a, b) => (b.doneAt ?? 0) - (a.doneAt ?? 0)),
@@ -154,10 +182,27 @@ function PainelPage() {
           <FilterChip active={view === "preparing"} onClick={() => setView("preparing")} label="Em preparo" count={preparing.length} tone="amber" />
         </nav>
 
-        <div className="text-right shrink-0">
-          <div className="text-2xl sm:text-3xl font-black tabular-nums">{new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</div>
-          <div className="text-[10px] uppercase tracking-widest text-white/40 hidden sm:block">
-            {new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" })}
+        <div className="flex items-center gap-3 shrink-0">
+          <button
+            onClick={() => {
+              const next = !voiceOn;
+              setVoiceOn(next);
+              if (next) speak("Anúncios de voz ativados.");
+            }}
+            title={voiceOn ? "Desativar anúncios de voz" : "Ativar anúncios de voz"}
+            className={`grid place-items-center w-10 h-10 rounded-xl border transition ${
+              voiceOn
+                ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-300"
+                : "bg-white/5 border-white/10 text-white/40"
+            }`}
+          >
+            {voiceOn ? "🔊" : "🔇"}
+          </button>
+          <div className="text-right">
+            <div className="text-2xl sm:text-3xl font-black tabular-nums">{new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</div>
+            <div className="text-[10px] uppercase tracking-widest text-white/40 hidden sm:block">
+              {new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" })}
+            </div>
           </div>
         </div>
       </header>
