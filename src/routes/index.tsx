@@ -31,9 +31,13 @@ function Landing() {
           <div className="w-9 h-9 rounded-xl bg-gradient-ember grid place-items-center font-black text-lg shadow-ember">T</div>
           <span className="font-black tracking-tight">Top Burguer</span>
         </div>
-        <div className="hidden md:flex items-center gap-2 text-xs">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-live" />
-          <span className="text-white/60 uppercase tracking-widest">Sistema online</span>
+        <div className="flex items-center gap-3 text-xs">
+          <Link to="/dashboard" className="hidden sm:inline text-white/60 hover:text-amber-warm transition">📊 Dashboard</Link>
+          <Link to="/finance" className="hidden sm:inline text-white/60 hover:text-amber-warm transition">💰 Financeiro</Link>
+          <div className="hidden md:flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-live" />
+            <span className="text-white/60 uppercase tracking-widest">Sistema online</span>
+          </div>
         </div>
       </nav>
 
