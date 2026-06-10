@@ -107,10 +107,17 @@ function OrderPage() {
             <div className="w-9 h-9 rounded-xl bg-gradient-ember grid place-items-center font-black shadow-ember">T</div>
             <div>
               <div className="font-black leading-none">Top Burguer</div>
-              <div className="text-[10px] text-amber-warm uppercase tracking-widest">Faça seu pedido</div>
+              <div className="text-[10px] text-amber-warm uppercase tracking-widest">
+                {mesa ? `Mesa ${mesa} · Faça seu pedido` : "Faça seu pedido"}
+              </div>
             </div>
           </Link>
           <div className="flex items-center gap-3 text-xs">
+            {mesa && (
+              <span className="px-2.5 py-1 rounded-full bg-amber-warm text-charcoal font-black text-[11px]">
+                🪑 MESA {mesa}
+              </span>
+            )}
             <Link to="/status" className="text-white/70 hover:text-amber-warm">Status</Link>
             <Link to="/kitchen" className="text-white/70 hover:text-amber-warm">Cozinha</Link>
           </div>
