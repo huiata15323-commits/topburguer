@@ -1,7 +1,14 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useOrders, type Order } from "@/lib/orders-store";
+import {
+  ensureServiceWorker,
+  getPermission,
+  notifyOrderReady,
+  requestPermission,
+  type PermissionState,
+} from "@/lib/push-notify";
 import { z } from "zod";
 
 const search = z.object({ n: z.coerce.number().int().positive().optional() });
@@ -40,6 +47,30 @@ function StatusPage() {
     const i = setInterval(() => force((x) => x + 1), 5000);
     return () => clearInterval(i);
   }, []);
+
+  // ===== Notificações automáticas (Web Push local) =====
+  const [perm, setPerm] = useState<PermissionState>("default");
+  const notifiedRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    setPerm(getPermission());
+    if (getPermission() === "granted") void ensureServiceWorker();
+  }, []);
+
+  // Dispara notificação automaticamente quando o pedido acompanhado vira "done"
+  useEffect(() => {
+    if (!order) return;
+    if (order.status !== "done") return;
+    if (perm !== "granted") return;
+    if (notifiedRef.current.has(order.id)) return;
+    notifiedRef.current.add(order.id);
+    void notifyOrderReady(order.number);
+  }, [order?.status, order?.id, order?.number, perm]);
+
+  const handleEnableNotifications = async () => {
+    const res = await requestPermission();
+    setPerm(res);
+  };
 
   const stepIndex = order ? STEPS.findIndex((s) => s.key === order.status) : -1;
 
@@ -105,6 +136,55 @@ function StatusPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Banner de notificação automática */}
+              {order.status !== "done" && perm !== "unsupported" && (
+                <div
+                  className={`rounded-2xl border p-4 flex items-center gap-3 ${
+                    perm === "granted"
+                      ? "border-emerald-500/30 bg-emerald-500/10"
+                      : perm === "denied"
+                      ? "border-red-500/30 bg-red-500/10"
+                      : "border-amber-warm/40 bg-amber-warm/10"
+                  }`}
+                >
+                  <div className="text-2xl">
+                    {perm === "granted" ? "🔔" : perm === "denied" ? "🔕" : "📲"}
+                  </div>
+                  <div className="flex-1 text-sm">
+                    {perm === "granted" ? (
+                      <>
+                        <div className="font-bold">Notificações ativas</div>
+                        <div className="text-muted-foreground">
+                          Avisaremos automaticamente quando seu pedido ficar pronto — mesmo com a tela bloqueada.
+                        </div>
+                      </>
+                    ) : perm === "denied" ? (
+                      <>
+                        <div className="font-bold">Notificações bloqueadas</div>
+                        <div className="text-muted-foreground">
+                          Libere notificações para este site nas configurações do navegador para receber o aviso automático.
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="font-bold">Receba aviso automático quando ficar pronto</div>
+                        <div className="text-muted-foreground">
+                          Sem custo, sem app — direto no seu navegador.
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  {perm === "default" && (
+                    <button
+                      onClick={handleEnableNotifications}
+                      className="shrink-0 px-4 py-2 rounded-xl bg-gradient-ember text-ember-foreground font-bold shadow-ember text-sm"
+                    >
+                      Ativar
+                    </button>
+                  )}
+                </div>
+              )}
 
               {/* Progress steps */}
               <div className="rounded-3xl bg-card border border-border p-6 shadow-card-soft">
