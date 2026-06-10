@@ -1,6 +1,8 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import confetti from "canvas-confetti";
+import { toast } from "sonner";
 import { useOrders, type Order } from "@/lib/orders-store";
 import {
   ensureServiceWorker,
@@ -33,7 +35,7 @@ const STEPS = [
 function StatusPage() {
   const { n } = useSearch({ from: "/status" });
   const navigate = useNavigate({ from: "/status" });
-  const { orders } = useOrders();
+  const { orders, rateOrder } = useOrders();
   const [input, setInput] = useState(n ? String(n) : "");
 
   const order: Order | undefined = useMemo(
@@ -57,14 +59,30 @@ function StatusPage() {
     if (getPermission() === "granted") void ensureServiceWorker();
   }, []);
 
-  // Dispara notificação automaticamente quando o pedido acompanhado vira "done"
+  // Dispara notificação + confete automaticamente quando o pedido acompanhado vira "done"
+  const confettiFiredRef = useRef<Set<string>>(new Set());
   useEffect(() => {
     if (!order) return;
     if (order.status !== "done") return;
-    if (perm !== "granted") return;
     if (notifiedRef.current.has(order.id)) return;
     notifiedRef.current.add(order.id);
-    void notifyOrderReady(order.number);
+    if (perm === "granted") void notifyOrderReady(order.number);
+    if (!confettiFiredRef.current.has(order.id)) {
+      confettiFiredRef.current.add(order.id);
+      const fire = (origin: { x: number; y: number }) => {
+        confetti({
+          particleCount: 80,
+          spread: 75,
+          startVelocity: 45,
+          origin,
+          colors: ["#ff7a1a", "#ffb347", "#ffd54f", "#fff7ed", "#10b981"],
+          ticks: 220,
+        });
+      };
+      fire({ x: 0.25, y: 0.4 });
+      setTimeout(() => fire({ x: 0.75, y: 0.4 }), 200);
+      setTimeout(() => fire({ x: 0.5, y: 0.3 }), 400);
+    }
   }, [order?.status, order?.id, order?.number, perm]);
 
   const handleEnableNotifications = async () => {
@@ -234,6 +252,17 @@ function StatusPage() {
                 </div>
               </div>
 
+              {/* Avaliação pós-retirada (somente quando pronto) */}
+              {order.status === "done" && (
+                <RatingCard
+                  order={order}
+                  onRate={(stars, review) => {
+                    rateOrder(order.id, stars, review);
+                    toast.success("Obrigado pela avaliação! ⭐");
+                  }}
+                />
+              )}
+
               {/* Items */}
               <div className="rounded-3xl bg-card border border-border p-6 shadow-card-soft">
                 <h3 className="font-bold mb-4">Seu pedido</h3>
@@ -297,6 +326,86 @@ function NotFound({ n }: { n: number }) {
     >
       <div className="text-6xl mb-4">😕</div>
       <p className="text-muted-foreground">Pedido #{n} não encontrado.</p>
+    </motion.div>
+  );
+}
+
+function RatingCard({ order, onRate }: { order: Order; onRate: (stars: number, review?: string) => void }) {
+  const [hover, setHover] = useState(0);
+  const [picked, setPicked] = useState(order.rating ?? 0);
+  const [review, setReview] = useState(order.review ?? "");
+  const submitted = !!order.rating;
+
+  if (submitted) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="rounded-3xl bg-gradient-to-br from-emerald-500/15 via-emerald-500/5 to-transparent border border-emerald-500/30 p-6 text-center"
+      >
+        <div className="text-4xl mb-2">🙏</div>
+        <h3 className="font-black text-lg">Avaliação enviada!</h3>
+        <div className="mt-2 flex justify-center gap-1 text-3xl">
+          {[1, 2, 3, 4, 5].map((s) => (
+            <span key={s} className={s <= (order.rating ?? 0) ? "text-amber-warm" : "text-muted/40"}>★</span>
+          ))}
+        </div>
+        {order.review && (
+          <p className="mt-3 text-sm text-muted-foreground italic">"{order.review}"</p>
+        )}
+      </motion.div>
+    );
+  }
+
+  const labels = ["", "Ruim", "Mais ou menos", "Bom", "Muito bom", "Excelente!"];
+  const showing = hover || picked;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="rounded-3xl bg-card border-2 border-amber-warm/30 p-6 shadow-card-soft"
+    >
+      <h3 className="font-black text-lg flex items-center gap-2">
+        <span className="text-2xl">⭐</span> Como foi sua experiência?
+      </h3>
+      <p className="text-sm text-muted-foreground mt-1">Sua opinião nos ajuda a melhorar.</p>
+
+      <div className="flex justify-center gap-1 mt-4">
+        {[1, 2, 3, 4, 5].map((s) => (
+          <button
+            key={s}
+            onMouseEnter={() => setHover(s)}
+            onMouseLeave={() => setHover(0)}
+            onClick={() => setPicked(s)}
+            className={`text-5xl transition-all hover:scale-125 active:scale-110 ${
+              s <= showing ? "text-amber-warm drop-shadow-[0_0_8px_rgba(255,167,38,0.5)]" : "text-muted/40 hover:text-amber-warm/60"
+            }`}
+            aria-label={`${s} estrelas`}
+          >
+            ★
+          </button>
+        ))}
+      </div>
+      <div className="text-center text-sm font-bold text-amber-warm mt-2 h-5">
+        {showing > 0 ? labels[showing] : "Toque nas estrelas"}
+      </div>
+
+      <textarea
+        value={review}
+        onChange={(e) => setReview(e.target.value.slice(0, 300))}
+        rows={2}
+        placeholder="Conte como foi (opcional)…"
+        className="mt-4 w-full px-3 py-2 text-sm rounded-xl border border-border bg-background focus:border-ember focus:outline-none resize-none"
+      />
+
+      <button
+        onClick={() => picked > 0 && onRate(picked, review.trim() || undefined)}
+        disabled={picked === 0}
+        className="mt-3 w-full py-3 rounded-2xl bg-gradient-ember text-ember-foreground font-bold shadow-ember disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        Enviar avaliação
+      </button>
     </motion.div>
   );
 }

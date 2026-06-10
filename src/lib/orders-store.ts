@@ -26,6 +26,9 @@ export type Order = {
   createdAt: number;
   doneAt?: number;
   notifiedAt?: number;
+  rating?: number; // 1-5
+  review?: string;
+  ratedAt?: number;
 };
 
 const STORAGE_KEY = "fast-order:orders";
@@ -120,6 +123,20 @@ export function useOrders() {
     [broadcast]
   );
 
+  const rateOrder = useCallback(
+    (id: string, rating: number, review?: string) => {
+      const next = read().map((o) =>
+        o.id === id
+          ? { ...o, rating: Math.max(1, Math.min(5, Math.round(rating))), review: review?.slice(0, 300), ratedAt: Date.now() }
+          : o
+      );
+      write(next);
+      setOrders(next);
+      broadcast();
+    },
+    [broadcast]
+  );
+
   const clearDone = useCallback(() => {
     const next = read().filter((o) => o.status !== "done");
     write(next);
@@ -134,5 +151,5 @@ export function useOrders() {
     broadcast();
   }, [broadcast]);
 
-  return { orders, addOrder, updateStatus, markNotified, clearDone, clearAll };
+  return { orders, addOrder, updateStatus, markNotified, rateOrder, clearDone, clearAll };
 }

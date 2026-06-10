@@ -32,6 +32,8 @@ function Landing() {
           <span className="font-black tracking-tight">Top Burguer</span>
         </div>
         <div className="flex items-center gap-3 text-xs">
+          <Link to="/admin" className="hidden sm:inline text-white/60 hover:text-amber-warm transition">⚙️ Admin</Link>
+          <Link to="/painel" className="hidden sm:inline text-white/60 hover:text-amber-warm transition">📺 Painel</Link>
           <Link to="/dashboard" className="hidden sm:inline text-white/60 hover:text-amber-warm transition">📊 Dashboard</Link>
           <Link to="/finance" className="hidden sm:inline text-white/60 hover:text-amber-warm transition">💰 Financeiro</Link>
           <div className="hidden md:flex items-center gap-2">

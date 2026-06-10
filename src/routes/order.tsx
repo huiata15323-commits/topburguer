@@ -2,7 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { MENU, type MenuItem } from "@/lib/menu";
+import { type MenuItem } from "@/lib/menu";
+import { useMenu } from "@/lib/menu-store";
 import { useOrders, type OrderItem } from "@/lib/orders-store";
 import { formatPhoneBR, normalizePhoneBR } from "@/lib/whatsapp";
 
@@ -26,6 +27,7 @@ type CartEntry = { qty: number; notes?: string };
 
 function OrderPage() {
   const { addOrder } = useOrders();
+  const { items: menu } = useMenu();
   const navigate = useNavigate();
   const [cart, setCart] = useState<Record<string, CartEntry>>({});
   const [customer, setCustomer] = useState("");
@@ -34,16 +36,16 @@ function OrderPage() {
   const [submitting, setSubmitting] = useState(false);
   const [activeCat, setActiveCat] = useState<MenuItem["category"]>("burger");
 
-  const items: OrderItem[] = useMemo(
-    () =>
-      Object.entries(cart)
-        .filter(([, e]) => e.qty > 0)
-        .map(([id, e]) => {
-          const m = MENU.find((x) => x.id === id)!;
-          return { menuId: m.id, name: m.name, emoji: m.emoji, image: m.image, price: m.price, quantity: e.qty, notes: e.notes };
-        }),
-    [cart]
-  );
+  const items: OrderItem[] = useMemo(() => {
+    const out: OrderItem[] = [];
+    for (const [id, e] of Object.entries(cart)) {
+      if (!e || e.qty <= 0) continue;
+      const m = menu.find((x) => x.id === id);
+      if (!m) continue;
+      out.push({ menuId: m.id, name: m.name, emoji: m.emoji, image: m.image, price: m.price, quantity: e.qty, notes: e.notes });
+    }
+    return out;
+  }, [cart, menu]);
 
   const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
   const itemCount = items.reduce((s, i) => s + i.quantity, 0);
@@ -131,9 +133,10 @@ function OrderPage() {
                 <span className="text-2xl">{cat.emoji}</span> {cat.label}
               </h2>
               <div className="grid gap-3 sm:grid-cols-2">
-                {MENU.filter((m) => m.category === cat.key).map((m, i) => {
+                {menu.filter((m) => m.category === cat.key).map((m, i) => {
                   const entry = cart[m.id];
                   const q = entry?.qty || 0;
+                  const soldOut = m.soldOut;
                   return (
                     <motion.div
                       key={m.id}
@@ -142,7 +145,9 @@ function OrderPage() {
                       viewport={{ once: true, margin: "-50px" }}
                       transition={{ delay: i * 0.05, duration: 0.4 }}
                       className={`group rounded-3xl bg-card border transition-all overflow-hidden flex flex-col ${
-                        q > 0
+                        soldOut
+                          ? "border-border opacity-60"
+                          : q > 0
                           ? "border-ember shadow-ember"
                           : "border-border hover:border-ember/40 hover:shadow-card-soft"
                       }`}
@@ -154,9 +159,18 @@ function OrderPage() {
                           loading="lazy"
                           width={512}
                           height={384}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          className={`w-full h-full object-cover transition-transform duration-500 ${
+                            soldOut ? "grayscale" : "group-hover:scale-105"
+                          }`}
                         />
-                        {q > 0 && (
+                        {soldOut && (
+                          <div className="absolute inset-0 bg-black/55 grid place-items-center">
+                            <span className="px-3 py-1 rounded-full bg-red-500 text-white text-xs font-black uppercase tracking-widest">
+                              Esgotado hoje
+                            </span>
+                          </div>
+                        )}
+                        {!soldOut && q > 0 && (
                           <motion.div
                             initial={{ scale: 0 }} animate={{ scale: 1 }}
                             className="absolute top-3 right-3 w-8 h-8 rounded-full bg-ember text-ember-foreground grid place-items-center font-black shadow-ember"
@@ -174,7 +188,7 @@ function OrderPage() {
                           <p className="text-ember font-black text-lg">R$ {m.price.toFixed(2)}</p>
                           <div className="flex items-center gap-1.5">
                             <AnimatePresence>
-                              {q > 0 && (
+                              {q > 0 && !soldOut && (
                                 <motion.button
                                   key="dec"
                                   initial={{ opacity: 0, scale: 0.5 }}
@@ -188,10 +202,11 @@ function OrderPage() {
                                 </motion.button>
                               )}
                             </AnimatePresence>
-                            {q > 0 && <span className="w-6 text-center font-bold">{q}</span>}
+                            {q > 0 && !soldOut && <span className="w-6 text-center font-bold">{q}</span>}
                             <button
-                              onClick={() => inc(m.id)}
-                              className="w-9 h-9 rounded-full bg-gradient-ember text-ember-foreground hover:scale-110 font-bold transition-transform active:scale-90 shadow-ember"
+                              onClick={() => !soldOut && inc(m.id)}
+                              disabled={soldOut}
+                              className="w-9 h-9 rounded-full bg-gradient-ember text-ember-foreground hover:scale-110 font-bold transition-transform active:scale-90 shadow-ember disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
                               aria-label="Adicionar"
                             >
                               +
