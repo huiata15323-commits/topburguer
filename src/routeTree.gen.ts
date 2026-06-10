@@ -11,10 +11,12 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StatusRouteImport } from './routes/status'
 import { Route as ReceiptRouteImport } from './routes/receipt'
+import { Route as PainelRouteImport } from './routes/painel'
 import { Route as OrderRouteImport } from './routes/order'
 import { Route as KitchenRouteImport } from './routes/kitchen'
 import { Route as FinanceRouteImport } from './routes/finance'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 
 const StatusRoute = StatusRouteImport.update({
@@ -25,6 +27,11 @@ const StatusRoute = StatusRouteImport.update({
 const ReceiptRoute = ReceiptRouteImport.update({
   id: '/receipt',
   path: '/receipt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PainelRoute = PainelRouteImport.update({
+  id: '/painel',
+  path: '/painel',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OrderRoute = OrderRouteImport.update({
@@ -47,6 +54,11 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -55,29 +67,35 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/dashboard': typeof DashboardRoute
   '/finance': typeof FinanceRoute
   '/kitchen': typeof KitchenRoute
   '/order': typeof OrderRoute
+  '/painel': typeof PainelRoute
   '/receipt': typeof ReceiptRoute
   '/status': typeof StatusRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/dashboard': typeof DashboardRoute
   '/finance': typeof FinanceRoute
   '/kitchen': typeof KitchenRoute
   '/order': typeof OrderRoute
+  '/painel': typeof PainelRoute
   '/receipt': typeof ReceiptRoute
   '/status': typeof StatusRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/dashboard': typeof DashboardRoute
   '/finance': typeof FinanceRoute
   '/kitchen': typeof KitchenRoute
   '/order': typeof OrderRoute
+  '/painel': typeof PainelRoute
   '/receipt': typeof ReceiptRoute
   '/status': typeof StatusRoute
 }
@@ -85,38 +103,46 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/dashboard'
     | '/finance'
     | '/kitchen'
     | '/order'
+    | '/painel'
     | '/receipt'
     | '/status'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/dashboard'
     | '/finance'
     | '/kitchen'
     | '/order'
+    | '/painel'
     | '/receipt'
     | '/status'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/dashboard'
     | '/finance'
     | '/kitchen'
     | '/order'
+    | '/painel'
     | '/receipt'
     | '/status'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   DashboardRoute: typeof DashboardRoute
   FinanceRoute: typeof FinanceRoute
   KitchenRoute: typeof KitchenRoute
   OrderRoute: typeof OrderRoute
+  PainelRoute: typeof PainelRoute
   ReceiptRoute: typeof ReceiptRoute
   StatusRoute: typeof StatusRoute
 }
@@ -135,6 +161,13 @@ declare module '@tanstack/react-router' {
       path: '/receipt'
       fullPath: '/receipt'
       preLoaderRoute: typeof ReceiptRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/painel': {
+      id: '/painel'
+      path: '/painel'
+      fullPath: '/painel'
+      preLoaderRoute: typeof PainelRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/order': {
@@ -165,6 +198,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -177,13 +217,25 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   DashboardRoute: DashboardRoute,
   FinanceRoute: FinanceRoute,
   KitchenRoute: KitchenRoute,
   OrderRoute: OrderRoute,
+  PainelRoute: PainelRoute,
   ReceiptRoute: ReceiptRoute,
   StatusRoute: StatusRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
