@@ -222,6 +222,7 @@ function OrderPage() {
         <aside className="hidden lg:block lg:sticky lg:top-32 lg:self-start">
           <CartCard
             customer={customer} setCustomer={setCustomer}
+            phone={phone} setPhone={setPhone}
             notes={notes} setNotes={setNotes}
             items={items} total={total} submitting={submitting} onSubmit={submit}
           />
@@ -255,6 +256,7 @@ function OrderPage() {
               <div className="p-4 pt-0 max-h-[60vh] overflow-y-auto">
                 <CartCard
                   customer={customer} setCustomer={setCustomer}
+                  phone={phone} setPhone={setPhone}
                   notes={notes} setNotes={setNotes}
                   items={items} total={total} submitting={submitting} onSubmit={submit}
                   embedded
