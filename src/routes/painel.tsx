@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { z } from "zod";
 import { useOrders, type Order } from "@/lib/orders-store";
 import { useMenu, type EditableMenuItem } from "@/lib/menu-store";
+import { initVoice, announceReady, announceWaiter, speak } from "@/lib/voice";
 
 const search = z.object({
   view: z.enum(["all", "ready", "preparing"]).optional().default("all").catch("all"),
