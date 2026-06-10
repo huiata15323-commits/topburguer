@@ -329,3 +329,83 @@ function NotFound({ n }: { n: number }) {
     </motion.div>
   );
 }
+
+function RatingCard({ order, onRate }: { order: Order; onRate: (stars: number, review?: string) => void }) {
+  const [hover, setHover] = useState(0);
+  const [picked, setPicked] = useState(order.rating ?? 0);
+  const [review, setReview] = useState(order.review ?? "");
+  const submitted = !!order.rating;
+
+  if (submitted) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="rounded-3xl bg-gradient-to-br from-emerald-500/15 via-emerald-500/5 to-transparent border border-emerald-500/30 p-6 text-center"
+      >
+        <div className="text-4xl mb-2">🙏</div>
+        <h3 className="font-black text-lg">Avaliação enviada!</h3>
+        <div className="mt-2 flex justify-center gap-1 text-3xl">
+          {[1, 2, 3, 4, 5].map((s) => (
+            <span key={s} className={s <= (order.rating ?? 0) ? "text-amber-warm" : "text-muted/40"}>★</span>
+          ))}
+        </div>
+        {order.review && (
+          <p className="mt-3 text-sm text-muted-foreground italic">"{order.review}"</p>
+        )}
+      </motion.div>
+    );
+  }
+
+  const labels = ["", "Ruim", "Mais ou menos", "Bom", "Muito bom", "Excelente!"];
+  const showing = hover || picked;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="rounded-3xl bg-card border-2 border-amber-warm/30 p-6 shadow-card-soft"
+    >
+      <h3 className="font-black text-lg flex items-center gap-2">
+        <span className="text-2xl">⭐</span> Como foi sua experiência?
+      </h3>
+      <p className="text-sm text-muted-foreground mt-1">Sua opinião nos ajuda a melhorar.</p>
+
+      <div className="flex justify-center gap-1 mt-4">
+        {[1, 2, 3, 4, 5].map((s) => (
+          <button
+            key={s}
+            onMouseEnter={() => setHover(s)}
+            onMouseLeave={() => setHover(0)}
+            onClick={() => setPicked(s)}
+            className={`text-5xl transition-all hover:scale-125 active:scale-110 ${
+              s <= showing ? "text-amber-warm drop-shadow-[0_0_8px_rgba(255,167,38,0.5)]" : "text-muted/40 hover:text-amber-warm/60"
+            }`}
+            aria-label={`${s} estrelas`}
+          >
+            ★
+          </button>
+        ))}
+      </div>
+      <div className="text-center text-sm font-bold text-amber-warm mt-2 h-5">
+        {showing > 0 ? labels[showing] : "Toque nas estrelas"}
+      </div>
+
+      <textarea
+        value={review}
+        onChange={(e) => setReview(e.target.value.slice(0, 300))}
+        rows={2}
+        placeholder="Conte como foi (opcional)…"
+        className="mt-4 w-full px-3 py-2 text-sm rounded-xl border border-border bg-background focus:border-ember focus:outline-none resize-none"
+      />
+
+      <button
+        onClick={() => picked > 0 && onRate(picked, review.trim() || undefined)}
+        disabled={picked === 0}
+        className="mt-3 w-full py-3 rounded-2xl bg-gradient-ember text-ember-foreground font-bold shadow-ember disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        Enviar avaliação
+      </button>
+    </motion.div>
+  );
+}
