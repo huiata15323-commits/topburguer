@@ -73,6 +73,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "theme-color", content: "#ff7a1a" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-title", content: "Top Burguer" },
       { title: "Lovable App" },
       { name: "description", content: "Fast Burger Orders is a web application for burger joints that streamlines order taking and kitchen display." },
       { name: "author", content: "Lovable" },
@@ -87,10 +90,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/6cc9bce8-513d-48bc-b2c6-00a900ea6be3/id-preview-67193cac--e71c1bcd-35ca-41e6-a505-76c7cee0a064.lovable.app-1779968521266.png" },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
+      { rel: "stylesheet", href: appCss },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "icon", href: "/favicon.ico" },
     ],
   }),
   shellComponent: RootShell,
