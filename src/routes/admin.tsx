@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useMenu, type EditableMenuItem } from "@/lib/menu-store";
 import { MENU as SEED } from "@/lib/menu";
+import { TableQRGenerator } from "@/components/TableQRGenerator";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -103,8 +104,10 @@ function AdminPage() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-6xl px-4 py-8 grid gap-8 lg:grid-cols-[400px_1fr]">
-        {/* Form */}
+      <div className="mx-auto max-w-6xl px-4 py-8 space-y-8">
+        <TableQRGenerator />
+
+        <div className="grid gap-8 lg:grid-cols-[400px_1fr]">
         <aside className="lg:sticky lg:top-6 lg:self-start">
           <form onSubmit={submit} className="rounded-3xl bg-card border border-border p-5 shadow-card-soft space-y-3">
             <div className="flex items-center justify-between">
@@ -283,6 +286,7 @@ function AdminPage() {
             );
           })}
         </section>
+        </div>
       </div>
     </main>
   );

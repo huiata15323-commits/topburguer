@@ -254,7 +254,14 @@ function OrderCard({ order, onStatus, onNotified }: { order: Order; onStatus: (s
     >
       <div className="flex items-center justify-between">
         <div>
-          <div className="text-3xl font-black">#{order.number}</div>
+          <div className="flex items-center gap-2">
+            <div className="text-3xl font-black">#{order.number}</div>
+            {order.tableNumber && (
+              <span className="px-2 py-0.5 rounded-full bg-amber-warm text-charcoal text-xs font-black tracking-wide">
+                🪑 MESA {order.tableNumber}
+              </span>
+            )}
+          </div>
           <div className="text-sm text-white/70 truncate max-w-[180px]">{order.customer}</div>
           {order.phone && (
             <div className="text-[11px] text-emerald-400/80 font-mono mt-0.5">📱 {formatPhoneBR(order.phone.replace(/^55/, ""))}</div>

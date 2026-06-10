@@ -1,13 +1,19 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { z } from "zod";
 import { type MenuItem } from "@/lib/menu";
 import { useMenu } from "@/lib/menu-store";
 import { useOrders, type OrderItem } from "@/lib/orders-store";
 import { formatPhoneBR, normalizePhoneBR } from "@/lib/whatsapp";
 
+const search = z.object({
+  mesa: z.coerce.number().int().positive().max(999).optional().catch(undefined),
+});
+
 export const Route = createFileRoute("/order")({
+  validateSearch: search,
   head: () => ({
     meta: [
       { title: "Pedido — Fast Order" },
@@ -26,6 +32,7 @@ const CATEGORIES: { key: MenuItem["category"]; label: string; emoji: string }[] 
 type CartEntry = { qty: number; notes?: string };
 
 function OrderPage() {
+  const { mesa } = useSearch({ from: "/order" });
   const { addOrder } = useOrders();
   const { items: menu } = useMenu();
   const navigate = useNavigate();
@@ -56,7 +63,7 @@ function OrderPage() {
   const setItemNotes = (id: string, v: string) =>
     setCart((c) => ({ ...c, [id]: { ...c[id], qty: c[id]?.qty || 0, notes: v.slice(0, 80) } }));
 
-  const submit = () => {
+  const submit = async () => {
     if (!customer.trim()) return toast.error("Informe seu nome");
     if (customer.length > 50) return toast.error("Nome muito longo");
     if (items.length === 0) return toast.error("Adicione ao menos um item");
@@ -70,22 +77,26 @@ function OrderPage() {
     }
 
     setSubmitting(true);
-    const order = addOrder({
-      customer: customer.trim().slice(0, 50),
-      phone: normalized,
-      items,
-      notes: notes.trim().slice(0, 300) || undefined,
-      total,
-    });
-    toast.success(`Pedido #${order.number} enviado! 🔥`);
-    setCart({});
-    setCustomer("");
-    setPhone("");
-    setNotes("");
-    setTimeout(() => {
-      setSubmitting(false);
+    try {
+      const order = await addOrder({
+        customer: customer.trim().slice(0, 50),
+        phone: normalized,
+        tableNumber: mesa,
+        items,
+        notes: notes.trim().slice(0, 300) || undefined,
+        total,
+      });
+      toast.success(`Pedido #${order.number} enviado! 🔥`);
+      setCart({});
+      setCustomer("");
+      setPhone("");
+      setNotes("");
       navigate({ to: "/status", search: { n: order.number } });
-    }, 500);
+    } catch {
+      toast.error("Falha ao enviar pedido. Tente novamente.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -96,10 +107,17 @@ function OrderPage() {
             <div className="w-9 h-9 rounded-xl bg-gradient-ember grid place-items-center font-black shadow-ember">T</div>
             <div>
               <div className="font-black leading-none">Top Burguer</div>
-              <div className="text-[10px] text-amber-warm uppercase tracking-widest">Faça seu pedido</div>
+              <div className="text-[10px] text-amber-warm uppercase tracking-widest">
+                {mesa ? `Mesa ${mesa} · Faça seu pedido` : "Faça seu pedido"}
+              </div>
             </div>
           </Link>
           <div className="flex items-center gap-3 text-xs">
+            {mesa && (
+              <span className="px-2.5 py-1 rounded-full bg-amber-warm text-charcoal font-black text-[11px]">
+                🪑 MESA {mesa}
+              </span>
+            )}
             <Link to="/status" className="text-white/70 hover:text-amber-warm">Status</Link>
             <Link to="/kitchen" className="text-white/70 hover:text-amber-warm">Cozinha</Link>
           </div>
