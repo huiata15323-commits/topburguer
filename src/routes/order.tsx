@@ -56,7 +56,7 @@ function OrderPage() {
   const setItemNotes = (id: string, v: string) =>
     setCart((c) => ({ ...c, [id]: { ...c[id], qty: c[id]?.qty || 0, notes: v.slice(0, 80) } }));
 
-  const submit = () => {
+  const submit = async () => {
     if (!customer.trim()) return toast.error("Informe seu nome");
     if (customer.length > 50) return toast.error("Nome muito longo");
     if (items.length === 0) return toast.error("Adicione ao menos um item");
@@ -70,22 +70,26 @@ function OrderPage() {
     }
 
     setSubmitting(true);
-    const order = addOrder({
-      customer: customer.trim().slice(0, 50),
-      phone: normalized,
-      items,
-      notes: notes.trim().slice(0, 300) || undefined,
-      total,
-    });
-    toast.success(`Pedido #${order.number} enviado! 🔥`);
-    setCart({});
-    setCustomer("");
-    setPhone("");
-    setNotes("");
-    setTimeout(() => {
-      setSubmitting(false);
+    try {
+      const order = await addOrder({
+        customer: customer.trim().slice(0, 50),
+        phone: normalized,
+        tableNumber: mesa,
+        items,
+        notes: notes.trim().slice(0, 300) || undefined,
+        total,
+      });
+      toast.success(`Pedido #${order.number} enviado! 🔥`);
+      setCart({});
+      setCustomer("");
+      setPhone("");
+      setNotes("");
       navigate({ to: "/status", search: { n: order.number } });
-    }, 500);
+    } catch {
+      toast.error("Falha ao enviar pedido. Tente novamente.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (

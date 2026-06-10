@@ -167,7 +167,7 @@ export function useOrders() {
   );
 
   const updateStatus = useCallback(async (id: string, status: OrderStatus) => {
-    const patch: Record<string, unknown> = { status };
+    const patch: { status: OrderStatus; done_at?: string } = { status };
     if (status === "done") patch.done_at = new Date().toISOString();
     const { error } = await supabase.from("orders").update(patch).eq("id", id);
     if (error) console.error("[orders] updateStatus failed", error);
