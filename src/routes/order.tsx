@@ -60,9 +60,17 @@ function OrderPage() {
     if (items.length === 0) return toast.error("Adicione ao menos um item");
     if (notes.length > 300) return toast.error("Observações muito longas");
 
+    let normalized: string | undefined;
+    if (phone.trim()) {
+      const n = normalizePhoneBR(phone);
+      if (!n) return toast.error("Telefone inválido (use DDD + número)");
+      normalized = n;
+    }
+
     setSubmitting(true);
     const order = addOrder({
       customer: customer.trim().slice(0, 50),
+      phone: normalized,
       items,
       notes: notes.trim().slice(0, 300) || undefined,
       total,
@@ -70,6 +78,7 @@ function OrderPage() {
     toast.success(`Pedido #${order.number} enviado! 🔥`);
     setCart({});
     setCustomer("");
+    setPhone("");
     setNotes("");
     setTimeout(() => {
       setSubmitting(false);
