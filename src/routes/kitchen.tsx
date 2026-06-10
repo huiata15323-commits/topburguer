@@ -318,6 +318,22 @@ function OrderCard({ order, onStatus, onNotified }: { order: Order; onStatus: (s
           </button>
         )}
       </div>
+
+      {order.status === "done" && order.phone && (
+        <a
+          href={waLink(order.phone, buildReadyMessage({ customer: order.customer, number: order.number, total: order.total }))}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={onNotified}
+          className={`flex items-center justify-center gap-2 py-2.5 rounded-lg font-bold text-sm transition active:scale-95 ${
+            order.notifiedAt
+              ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
+              : "bg-[#25D366] hover:brightness-110 text-white shadow-lg"
+          }`}
+        >
+          {order.notifiedAt ? "✓ Cliente notificado" : "💬 Notificar pelo WhatsApp"}
+        </a>
+      )}
     </motion.div>
   );
 }
