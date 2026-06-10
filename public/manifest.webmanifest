@@ -1,0 +1,13 @@
+{
+  "name": "Top Burguer — Fast Order",
+  "short_name": "Top Burguer",
+  "description": "Sistema de pedidos da hamburgueria Top Burguer.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0a09",
+  "theme_color": "#ff7a1a",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/favicon.ico", "sizes": "64x64 32x32 24x24 16x16", "type": "image/x-icon" }
+  ]
+}
