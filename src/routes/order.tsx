@@ -144,7 +144,20 @@ function OrderPage() {
         </div>
       </header>
 
+      {/* Estimativa de tempo de espera */}
+      <div className="mx-auto max-w-6xl px-4 pt-4">
+        <div className="rounded-2xl border border-amber-warm/30 bg-gradient-to-r from-amber-warm/10 via-ember/5 to-transparent px-4 py-3 flex items-center gap-3">
+          <span className="text-2xl">⏱️</span>
+          <div className="flex-1 text-sm">
+            <span className="font-bold">Tempo estimado de preparo: </span>
+            <span className="text-ember font-black">~{waitMin} min</span>
+            <span className="text-muted-foreground"> · baseado na fila atual</span>
+          </div>
+        </div>
+      </div>
+
       <div className="mx-auto max-w-6xl px-4 py-6 grid gap-6 lg:grid-cols-[1fr_380px]">
+
         <section className="space-y-10">
           {CATEGORIES.map((cat) => (
             <div key={cat.key} id={`cat-${cat.key}`} className="scroll-mt-32">
