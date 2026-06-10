@@ -96,6 +96,23 @@ function FinancePage() {
     toast.success("CSV exportado");
   };
 
+  const exportPDF = () => {
+    const label = range === "today" ? "Hoje" : range === "7d" ? "Últimos 7 dias" : range === "30d" ? "Últimos 30 dias" : "Histórico completo";
+    generateReportPDF({
+      orders: filteredOrders,
+      expenses: filteredExpenses,
+      range: { label, from: fromTs, to: Date.now() },
+    });
+    toast.success("Relatório PDF gerado");
+  };
+
+  const resetFinance = () => {
+    if (!confirm("Zerar TODAS as despesas registradas? Esta ação não pode ser desfeita.")) return;
+    clearAll();
+    toast.success("Financeiro zerado");
+  };
+
+
   return (
     <main className="min-h-screen bg-neutral-950 text-white">
       <header className="border-b border-white/10 bg-black/80 backdrop-blur sticky top-0 z-10">
