@@ -220,6 +220,11 @@ function DashboardPage() {
           </section>
         </div>
 
+        {/* Operação e satisfação */}
+        <OperationsRow orders={filtered} />
+
+
+
         {/* Top items list */}
         <section className="rounded-2xl bg-neutral-900 border border-white/10 p-5">
           <h2 className="font-black text-lg mb-4">🔥 Mais vendidos</h2>
@@ -368,6 +373,142 @@ function StatusPill({ status }: { status: Order["status"] }) {
 function EmptyHint({ label }: { label: string }) {
   return <div className="text-center py-10 text-white/40 text-sm">{label}</div>;
 }
+
+function OperationsRow({ orders }: { orders: Order[] }) {
+  const done = orders.filter((o) => o.status === "done" && o.doneAt);
+  const fast = done.filter((o) => (o.doneAt! - o.createdAt) <= 10 * 60000).length;
+  const fastPct = done.length ? Math.round((fast / done.length) * 100) : 0;
+  const rated = orders.filter((o) => o.rating);
+  const avgRating = rated.length
+    ? rated.reduce((s, o) => s + (o.rating ?? 0), 0) / rated.length
+    : 0;
+  const ratingDist = [5, 4, 3, 2, 1].map((s) => ({
+    stars: s,
+    count: rated.filter((o) => o.rating === s).length,
+  }));
+  const waiterCalls = orders.filter((o) => o.waiterCalledAt).length;
+
+  // Mesas (heatmap)
+  const tableMap = new Map<number, { orders: number; revenue: number }>();
+  for (const o of orders) {
+    if (!o.tableNumber) continue;
+    const cur = tableMap.get(o.tableNumber) ?? { orders: 0, revenue: 0 };
+    cur.orders++;
+    cur.revenue += o.total;
+    tableMap.set(o.tableNumber, cur);
+  }
+  const tables = [...tableMap.entries()]
+    .map(([n, v]) => ({ n, ...v }))
+    .sort((a, b) => b.orders - a.orders);
+  const maxOrders = tables[0]?.orders ?? 0;
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Performance */}
+      <section className="rounded-2xl bg-neutral-900 border border-white/10 p-5">
+        <h2 className="font-black text-lg mb-4">⚡ Performance da cozinha</h2>
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-3">
+            <div className="text-[10px] uppercase tracking-widest text-emerald-300">Em até 10 min</div>
+            <div className="text-3xl font-black text-emerald-400 tabular-nums">{fastPct}%</div>
+            <div className="text-[11px] text-white/50">{fast} de {done.length} pedidos</div>
+          </div>
+          <div className="rounded-xl bg-amber-warm/10 border border-amber-warm/30 p-3">
+            <div className="text-[10px] uppercase tracking-widest text-amber-warm">Chamadas atendente</div>
+            <div className="text-3xl font-black text-amber-warm tabular-nums">{waiterCalls}</div>
+            <div className="text-[11px] text-white/50">no período</div>
+          </div>
+        </div>
+        <div className="text-xs text-white/40 uppercase tracking-widest mb-2">Velocidade</div>
+        <div className="h-3 rounded-full bg-white/5 overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-emerald-500 via-amber-warm to-red-500"
+            style={{ width: `${Math.max(5, fastPct)}%` }}
+          />
+        </div>
+        <div className="flex justify-between text-[10px] text-white/40 mt-1">
+          <span>🐢 Lento</span>
+          <span>🚀 Rápido</span>
+        </div>
+      </section>
+
+      {/* Satisfação */}
+      <section className="rounded-2xl bg-neutral-900 border border-white/10 p-5">
+        <h2 className="font-black text-lg mb-4">⭐ Satisfação</h2>
+        {rated.length === 0 ? (
+          <EmptyHint label="Sem avaliações ainda." />
+        ) : (
+          <>
+            <div className="flex items-baseline gap-2 mb-3">
+              <div className="text-5xl font-black text-amber-warm tabular-nums">
+                {avgRating.toFixed(1)}
+              </div>
+              <div className="text-xl">
+                {"★".repeat(Math.round(avgRating))}
+                <span className="text-white/20">{"★".repeat(5 - Math.round(avgRating))}</span>
+              </div>
+              <div className="text-xs text-white/40 ml-auto">{rated.length} avaliações</div>
+            </div>
+            <ul className="space-y-1.5">
+              {ratingDist.map((r) => {
+                const pct = rated.length ? (r.count / rated.length) * 100 : 0;
+                return (
+                  <li key={r.stars} className="flex items-center gap-2 text-xs">
+                    <span className="w-8 text-white/60 tabular-nums">{r.stars}★</span>
+                    <div className="flex-1 h-2 rounded-full bg-white/5 overflow-hidden">
+                      <div className="h-full bg-amber-warm" style={{ width: `${pct}%` }} />
+                    </div>
+                    <span className="w-8 text-right text-white/50 tabular-nums">{r.count}</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </>
+        )}
+      </section>
+
+      {/* Heatmap de mesas */}
+      <section className="rounded-2xl bg-neutral-900 border border-white/10 p-5">
+        <h2 className="font-black text-lg mb-4">🪑 Mesas mais ativas</h2>
+        {tables.length === 0 ? (
+          <EmptyHint label="Sem pedidos por mesa." />
+        ) : (
+          <>
+            <div className="grid grid-cols-5 gap-1.5 mb-4">
+              {tables.slice(0, 20).map((t) => {
+                const intensity = maxOrders ? t.orders / maxOrders : 0;
+                return (
+                  <div
+                    key={t.n}
+                    title={`Mesa ${t.n} · ${t.orders} pedido(s) · R$ ${t.revenue.toFixed(2)}`}
+                    className="aspect-square rounded-lg grid place-items-center text-xs font-black border border-white/10 transition-transform hover:scale-110 cursor-help"
+                    style={{
+                      background: `rgba(255, 138, 61, ${0.15 + intensity * 0.65})`,
+                    }}
+                  >
+                    {t.n}
+                  </div>
+                );
+              })}
+            </div>
+            <ul className="space-y-1 text-xs">
+              {tables.slice(0, 3).map((t, i) => (
+                <li key={t.n} className="flex items-center gap-2">
+                  <span className="text-amber-warm font-black">{["🥇","🥈","🥉"][i]}</span>
+                  <span className="font-bold">Mesa {t.n}</span>
+                  <span className="text-white/40 ml-auto tabular-nums">
+                    {t.orders} ped · R$ {t.revenue.toFixed(2)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </section>
+    </div>
+  );
+}
+
 
 function computeStats(orders: Order[]) {
   const done = orders.filter((o) => o.status === "done");
