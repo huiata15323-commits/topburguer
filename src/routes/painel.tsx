@@ -44,9 +44,10 @@ function elapsedLabel(ms: number) {
 function PainelPage() {
   const { view } = useSearch({ from: "/painel" });
   const navigate = useNavigate({ from: "/painel" });
-  const { orders } = useOrders();
+  const { orders, clearWaiterCall } = useOrders();
   const { items: menu } = useMenu();
   const lastReadyIds = useRef<Set<string>>(new Set());
+  const lastWaiterIds = useRef<Set<string>>(new Set());
   const [, force] = useState(0);
 
   // tick para timer
@@ -77,6 +78,32 @@ function PainelPage() {
     }
     lastReadyIds.current = readyIds;
   }, [orders]);
+
+  // Som distinto quando alguém chama o atendente
+  const waiterCalls = useMemo(
+    () => orders.filter((o) => o.waiterCalledAt && o.status !== "done"),
+    [orders]
+  );
+  useEffect(() => {
+    const ids = new Set(waiterCalls.map((o) => o.id));
+    const newOnes = [...ids].filter((id) => !lastWaiterIds.current.has(id));
+    if (lastWaiterIds.current.size > 0 && newOnes.length > 0) {
+      try {
+        const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        const ctx = new Ctx();
+        [660, 660, 880].forEach((freq, i) => {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.frequency.value = freq;
+          g.gain.value = 0.14;
+          o.connect(g); g.connect(ctx.destination);
+          o.start(ctx.currentTime + i * 0.22);
+          o.stop(ctx.currentTime + i * 0.22 + 0.2);
+        });
+      } catch {}
+    }
+    lastWaiterIds.current = ids;
+  }, [waiterCalls]);
 
   const ready = useMemo(
     () => orders.filter((o) => o.status === "done").sort((a, b) => (b.doneAt ?? 0) - (a.doneAt ?? 0)),
