@@ -44,6 +44,7 @@ function OrderPage() {
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [activeCat, setActiveCat] = useState<MenuItem["category"]>("burger");
+  const [payOpen, setPayOpen] = useState(false);
 
   const items: OrderItem[] = useMemo(() => {
     const out: OrderItem[] = [];
@@ -65,21 +66,21 @@ function OrderPage() {
   const setItemNotes = (id: string, v: string) =>
     setCart((c) => ({ ...c, [id]: { ...c[id], qty: c[id]?.qty || 0, notes: v.slice(0, 80) } }));
 
-  const submit = async () => {
+  const submit = () => {
     if (!customer.trim()) return toast.error("Informe seu nome");
     if (customer.length > 50) return toast.error("Nome muito longo");
     if (items.length === 0) return toast.error("Adicione ao menos um item");
     if (notes.length > 300) return toast.error("Observações muito longas");
+    if (phone.trim() && !normalizePhoneBR(phone))
+      return toast.error("Telefone inválido (use DDD + número)");
+    setPayOpen(true);
+  };
 
-    let normalized: string | undefined;
-    if (phone.trim()) {
-      const n = normalizePhoneBR(phone);
-      if (!n) return toast.error("Telefone inválido (use DDD + número)");
-      normalized = n;
-    }
-
+  const confirmPaymentAndSubmit = async () => {
+    setPayOpen(false);
     setSubmitting(true);
     try {
+      const normalized = phone.trim() ? normalizePhoneBR(phone) ?? undefined : undefined;
       const order = await addOrder({
         customer: customer.trim().slice(0, 50),
         phone: normalized,
