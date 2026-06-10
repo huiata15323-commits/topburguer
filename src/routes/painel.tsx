@@ -274,6 +274,11 @@ function FeaturedReady({ featured, big }: { featured?: Order; big?: boolean }) {
             </motion.div>
             <div className="mt-3 text-2xl sm:text-3xl font-bold text-white/90 truncate max-w-[80vw] mx-auto">
               {featured.customer}
+              {featured.tableNumber && (
+                <span className="ml-3 px-3 py-1 rounded-full bg-amber-warm text-charcoal text-base sm:text-lg font-black align-middle">
+                  🪑 MESA {featured.tableNumber}
+                </span>
+              )}
             </div>
             <div className="mt-1 text-base sm:text-lg text-white/60">
               {featured.items.reduce((s, i) => s + i.quantity, 0)} itens · pronto há {elapsedLabel(featured.doneAt ?? featured.createdAt)}
@@ -412,7 +417,14 @@ function PreparingKanban({ orders, menu }: { orders: Order[]; menu: EditableMenu
             >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <div className="text-4xl font-black tabular-nums leading-none">#{o.number}</div>
+                  <div className="flex items-center gap-2">
+                    <div className="text-4xl font-black tabular-nums leading-none">#{o.number}</div>
+                    {o.tableNumber && (
+                      <span className="px-2 py-0.5 rounded-full bg-amber-warm text-charcoal text-[10px] font-black">
+                        🪑 {o.tableNumber}
+                      </span>
+                    )}
+                  </div>
                   <div className="text-xs text-white/70 truncate mt-1">{o.customer}</div>
                 </div>
                 <div className={`text-xs font-mono font-bold tabular-nums shrink-0 ${
