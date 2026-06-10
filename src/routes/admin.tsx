@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { useMenu, type EditableMenuItem } from "@/lib/menu-store";
 import { MENU as SEED } from "@/lib/menu";
+import { TableQRGenerator } from "@/components/TableQRGenerator";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
