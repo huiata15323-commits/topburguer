@@ -35,7 +35,7 @@ const STEPS = [
 function StatusPage() {
   const { n } = useSearch({ from: "/status" });
   const navigate = useNavigate({ from: "/status" });
-  const { orders, rateOrder } = useOrders();
+  const { orders, rateOrder, callWaiter, clearWaiterCall } = useOrders();
   const [input, setInput] = useState(n ? String(n) : "");
 
   const order: Order | undefined = useMemo(
