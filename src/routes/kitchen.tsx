@@ -132,13 +132,51 @@ function KitchenPage() {
   const active = orders.filter((o) => o.status !== "done");
   const list = filter === "all" ? active : orders.filter((o) => o.status === filter);
 
+  // Emojis flutuantes — pré-distribuídos para o fundo não parecer aleatório demais
+  const floatingEmojis = [
+    { e: "🍔", left: "8%",  dur: 26, delay: 0,   size: "3.5rem" },
+    { e: "🍟", left: "22%", dur: 32, delay: 6,   size: "2.5rem" },
+    { e: "🥤", left: "38%", dur: 28, delay: 12,  size: "3rem"   },
+    { e: "🌶️", left: "55%", dur: 36, delay: 3,   size: "2rem"   },
+    { e: "🧀", left: "72%", dur: 30, delay: 18,  size: "2.8rem" },
+    { e: "🥓", left: "88%", dur: 34, delay: 9,   size: "2.6rem" },
+    { e: "🍅", left: "15%", dur: 38, delay: 22,  size: "2.2rem" },
+    { e: "🥗", left: "62%", dur: 30, delay: 15,  size: "2.6rem" },
+  ];
+
   return (
     <main
       ref={containerRef}
       style={{ filter: `brightness(${brightness.toFixed(2)})` }}
-      className={`min-h-screen bg-neutral-950 text-white transition-[filter] duration-700 ${tvMode ? "tv-mode" : ""}`}
+      className={`min-h-screen bg-neutral-950 text-white transition-[filter] duration-700 relative overflow-hidden ${tvMode ? "tv-mode" : ""}`}
     >
-      <header className="border-b border-white/10 bg-black/80 backdrop-blur sticky top-0 z-10">
+      {/* Fundo interativo: aurora, grade técnica e emojis flutuantes */}
+      <div aria-hidden className="absolute inset-0 pointer-events-none z-0">
+        <div className="kitchen-aurora" />
+        <div className="kitchen-grid" />
+        {floatingEmojis.map((f, i) => (
+          <span
+            key={i}
+            className="float-emoji"
+            style={{
+              left: f.left,
+              animationDuration: `${f.dur}s`,
+              animationDelay: `-${f.delay}s`,
+              fontSize: f.size,
+            }}
+          >
+            {f.e}
+          </span>
+        ))}
+        {/* Barra de status superior — pulso brand quando há pedidos urgentes */}
+        {orders.some((o) => o.status !== "done" && (Date.now() - o.createdAt) / 1000 > 300) && (
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-red-500 to-transparent animate-pulse" />
+        )}
+      </div>
+
+      <div className="relative z-10">
+      <header className="border-b border-white/10 bg-black/70 backdrop-blur-xl sticky top-0 z-10">
+
         <div className="px-6 py-4 flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-4">
             <Link to="/" className="w-10 h-10 rounded-xl bg-gradient-ember grid place-items-center font-black shadow-ember">T</Link>
@@ -204,7 +242,9 @@ function KitchenPage() {
           </div>
         )}
       </div>
+      </div>
     </main>
+
   );
 }
 

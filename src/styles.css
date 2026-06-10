@@ -171,4 +171,62 @@
     50% { opacity: 0.6; transform: scale(1.15); }
   }
   .animate-live { animation: live-pulse 1.6s ease-in-out infinite; }
+
+  /* Aurora animada: dois blobs brand que orbitam — fundo do KDS da cozinha */
+  @keyframes aurora-a {
+    0%, 100% { transform: translate3d(-10%, -10%, 0) scale(1); }
+    50%      { transform: translate3d( 20%,  15%, 0) scale(1.25); }
+  }
+  @keyframes aurora-b {
+    0%, 100% { transform: translate3d( 20%,  20%, 0) scale(1.1); }
+    50%      { transform: translate3d(-15%, -10%, 0) scale(0.95); }
+  }
+  .kitchen-aurora { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+  .kitchen-aurora::before,
+  .kitchen-aurora::after {
+    content: "";
+    position: absolute;
+    width: 65vmax;
+    height: 65vmax;
+    border-radius: 9999px;
+    filter: blur(80px);
+    opacity: 0.35;
+    mix-blend-mode: screen;
+    will-change: transform;
+  }
+  .kitchen-aurora::before {
+    top: -20%; left: -20%;
+    background: radial-gradient(circle, oklch(0.68 0.22 35 / 0.85), transparent 60%);
+    animation: aurora-a 22s ease-in-out infinite;
+  }
+  .kitchen-aurora::after {
+    bottom: -25%; right: -15%;
+    background: radial-gradient(circle, oklch(0.82 0.17 75 / 0.7), transparent 60%);
+    animation: aurora-b 28s ease-in-out infinite;
+  }
+
+  /* Grade tecnológica sutil sobre o fundo escuro */
+  .kitchen-grid {
+    position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      linear-gradient(to right, oklch(1 0 0 / 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, oklch(1 0 0 / 0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    mask-image: radial-gradient(ellipse at center, black 40%, transparent 90%);
+  }
+
+  /* Emoji de comida flutuando — drift lento, opacidade baixa */
+  @keyframes float-up {
+    0%   { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+    10%  { opacity: 0.18; }
+    90%  { opacity: 0.18; }
+    100% { transform: translateY(-15vh) rotate(360deg); opacity: 0; }
+  }
+  .float-emoji {
+    position: absolute;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    animation: float-up linear infinite;
+    will-change: transform, opacity;
+    filter: drop-shadow(0 0 12px oklch(0.68 0.22 35 / 0.4));
+  }
 }

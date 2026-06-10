@@ -39,7 +39,7 @@ const CATS: { key: EditableMenuItem["category"]; label: string; emoji: string }[
 const DEFAULT_IMG = SEED[0].image;
 
 function AdminPage() {
-  const { items, addItem, updateItem, removeItem, toggleSoldOut, resetToDefaults } = useMenu();
+  const { items, addItem, updateItem, removeItem, toggleSoldOut, setStock, resetToDefaults } = useMenu();
   const [form, setForm] = useState<FormState>(EMPTY);
   const [editing, setEditing] = useState(false);
 
@@ -236,6 +236,16 @@ function AdminPage() {
                               <span className="px-3 py-1 rounded-full bg-red-500 text-white text-xs font-black uppercase tracking-widest">Esgotado</span>
                             </div>
                           )}
+                          {!m.soldOut && typeof m.stock === "number" && m.stock <= 5 && m.stock > 0 && (
+                            <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-amber-warm text-charcoal text-[10px] font-black uppercase tracking-wider shadow-md animate-pulse">
+                              ⚠ Restam {m.stock}
+                            </div>
+                          )}
+                          {typeof m.stock === "number" && m.stock > 5 && (
+                            <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-emerald-500/90 text-white text-[10px] font-bold uppercase tracking-wider">
+                              📦 {m.stock} em estoque
+                            </div>
+                          )}
                         </div>
                         <div className="p-3">
                           <div className="flex items-start justify-between gap-2">
@@ -247,7 +257,32 @@ function AdminPage() {
                             </div>
                             <div className="text-ember font-black shrink-0">R$ {m.price.toFixed(2)}</div>
                           </div>
-                          <div className="mt-3 flex gap-1.5">
+                          {/* Controle de estoque inline */}
+                          <div className="mt-2 flex items-center gap-2 text-xs">
+                            <label className="text-muted-foreground shrink-0">Estoque:</label>
+                            <input
+                              type="number"
+                              min={0}
+                              max={999}
+                              value={typeof m.stock === "number" ? m.stock : ""}
+                              onChange={(e) => {
+                                const v = e.target.value;
+                                setStock(m.id, v === "" ? undefined : Math.max(0, Math.min(999, parseInt(v, 10) || 0)));
+                              }}
+                              placeholder="∞"
+                              className="w-16 px-2 py-1 rounded-md border border-border bg-background text-center tabular-nums"
+                            />
+                            {typeof m.stock === "number" && (
+                              <button
+                                onClick={() => setStock(m.id, undefined)}
+                                className="text-[10px] text-muted-foreground hover:text-foreground underline"
+                                title="Voltar para ilimitado"
+                              >
+                                ∞
+                              </button>
+                            )}
+                          </div>
+                          <div className="mt-2 flex gap-1.5">
                             <button
                               onClick={() => startEdit(m)}
                               className="flex-1 py-1.5 text-xs rounded-lg bg-muted hover:bg-secondary font-semibold"
@@ -277,6 +312,7 @@ function AdminPage() {
                             </button>
                           </div>
                         </div>
+
                       </motion.div>
                     ))}
                   </AnimatePresence>

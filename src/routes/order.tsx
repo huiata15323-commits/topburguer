@@ -36,7 +36,7 @@ function OrderPage() {
   const { mesa } = useSearch({ from: "/order" });
   const { addOrder, orders } = useOrders();
   const waitMin = useMemo(() => estimateWaitMinutes(orders), [orders]);
-  const { items: menu } = useMenu();
+  const { items: menu, decrementStock } = useMenu();
   const navigate = useNavigate();
   const [cart, setCart] = useState<Record<string, CartEntry>>({});
   const [customer, setCustomer] = useState("");
@@ -89,6 +89,8 @@ function OrderPage() {
         notes: notes.trim().slice(0, 300) || undefined,
         total,
       });
+      // Atualiza estoque (itens sem controle são ignorados internamente)
+      decrementStock(items.map((i) => ({ menuId: i.menuId, quantity: i.quantity })));
       toast.success(`Pedido #${order.number} enviado! 🔥`);
       setCart({});
       setCustomer("");

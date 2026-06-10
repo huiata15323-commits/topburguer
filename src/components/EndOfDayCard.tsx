@@ -1,9 +1,12 @@
 // Encerramento do dia: gera um PDF-resumo de todos os pedidos
 // e, em seguida, zera a base — pronto pra próxima simulação.
+// Inclui também um resumo executivo gerado por IA (Lovable AI Gateway).
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
+import { useServerFn } from "@tanstack/react-start";
 import { useOrders, type Order } from "@/lib/orders-store";
+import { generateDaySummary } from "@/lib/ai-summary.functions";
 
 function fmtDate(d: Date) {
   return d.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
@@ -155,6 +158,9 @@ function buildPdf(orders: Order[]): jsPDF {
 export function EndOfDayCard() {
   const { orders, clearAll } = useOrders();
   const [busy, setBusy] = useState(false);
+  const [aiBusy, setAiBusy] = useState(false);
+  const [aiSummary, setAiSummary] = useState<string | null>(null);
+  const fetchSummary = useServerFn(generateDaySummary);
 
   const summary = useMemo(() => {
     const done = orders.filter((o) => o.status === "done");
@@ -194,6 +200,63 @@ export function EndOfDayCard() {
     doc.output("dataurlnewwindow");
   };
 
+  const handleAiSummary = async () => {
+    if (orders.length === 0) return toast.error("Sem pedidos para resumir.");
+    setAiBusy(true);
+    setAiSummary(null);
+    try {
+      const done = orders.filter((o) => o.status === "done");
+      const revenue = done.reduce((s, o) => s + o.total, 0);
+      const avgTicket = done.length ? revenue / done.length : 0;
+      const avgPrepMin = done.length
+        ? done.reduce((s, o) => s + ((o.doneAt ?? o.createdAt) - o.createdAt), 0) / done.length / 60000
+        : 0;
+      const rated = done.filter((o) => o.rating);
+      const avgRating = rated.length
+        ? rated.reduce((s, o) => s + (o.rating ?? 0), 0) / rated.length
+        : 0;
+      const hourly = new Array(24).fill(0) as number[];
+      for (const o of orders) hourly[new Date(o.createdAt).getHours()]++;
+      let peakHour: number | null = null;
+      let peakHourCount = 0;
+      hourly.forEach((c, h) => {
+        if (c > peakHourCount) { peakHourCount = c; peakHour = h; }
+      });
+      const counts = new Map<string, { name: string; qty: number; revenue: number }>();
+      for (const o of done) {
+        for (const it of o.items) {
+          const cur = counts.get(it.menuId) ?? { name: it.name, qty: 0, revenue: 0 };
+          cur.qty += it.quantity;
+          cur.revenue += it.price * it.quantity;
+          counts.set(it.menuId, cur);
+        }
+      }
+      const topItems = [...counts.values()].sort((a, b) => b.qty - a.qty).slice(0, 5);
+
+      const res = await fetchSummary({
+        data: {
+          doneCount: done.length,
+          totalCount: orders.length,
+          revenue,
+          avgTicket,
+          avgPrepMin,
+          avgRating,
+          ratingsCount: rated.length,
+          peakHour: peakHourCount > 0 ? peakHour : null,
+          peakHourCount,
+          topItems,
+          hourlyCounts: hourly,
+        },
+      });
+      setAiSummary(res.summary);
+    } catch (e) {
+      console.error(e);
+      toast.error("Falha ao gerar resumo com IA.");
+    } finally {
+      setAiBusy(false);
+    }
+  };
+
   return (
     <section className="rounded-3xl border-2 border-amber-warm/30 bg-gradient-to-br from-amber-warm/10 via-card to-card p-5 shadow-card-soft">
       <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -213,6 +276,32 @@ export function EndOfDayCard() {
           </div>
         </div>
       </div>
+
+      {/* Resumo executivo por IA */}
+      <div className="mt-4 rounded-2xl border border-purple-400/30 bg-gradient-to-br from-purple-500/10 via-fuchsia-500/5 to-transparent p-4">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">🤖</span>
+            <div>
+              <div className="font-bold text-sm">Resumo do dia (IA)</div>
+              <div className="text-[11px] text-muted-foreground">Análise executiva gerada por inteligência artificial</div>
+            </div>
+          </div>
+          <button
+            onClick={handleAiSummary}
+            disabled={aiBusy || orders.length === 0}
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white font-bold text-xs shadow-md hover:brightness-110 disabled:opacity-40 transition"
+          >
+            {aiBusy ? "Analisando…" : aiSummary ? "↻ Gerar de novo" : "✨ Gerar resumo"}
+          </button>
+        </div>
+        {aiSummary && (
+          <div className="mt-3 text-sm leading-relaxed whitespace-pre-wrap text-foreground/90 bg-background/50 rounded-xl p-3 border border-border">
+            {aiSummary}
+          </div>
+        )}
+      </div>
+
       <div className="mt-4 flex gap-2 flex-wrap">
         <button
           onClick={handlePreview}
