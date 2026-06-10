@@ -72,5 +72,11 @@ export function useExpenses() {
     broadcast();
   }, [broadcast]);
 
-  return { expenses, addExpense, removeExpense };
+  const clearAll = useCallback(() => {
+    write([]);
+    setExpenses([]);
+    broadcast();
+  }, [broadcast]);
+
+  return { expenses, addExpense, removeExpense, clearAll };
 }
