@@ -2,7 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { MENU, type MenuItem } from "@/lib/menu";
+import { type MenuItem } from "@/lib/menu";
+import { useMenu } from "@/lib/menu-store";
 import { useOrders, type OrderItem } from "@/lib/orders-store";
 import { formatPhoneBR, normalizePhoneBR } from "@/lib/whatsapp";
 
@@ -26,6 +27,7 @@ type CartEntry = { qty: number; notes?: string };
 
 function OrderPage() {
   const { addOrder } = useOrders();
+  const { items: menu } = useMenu();
   const navigate = useNavigate();
   const [cart, setCart] = useState<Record<string, CartEntry>>({});
   const [customer, setCustomer] = useState("");
@@ -39,10 +41,12 @@ function OrderPage() {
       Object.entries(cart)
         .filter(([, e]) => e.qty > 0)
         .map(([id, e]) => {
-          const m = MENU.find((x) => x.id === id)!;
+          const m = menu.find((x) => x.id === id);
+          if (!m) return null;
           return { menuId: m.id, name: m.name, emoji: m.emoji, image: m.image, price: m.price, quantity: e.qty, notes: e.notes };
-        }),
-    [cart]
+        })
+        .filter((x): x is OrderItem => x !== null),
+    [cart, menu]
   );
 
   const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
@@ -131,9 +135,10 @@ function OrderPage() {
                 <span className="text-2xl">{cat.emoji}</span> {cat.label}
               </h2>
               <div className="grid gap-3 sm:grid-cols-2">
-                {MENU.filter((m) => m.category === cat.key).map((m, i) => {
+                {menu.filter((m) => m.category === cat.key).map((m, i) => {
                   const entry = cart[m.id];
                   const q = entry?.qty || 0;
+                  const soldOut = m.soldOut;
                   return (
                     <motion.div
                       key={m.id}
