@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { MENU, type MenuItem } from "@/lib/menu";
 import { useOrders, type OrderItem } from "@/lib/orders-store";
+import { formatPhoneBR, normalizePhoneBR } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/order")({
   head: () => ({
@@ -28,6 +29,7 @@ function OrderPage() {
   const navigate = useNavigate();
   const [cart, setCart] = useState<Record<string, CartEntry>>({});
   const [customer, setCustomer] = useState("");
+  const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [activeCat, setActiveCat] = useState<MenuItem["category"]>("burger");
@@ -58,9 +60,17 @@ function OrderPage() {
     if (items.length === 0) return toast.error("Adicione ao menos um item");
     if (notes.length > 300) return toast.error("Observações muito longas");
 
+    let normalized: string | undefined;
+    if (phone.trim()) {
+      const n = normalizePhoneBR(phone);
+      if (!n) return toast.error("Telefone inválido (use DDD + número)");
+      normalized = n;
+    }
+
     setSubmitting(true);
     const order = addOrder({
       customer: customer.trim().slice(0, 50),
+      phone: normalized,
       items,
       notes: notes.trim().slice(0, 300) || undefined,
       total,
@@ -68,6 +78,7 @@ function OrderPage() {
     toast.success(`Pedido #${order.number} enviado! 🔥`);
     setCart({});
     setCustomer("");
+    setPhone("");
     setNotes("");
     setTimeout(() => {
       setSubmitting(false);
@@ -211,6 +222,7 @@ function OrderPage() {
         <aside className="hidden lg:block lg:sticky lg:top-32 lg:self-start">
           <CartCard
             customer={customer} setCustomer={setCustomer}
+            phone={phone} setPhone={setPhone}
             notes={notes} setNotes={setNotes}
             items={items} total={total} submitting={submitting} onSubmit={submit}
           />
@@ -244,6 +256,7 @@ function OrderPage() {
               <div className="p-4 pt-0 max-h-[60vh] overflow-y-auto">
                 <CartCard
                   customer={customer} setCustomer={setCustomer}
+                  phone={phone} setPhone={setPhone}
                   notes={notes} setNotes={setNotes}
                   items={items} total={total} submitting={submitting} onSubmit={submit}
                   embedded
@@ -258,9 +271,10 @@ function OrderPage() {
 }
 
 function CartCard({
-  customer, setCustomer, notes, setNotes, items, total, submitting, onSubmit, embedded,
+  customer, setCustomer, phone, setPhone, notes, setNotes, items, total, submitting, onSubmit, embedded,
 }: {
   customer: string; setCustomer: (s: string) => void;
+  phone: string; setPhone: (s: string) => void;
   notes: string; setNotes: (s: string) => void;
   items: OrderItem[]; total: number; submitting: boolean; onSubmit: () => void;
   embedded?: boolean;
@@ -275,6 +289,18 @@ function CartCard({
         onChange={(e) => setCustomer(e.target.value)}
         maxLength={50}
         placeholder="Como te chamamos?"
+        className="w-full px-3 py-2.5 rounded-xl border border-border focus:border-ember focus:outline-none mb-3 bg-background"
+      />
+
+      <label className="block text-xs font-medium text-muted-foreground mb-1">
+        WhatsApp <span className="text-muted-foreground/60">(opcional — avisamos quando ficar pronto)</span>
+      </label>
+      <input
+        value={phone}
+        onChange={(e) => setPhone(formatPhoneBR(e.target.value))}
+        inputMode="tel"
+        maxLength={16}
+        placeholder="(11) 91234-5678"
         className="w-full px-3 py-2.5 rounded-xl border border-border focus:border-ember focus:outline-none mb-3 bg-background"
       />
 

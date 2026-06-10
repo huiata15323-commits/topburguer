@@ -18,12 +18,14 @@ export type Order = {
   id: string;
   number: number;
   customer: string;
+  phone?: string;
   items: OrderItem[];
   notes?: string;
   total: number;
   status: OrderStatus;
   createdAt: number;
   doneAt?: number;
+  notifiedAt?: number;
 };
 
 const STORAGE_KEY = "fast-order:orders";
@@ -108,6 +110,16 @@ export function useOrders() {
     [broadcast]
   );
 
+  const markNotified = useCallback(
+    (id: string) => {
+      const next = read().map((o) => (o.id === id ? { ...o, notifiedAt: Date.now() } : o));
+      write(next);
+      setOrders(next);
+      broadcast();
+    },
+    [broadcast]
+  );
+
   const clearDone = useCallback(() => {
     const next = read().filter((o) => o.status !== "done");
     write(next);
@@ -115,5 +127,5 @@ export function useOrders() {
     broadcast();
   }, [broadcast]);
 
-  return { orders, addOrder, updateStatus, clearDone };
+  return { orders, addOrder, updateStatus, markNotified, clearDone };
 }

@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useOrders, type Order, type OrderStatus } from "@/lib/orders-store";
+import { buildReadyMessage, waLink, formatPhoneBR } from "@/lib/whatsapp";
 
 export const Route = createFileRoute("/kitchen")({
   head: () => ({
@@ -30,7 +31,7 @@ type LuxSensor = EventTarget & { illuminance?: number; start: () => void; stop: 
 type LuxSensorCtor = new (opts?: { frequency?: number }) => LuxSensor;
 
 function KitchenPage() {
-  const { orders, updateStatus, clearDone } = useOrders();
+  const { orders, updateStatus, markNotified, clearDone } = useOrders();
   const [, force] = useState(0);
   const prevIdsRef = useRef<Set<string>>(new Set());
   const [filter, setFilter] = useState<"all" | OrderStatus>("all");
@@ -197,7 +198,7 @@ function KitchenPage() {
           <div className={`grid gap-4 ${tvMode ? "grid-cols-2 md:grid-cols-3 xl:grid-cols-4 text-lg" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"}`}>
             <AnimatePresence mode="popLayout">
               {list.map((o) => (
-                <OrderCard key={o.id} order={o} onStatus={(s) => updateStatus(o.id, s)} />
+                <OrderCard key={o.id} order={o} onStatus={(s) => updateStatus(o.id, s)} onNotified={() => markNotified(o.id)} />
               ))}
             </AnimatePresence>
           </div>
@@ -229,7 +230,7 @@ function FilterChip({
   );
 }
 
-function OrderCard({ order, onStatus }: { order: Order; onStatus: (s: OrderStatus) => void }) {
+function OrderCard({ order, onStatus, onNotified }: { order: Order; onStatus: (s: OrderStatus) => void; onNotified: () => void }) {
   const age = (Date.now() - order.createdAt) / 1000;
   const urgent = age > 300 && order.status !== "done";
 
@@ -255,6 +256,9 @@ function OrderCard({ order, onStatus }: { order: Order; onStatus: (s: OrderStatu
         <div>
           <div className="text-3xl font-black">#{order.number}</div>
           <div className="text-sm text-white/70 truncate max-w-[180px]">{order.customer}</div>
+          {order.phone && (
+            <div className="text-[11px] text-emerald-400/80 font-mono mt-0.5">📱 {formatPhoneBR(order.phone.replace(/^55/, ""))}</div>
+          )}
         </div>
         <div className="text-right">
           <div className={`text-xs font-bold uppercase ${
@@ -314,6 +318,22 @@ function OrderCard({ order, onStatus }: { order: Order; onStatus: (s: OrderStatu
           </button>
         )}
       </div>
+
+      {order.status === "done" && order.phone && (
+        <a
+          href={waLink(order.phone, buildReadyMessage({ customer: order.customer, number: order.number, total: order.total }))}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={onNotified}
+          className={`flex items-center justify-center gap-2 py-2.5 rounded-lg font-bold text-sm transition active:scale-95 ${
+            order.notifiedAt
+              ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
+              : "bg-[#25D366] hover:brightness-110 text-white shadow-lg"
+          }`}
+        >
+          {order.notifiedAt ? "✓ Cliente notificado" : "💬 Notificar pelo WhatsApp"}
+        </a>
+      )}
     </motion.div>
   );
 }
