@@ -1,6 +1,7 @@
-// Estado compartilhado de pedidos em tempo real entre abas (cliente <-> cozinha)
-// Usa localStorage para persistência + BroadcastChannel para sincronização instantânea.
+// Estado compartilhado de pedidos em tempo real via Lovable Cloud (Supabase Realtime).
+// Funciona em múltiplos dispositivos: cliente no celular, cozinha no PC, painel na TV.
 import { useEffect, useState, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export type OrderStatus = "pending" | "preparing" | "done";
 
@@ -19,6 +20,7 @@ export type Order = {
   number: number;
   customer: string;
   phone?: string;
+  tableNumber?: number;
   items: OrderItem[];
   notes?: string;
   total: number;
@@ -26,130 +28,195 @@ export type Order = {
   createdAt: number;
   doneAt?: number;
   notifiedAt?: number;
-  rating?: number; // 1-5
+  rating?: number;
   review?: string;
   ratedAt?: number;
 };
 
-const STORAGE_KEY = "fast-order:orders";
-const COUNTER_KEY = "fast-order:counter";
-const CHANNEL = "fast-order:channel";
+// ===== Mapeamento entre o registro do DB e o tipo Order =====
+type DbRow = {
+  id: string;
+  number: number;
+  customer: string;
+  phone: string | null;
+  table_number: number | null;
+  items: unknown;
+  notes: string | null;
+  total: number | string;
+  status: OrderStatus;
+  created_at: string;
+  done_at: string | null;
+  notified_at: string | null;
+  rating: number | null;
+  review: string | null;
+  rated_at: string | null;
+};
 
-function read(): Order[] {
-  if (typeof window === "undefined") return [];
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
-  } catch {
-    return [];
+function rowToOrder(r: DbRow): Order {
+  return {
+    id: r.id,
+    number: r.number,
+    customer: r.customer,
+    phone: r.phone ?? undefined,
+    tableNumber: r.table_number ?? undefined,
+    items: Array.isArray(r.items) ? (r.items as OrderItem[]) : [],
+    notes: r.notes ?? undefined,
+    total: typeof r.total === "string" ? parseFloat(r.total) : r.total,
+    status: r.status,
+    createdAt: new Date(r.created_at).getTime(),
+    doneAt: r.done_at ? new Date(r.done_at).getTime() : undefined,
+    notifiedAt: r.notified_at ? new Date(r.notified_at).getTime() : undefined,
+    rating: r.rating ?? undefined,
+    review: r.review ?? undefined,
+    ratedAt: r.rated_at ? new Date(r.rated_at).getTime() : undefined,
+  };
+}
+
+// ===== Cache em memória compartilhado entre hooks na mesma aba =====
+let cache: Order[] = [];
+const listeners = new Set<(o: Order[]) => void>();
+let initialized = false;
+let realtimeChannel: ReturnType<typeof supabase.channel> | null = null;
+
+function notify() {
+  for (const fn of listeners) fn(cache);
+}
+
+async function fetchAll() {
+  const { data, error } = await supabase
+    .from("orders")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) {
+    console.error("[orders] fetch failed", error);
+    return;
   }
+  cache = (data as unknown as DbRow[]).map(rowToOrder);
+  notify();
 }
 
-function write(orders: Order[]) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
-}
-
-function getChannel(): BroadcastChannel | null {
-  if (typeof window === "undefined" || typeof BroadcastChannel === "undefined") return null;
-  return new BroadcastChannel(CHANNEL);
+function ensureRealtime() {
+  if (initialized) return;
+  initialized = true;
+  void fetchAll();
+  realtimeChannel = supabase
+    .channel("orders-stream")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "orders" },
+      (payload) => {
+        if (payload.eventType === "INSERT") {
+          const row = rowToOrder(payload.new as DbRow);
+          if (!cache.some((o) => o.id === row.id)) cache = [row, ...cache];
+        } else if (payload.eventType === "UPDATE") {
+          const row = rowToOrder(payload.new as DbRow);
+          cache = cache.map((o) => (o.id === row.id ? row : o));
+        } else if (payload.eventType === "DELETE") {
+          const oldId = (payload.old as { id: string }).id;
+          cache = cache.filter((o) => o.id !== oldId);
+        }
+        notify();
+      }
+    )
+    .subscribe();
 }
 
 export function useOrders() {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<Order[]>(cache);
 
   useEffect(() => {
-    setOrders(read());
-    const ch = getChannel();
-    const onMsg = () => setOrders(read());
-    ch?.addEventListener("message", onMsg);
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === STORAGE_KEY) setOrders(read());
-    };
-    window.addEventListener("storage", onStorage);
+    ensureRealtime();
+    const fn = (o: Order[]) => setOrders(o);
+    listeners.add(fn);
+    setOrders(cache);
     return () => {
-      ch?.removeEventListener("message", onMsg);
-      ch?.close();
-      window.removeEventListener("storage", onStorage);
+      listeners.delete(fn);
     };
-  }, []);
-
-  const broadcast = useCallback(() => {
-    const ch = getChannel();
-    ch?.postMessage({ t: Date.now() });
-    ch?.close();
   }, []);
 
   const addOrder = useCallback(
-    (data: Omit<Order, "id" | "number" | "status" | "createdAt">) => {
-      const current = read();
-      const counter = Number(localStorage.getItem(COUNTER_KEY) || "0") + 1;
-      localStorage.setItem(COUNTER_KEY, String(counter));
-      const order: Order = {
-        ...data,
-        id: crypto.randomUUID(),
-        number: counter,
-        status: "pending",
-        createdAt: Date.now(),
-      };
-      const next = [order, ...current];
-      write(next);
-      setOrders(next);
-      broadcast();
+    async (
+      data: Omit<Order, "id" | "number" | "status" | "createdAt">
+    ): Promise<Order> => {
+      const { data: inserted, error } = await supabase
+        .from("orders")
+        .insert({
+          customer: data.customer,
+          phone: data.phone ?? null,
+          table_number: data.tableNumber ?? null,
+          items: data.items,
+          notes: data.notes ?? null,
+          total: data.total,
+          status: "pending",
+        })
+        .select("*")
+        .single();
+      if (error || !inserted) {
+        console.error("[orders] insert failed", error);
+        throw error ?? new Error("insert failed");
+      }
+      const order = rowToOrder(inserted as unknown as DbRow);
+      // Otimista: já injeta no cache (o Realtime depois confirma)
+      if (!cache.some((o) => o.id === order.id)) {
+        cache = [order, ...cache];
+        notify();
+      }
       return order;
     },
-    [broadcast]
+    []
   );
 
-  const updateStatus = useCallback(
-    (id: string, status: OrderStatus) => {
-      const next = read().map((o) =>
-        o.id === id
-          ? { ...o, status, doneAt: status === "done" ? Date.now() : o.doneAt }
-          : o
-      );
-      write(next);
-      setOrders(next);
-      broadcast();
-    },
-    [broadcast]
-  );
+  const updateStatus = useCallback(async (id: string, status: OrderStatus) => {
+    const patch: Record<string, unknown> = { status };
+    if (status === "done") patch.done_at = new Date().toISOString();
+    const { error } = await supabase.from("orders").update(patch).eq("id", id);
+    if (error) console.error("[orders] updateStatus failed", error);
+  }, []);
 
-  const markNotified = useCallback(
-    (id: string) => {
-      const next = read().map((o) => (o.id === id ? { ...o, notifiedAt: Date.now() } : o));
-      write(next);
-      setOrders(next);
-      broadcast();
-    },
-    [broadcast]
-  );
+  const markNotified = useCallback(async (id: string) => {
+    const { error } = await supabase
+      .from("orders")
+      .update({ notified_at: new Date().toISOString() })
+      .eq("id", id);
+    if (error) console.error("[orders] markNotified failed", error);
+  }, []);
 
   const rateOrder = useCallback(
-    (id: string, rating: number, review?: string) => {
-      const next = read().map((o) =>
-        o.id === id
-          ? { ...o, rating: Math.max(1, Math.min(5, Math.round(rating))), review: review?.slice(0, 300), ratedAt: Date.now() }
-          : o
-      );
-      write(next);
-      setOrders(next);
-      broadcast();
+    async (id: string, rating: number, review?: string) => {
+      const safe = Math.max(1, Math.min(5, Math.round(rating)));
+      const { error } = await supabase
+        .from("orders")
+        .update({
+          rating: safe,
+          review: review?.slice(0, 300) ?? null,
+          rated_at: new Date().toISOString(),
+        })
+        .eq("id", id);
+      if (error) console.error("[orders] rateOrder failed", error);
     },
-    [broadcast]
+    []
   );
 
-  const clearDone = useCallback(() => {
-    const next = read().filter((o) => o.status !== "done");
-    write(next);
-    setOrders(next);
-    broadcast();
-  }, [broadcast]);
+  const clearDone = useCallback(async () => {
+    const { error } = await supabase.from("orders").delete().eq("status", "done");
+    if (error) console.error("[orders] clearDone failed", error);
+  }, []);
 
-  const clearAll = useCallback(() => {
-    write([]);
-    localStorage.removeItem(COUNTER_KEY);
-    setOrders([]);
-    broadcast();
-  }, [broadcast]);
+  const clearAll = useCallback(async () => {
+    const { error } = await supabase.from("orders").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+    if (error) console.error("[orders] clearAll failed", error);
+  }, []);
 
   return { orders, addOrder, updateStatus, markNotified, rateOrder, clearDone, clearAll };
+}
+
+// Cleanup do canal global (opcional, mas evita leaks em HMR)
+if (typeof window !== "undefined") {
+  window.addEventListener("beforeunload", () => {
+    if (realtimeChannel) {
+      void supabase.removeChannel(realtimeChannel);
+      realtimeChannel = null;
+      initialized = false;
+    }
+  });
 }
