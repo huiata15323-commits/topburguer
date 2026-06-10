@@ -1,7 +1,14 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useOrders, type Order } from "@/lib/orders-store";
+import {
+  ensureServiceWorker,
+  getPermission,
+  notifyOrderReady,
+  requestPermission,
+  type PermissionState,
+} from "@/lib/push-notify";
 import { z } from "zod";
 
 const search = z.object({ n: z.coerce.number().int().positive().optional() });
@@ -40,6 +47,30 @@ function StatusPage() {
     const i = setInterval(() => force((x) => x + 1), 5000);
     return () => clearInterval(i);
   }, []);
+
+  // ===== Notificações automáticas (Web Push local) =====
+  const [perm, setPerm] = useState<PermissionState>("default");
+  const notifiedRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    setPerm(getPermission());
+    if (getPermission() === "granted") void ensureServiceWorker();
+  }, []);
+
+  // Dispara notificação automaticamente quando o pedido acompanhado vira "done"
+  useEffect(() => {
+    if (!order) return;
+    if (order.status !== "done") return;
+    if (perm !== "granted") return;
+    if (notifiedRef.current.has(order.id)) return;
+    notifiedRef.current.add(order.id);
+    void notifyOrderReady(order.number);
+  }, [order?.status, order?.id, order?.number, perm]);
+
+  const handleEnableNotifications = async () => {
+    const res = await requestPermission();
+    setPerm(res);
+  };
 
   const stepIndex = order ? STEPS.findIndex((s) => s.key === order.status) : -1;
 
