@@ -315,6 +315,13 @@ function OrderPage() {
           </motion.div>
         )}
       </AnimatePresence>
+      <PaymentModal
+        open={payOpen}
+        amount={total}
+        customer={customer || "Cliente"}
+        onClose={() => setPayOpen(false)}
+        onConfirmed={confirmPaymentAndSubmit}
+      />
     </main>
   );
 }
@@ -398,7 +405,7 @@ function CartCard({
         disabled={submitting || items.length === 0}
         className="mt-4 w-full py-3.5 rounded-2xl bg-gradient-ember text-ember-foreground font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] shadow-ember"
       >
-        {submitting ? "Enviando…" : "🔥 Enviar para a cozinha"}
+        {submitting ? "Enviando…" : "⚡ Pagar com PIX e enviar"}
       </button>
     </div>
   );
