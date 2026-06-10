@@ -18,12 +18,14 @@ export type Order = {
   id: string;
   number: number;
   customer: string;
+  phone?: string;
   items: OrderItem[];
   notes?: string;
   total: number;
   status: OrderStatus;
   createdAt: number;
   doneAt?: number;
+  notifiedAt?: number;
 };
 
 const STORAGE_KEY = "fast-order:orders";
