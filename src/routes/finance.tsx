@@ -141,10 +141,23 @@ function FinancePage() {
               </button>
             ))}
             <button
+              onClick={exportPDF}
+              className="px-3 py-2 text-xs rounded-lg bg-ember/20 text-ember border border-ember/40 hover:bg-ember/30 font-bold transition"
+            >
+              📄 Relatório PDF
+            </button>
+            <button
               onClick={exportCSV}
               className="px-3 py-2 text-xs rounded-lg bg-white/10 hover:bg-white/20 font-bold transition"
             >
-              ⬇ Exportar CSV
+              ⬇ CSV
+            </button>
+            <button
+              onClick={resetFinance}
+              className="px-3 py-2 text-xs rounded-lg bg-red-500/15 text-red-300 hover:bg-red-500/25 border border-red-500/30 font-bold transition"
+              title="Zerar todas as despesas"
+            >
+              🗑 Zerar
             </button>
             <Link to="/dashboard" className="px-3 py-2 text-xs rounded-lg bg-white/10 hover:bg-white/20 font-bold transition">
               Dashboard →
