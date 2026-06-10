@@ -29,6 +29,7 @@ function OrderPage() {
   const navigate = useNavigate();
   const [cart, setCart] = useState<Record<string, CartEntry>>({});
   const [customer, setCustomer] = useState("");
+  const [phone, setPhone] = useState("");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [activeCat, setActiveCat] = useState<MenuItem["category"]>("burger");
