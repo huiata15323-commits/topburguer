@@ -189,7 +189,7 @@ function Landing() {
 
       <footer className="relative z-10 border-t border-white/5 py-6 text-center text-xs text-white/40">
         <div>Top Burguer · Fast Order — feito pra hamburgueria que voa.</div>
-        <div className="mt-1 text-white/25">Criado pelos alunos do Curso Técnico em Desenvolvimento de Sistemas — SENAI, do CEPI Elberto Alves: Erick Matheus, Bruno Abraão e Hitallo Gabriel</div>
+        <div className="mt-1 text-white/25">Criado pelos alunos do Curso Técnico em Desenvolvimento de Sistemas — SENAI, CEPI Elberto Alves · 2º Ano A e B</div>
       </footer>
     </main>
   );
