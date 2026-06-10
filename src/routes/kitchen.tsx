@@ -198,7 +198,7 @@ function KitchenPage() {
           <div className={`grid gap-4 ${tvMode ? "grid-cols-2 md:grid-cols-3 xl:grid-cols-4 text-lg" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"}`}>
             <AnimatePresence mode="popLayout">
               {list.map((o) => (
-                <OrderCard key={o.id} order={o} onStatus={(s) => updateStatus(o.id, s)} />
+                <OrderCard key={o.id} order={o} onStatus={(s) => updateStatus(o.id, s)} onNotified={() => markNotified(o.id)} />
               ))}
             </AnimatePresence>
           </div>
