@@ -102,7 +102,7 @@ function PainelPage() {
   }, [menu, preparing, pending]);
 
   const setView = (v: View) =>
-    navigate({ search: (prev) => ({ ...prev, view: v === "all" ? undefined : v }) });
+    navigate({ search: { view: v === "all" ? undefined : v } });
 
   const featured = ready[0];
 
