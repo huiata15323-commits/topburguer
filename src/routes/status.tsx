@@ -257,6 +257,22 @@ function StatusPage() {
                 </div>
               </div>
 
+              {/* Chamar atendente (apenas pedidos de mesa, ainda não retirados) */}
+              {order.status !== "done" && order.tableNumber && (
+                <WaiterCallCard
+                  order={order}
+                  onCall={async () => {
+                    await callWaiter(order.id);
+                    toast.success("Atendente avisado! 👋");
+                  }}
+                  onCancel={async () => {
+                    await clearWaiterCall(order.id);
+                    toast("Chamado cancelado");
+                  }}
+                />
+              )}
+
+
               {/* Avaliação pós-retirada (somente quando pronto) */}
               {order.status === "done" && (
                 <RatingCard
