@@ -165,6 +165,49 @@ function PainelPage() {
       {/* Faixa de categorias ao vivo */}
       <CategoryStrip counts={byCategory} totalActive={preparing.length + pending.length} />
 
+      {/* Chamados de atendente */}
+      <AnimatePresence>
+        {waiterCalls.length > 0 && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="border-b border-red-500/40 bg-gradient-to-r from-red-600/30 via-red-500/15 to-transparent overflow-hidden"
+          >
+            <div className="px-4 sm:px-8 py-3 flex items-center gap-3 sm:gap-5 overflow-x-auto">
+              <motion.div
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 1, repeat: Infinity }}
+                className="text-3xl shrink-0"
+              >🙋</motion.div>
+              <div className="text-[10px] uppercase tracking-[0.3em] text-red-300 font-black whitespace-nowrap shrink-0">
+                Chamando atendente
+              </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                {waiterCalls.map((o) => (
+                  <button
+                    key={o.id}
+                    onClick={() => void clearWaiterCall(o.id)}
+                    className="shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-red-400/40 text-sm font-bold transition group"
+                    title="Atendido — clique para limpar"
+                  >
+                    <span className="px-2 py-0.5 rounded-full bg-amber-warm text-charcoal text-xs font-black">
+                      🪑 MESA {o.tableNumber ?? "?"}
+                    </span>
+                    <span className="text-white/90">#{o.number} · {o.customer}</span>
+                    <span className="text-[10px] text-white/50 font-mono">
+                      há {elapsedLabel(o.waiterCalledAt ?? Date.now())}
+                    </span>
+                    <span className="opacity-0 group-hover:opacity-100 text-emerald-300 text-xs">✓ atendido</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+
       <div className="flex-1 min-h-0 p-4 sm:p-6">
         <AnimatePresence mode="wait">
           {view === "all" && (
