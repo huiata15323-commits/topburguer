@@ -351,6 +351,45 @@ function NotFound({ n }: { n: number }) {
   );
 }
 
+function WaiterCallCard({
+  order, onCall, onCancel,
+}: { order: Order; onCall: () => void; onCancel: () => void }) {
+  const called = !!order.waiterCalledAt;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className={`rounded-3xl border-2 p-5 flex items-center gap-4 ${
+        called
+          ? "border-emerald-500/40 bg-emerald-500/10"
+          : "border-amber-warm/30 bg-amber-warm/5"
+      }`}
+    >
+      <div className="text-4xl">{called ? "✅" : "🙋"}</div>
+      <div className="flex-1">
+        <div className="font-black">
+          {called ? "Atendente foi avisado" : "Precisa de ajuda na mesa?"}
+        </div>
+        <div className="text-xs text-muted-foreground">
+          {called
+            ? "Já está a caminho da sua mesa."
+            : "Chame um atendente sem precisar levantar."}
+        </div>
+      </div>
+      <button
+        onClick={called ? onCancel : onCall}
+        className={`shrink-0 px-4 py-2.5 rounded-xl font-bold text-sm transition ${
+          called
+            ? "bg-muted text-foreground hover:bg-secondary"
+            : "bg-gradient-ember text-ember-foreground shadow-ember"
+        }`}
+      >
+        {called ? "Cancelar" : "Chamar atendente"}
+      </button>
+    </motion.div>
+  );
+}
+
 function RatingCard({ order, onRate }: { order: Order; onRate: (stars: number, review?: string) => void }) {
   const [hover, setHover] = useState(0);
   const [picked, setPicked] = useState(order.rating ?? 0);
