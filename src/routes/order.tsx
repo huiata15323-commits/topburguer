@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { z } from "zod";
 import { type MenuItem } from "@/lib/menu";
 import { useMenu } from "@/lib/menu-store";
-import { useOrders, type OrderItem } from "@/lib/orders-store";
+import { useOrders, estimateWaitMinutes, type OrderItem } from "@/lib/orders-store";
 import { formatPhoneBR, normalizePhoneBR } from "@/lib/whatsapp";
 
 const search = z.object({
@@ -33,7 +33,8 @@ type CartEntry = { qty: number; notes?: string };
 
 function OrderPage() {
   const { mesa } = useSearch({ from: "/order" });
-  const { addOrder } = useOrders();
+  const { addOrder, orders } = useOrders();
+  const waitMin = useMemo(() => estimateWaitMinutes(orders), [orders]);
   const { items: menu } = useMenu();
   const navigate = useNavigate();
   const [cart, setCart] = useState<Record<string, CartEntry>>({});
