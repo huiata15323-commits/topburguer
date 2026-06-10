@@ -36,18 +36,16 @@ function OrderPage() {
   const [submitting, setSubmitting] = useState(false);
   const [activeCat, setActiveCat] = useState<MenuItem["category"]>("burger");
 
-  const items: OrderItem[] = useMemo(
-    () =>
-      Object.entries(cart)
-        .filter(([, e]) => e.qty > 0)
-        .map(([id, e]) => {
-          const m = menu.find((x) => x.id === id);
-          if (!m) return null;
-          return { menuId: m.id, name: m.name, emoji: m.emoji, image: m.image, price: m.price, quantity: e.qty, notes: e.notes };
-        })
-        .filter((x): x is OrderItem => x !== null),
-    [cart, menu]
-  );
+  const items: OrderItem[] = useMemo(() => {
+    const out: OrderItem[] = [];
+    for (const [id, e] of Object.entries(cart)) {
+      if (!e || e.qty <= 0) continue;
+      const m = menu.find((x) => x.id === id);
+      if (!m) continue;
+      out.push({ menuId: m.id, name: m.name, emoji: m.emoji, image: m.image, price: m.price, quantity: e.qty, notes: e.notes });
+    }
+    return out;
+  }, [cart, menu]);
 
   const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
   const itemCount = items.reduce((s, i) => s + i.quantity, 0);
