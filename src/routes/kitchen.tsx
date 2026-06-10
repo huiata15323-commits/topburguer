@@ -31,7 +31,7 @@ type LuxSensor = EventTarget & { illuminance?: number; start: () => void; stop: 
 type LuxSensorCtor = new (opts?: { frequency?: number }) => LuxSensor;
 
 function KitchenPage() {
-  const { orders, updateStatus, clearDone } = useOrders();
+  const { orders, updateStatus, markNotified, clearDone } = useOrders();
   const [, force] = useState(0);
   const prevIdsRef = useRef<Set<string>>(new Set());
   const [filter, setFilter] = useState<"all" | OrderStatus>("all");
