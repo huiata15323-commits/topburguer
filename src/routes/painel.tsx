@@ -3,12 +3,14 @@
 // Filtros (Tudo / Prontos / Em preparo) persistem no URL — basta abrir
 // /painel?view=ready numa TV pra dedicar a tela só à retirada.
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { z } from "zod";
+import { toast } from "sonner";
 import { useOrders, type Order } from "@/lib/orders-store";
 import { useMenu, type EditableMenuItem } from "@/lib/menu-store";
 import { initVoice, announceReady, announceWaiter, speak } from "@/lib/voice";
+import { spawnFakeOrder } from "@/lib/demo-mode";
 
 const search = z.object({
   view: z.enum(["all", "ready", "preparing"]).optional().default("all").catch("all"),
@@ -54,6 +56,8 @@ function PainelPage() {
     if (typeof window === "undefined") return true;
     return localStorage.getItem("painel.voice") !== "off";
   });
+  const [demoOn, setDemoOn] = useState(false);
+  const demoTimerRef = useRef<number | null>(null);
 
   useEffect(() => { initVoice(); }, []);
   useEffect(() => {
@@ -65,6 +69,52 @@ function PainelPage() {
   useEffect(() => {
     const i = setInterval(() => force((x) => x + 1), 1000);
     return () => clearInterval(i);
+  }, []);
+
+  // ===== Modo apresentador / demo automático =====
+  // Atalho: tecla "D" liga/desliga. Enquanto ligado, injeta pedidos sintéticos
+  // a cada ~9-13s, que progridem sozinhos (pending → preparing → done) e são
+  // deletados após 60s pra não poluir o relatório real.
+  const scheduleDemo = useCallback(() => {
+    const next = 9000 + Math.random() * 4000;
+    demoTimerRef.current = window.setTimeout(async () => {
+      await spawnFakeOrder(menu);
+      scheduleDemo();
+    }, next);
+  }, [menu]);
+
+  useEffect(() => {
+    if (!demoOn) {
+      if (demoTimerRef.current) {
+        clearTimeout(demoTimerRef.current);
+        demoTimerRef.current = null;
+      }
+      return;
+    }
+    // primeiro pedido quase imediato
+    void spawnFakeOrder(menu);
+    scheduleDemo();
+    return () => {
+      if (demoTimerRef.current) {
+        clearTimeout(demoTimerRef.current);
+        demoTimerRef.current = null;
+      }
+    };
+  }, [demoOn, menu, scheduleDemo]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() !== "d") return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      setDemoOn((v) => {
+        const next = !v;
+        toast.success(next ? "🎬 Modo apresentador ligado" : "⏸ Modo apresentador desligado");
+        return next;
+      });
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, []);
 
   // Som ao ficar pronto um novo pedido
@@ -185,6 +235,23 @@ function PainelPage() {
         <div className="flex items-center gap-3 shrink-0">
           <button
             onClick={() => {
+              setDemoOn((v) => {
+                const next = !v;
+                toast.success(next ? "🎬 Demo ligado (atalho: D)" : "⏸ Demo desligado");
+                return next;
+              });
+            }}
+            title="Modo apresentador: gera pedidos automáticos (atalho: D)"
+            className={`grid place-items-center w-10 h-10 rounded-xl border transition ${
+              demoOn
+                ? "bg-purple-500/20 border-purple-400/50 text-purple-200 animate-live"
+                : "bg-white/5 border-white/10 text-white/40 hover:text-white/70"
+            }`}
+          >
+            🎬
+          </button>
+          <button
+            onClick={() => {
               const next = !voiceOn;
               setVoiceOn(next);
               if (next) speak("Anúncios de voz ativados.");
@@ -206,6 +273,24 @@ function PainelPage() {
           </div>
         </div>
       </header>
+
+      {/* Banner do modo demo */}
+      <AnimatePresence>
+        {demoOn && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="bg-gradient-to-r from-purple-600/30 via-fuchsia-500/15 to-transparent border-b border-purple-400/30 overflow-hidden"
+          >
+            <div className="px-4 sm:px-8 py-2 text-xs sm:text-sm font-bold flex items-center gap-3 text-purple-100">
+              <span className="text-lg animate-live">🎬</span>
+              <span>MODO APRESENTADOR · gerando pedidos sintéticos · pressione <kbd className="px-1.5 py-0.5 rounded bg-white/10 font-mono">D</kbd> para desligar</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
 
       {/* Faixa de categorias ao vivo */}
       <CategoryStrip counts={byCategory} totalActive={preparing.length + pending.length} />
