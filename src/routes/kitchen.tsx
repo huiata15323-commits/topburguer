@@ -230,7 +230,7 @@ function FilterChip({
   );
 }
 
-function OrderCard({ order, onStatus }: { order: Order; onStatus: (s: OrderStatus) => void }) {
+function OrderCard({ order, onStatus, onNotified }: { order: Order; onStatus: (s: OrderStatus) => void; onNotified: () => void }) {
   const age = (Date.now() - order.createdAt) / 1000;
   const urgent = age > 300 && order.status !== "done";
 
