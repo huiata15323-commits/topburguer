@@ -1,6 +1,8 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import confetti from "canvas-confetti";
+import { toast } from "sonner";
 import { useOrders, type Order } from "@/lib/orders-store";
 import {
   ensureServiceWorker,
@@ -33,7 +35,7 @@ const STEPS = [
 function StatusPage() {
   const { n } = useSearch({ from: "/status" });
   const navigate = useNavigate({ from: "/status" });
-  const { orders } = useOrders();
+  const { orders, rateOrder } = useOrders();
   const [input, setInput] = useState(n ? String(n) : "");
 
   const order: Order | undefined = useMemo(
@@ -57,14 +59,30 @@ function StatusPage() {
     if (getPermission() === "granted") void ensureServiceWorker();
   }, []);
 
-  // Dispara notificação automaticamente quando o pedido acompanhado vira "done"
+  // Dispara notificação + confete automaticamente quando o pedido acompanhado vira "done"
+  const confettiFiredRef = useRef<Set<string>>(new Set());
   useEffect(() => {
     if (!order) return;
     if (order.status !== "done") return;
-    if (perm !== "granted") return;
     if (notifiedRef.current.has(order.id)) return;
     notifiedRef.current.add(order.id);
-    void notifyOrderReady(order.number);
+    if (perm === "granted") void notifyOrderReady(order.number);
+    if (!confettiFiredRef.current.has(order.id)) {
+      confettiFiredRef.current.add(order.id);
+      const fire = (origin: { x: number; y: number }) => {
+        confetti({
+          particleCount: 80,
+          spread: 75,
+          startVelocity: 45,
+          origin,
+          colors: ["#ff7a1a", "#ffb347", "#ffd54f", "#fff7ed", "#10b981"],
+          ticks: 220,
+        });
+      };
+      fire({ x: 0.25, y: 0.4 });
+      setTimeout(() => fire({ x: 0.75, y: 0.4 }), 200);
+      setTimeout(() => fire({ x: 0.5, y: 0.3 }), 400);
+    }
   }, [order?.status, order?.id, order?.number, perm]);
 
   const handleEnableNotifications = async () => {
