@@ -31,6 +31,7 @@ export type Order = {
   rating?: number;
   review?: string;
   ratedAt?: number;
+  waiterCalledAt?: number;
 };
 
 // ===== Mapeamento entre o registro do DB e o tipo Order =====
@@ -50,6 +51,7 @@ type DbRow = {
   rating: number | null;
   review: string | null;
   rated_at: string | null;
+  waiter_called_at: string | null;
 };
 
 function rowToOrder(r: DbRow): Order {
@@ -69,6 +71,7 @@ function rowToOrder(r: DbRow): Order {
     rating: r.rating ?? undefined,
     review: r.review ?? undefined,
     ratedAt: r.rated_at ? new Date(r.rated_at).getTime() : undefined,
+    waiterCalledAt: r.waiter_called_at ? new Date(r.waiter_called_at).getTime() : undefined,
   };
 }
 
@@ -197,6 +200,22 @@ export function useOrders() {
     []
   );
 
+  const callWaiter = useCallback(async (id: string) => {
+    const { error } = await supabase
+      .from("orders")
+      .update({ waiter_called_at: new Date().toISOString() })
+      .eq("id", id);
+    if (error) console.error("[orders] callWaiter failed", error);
+  }, []);
+
+  const clearWaiterCall = useCallback(async (id: string) => {
+    const { error } = await supabase
+      .from("orders")
+      .update({ waiter_called_at: null })
+      .eq("id", id);
+    if (error) console.error("[orders] clearWaiterCall failed", error);
+  }, []);
+
   const clearDone = useCallback(async () => {
     const { error } = await supabase.from("orders").delete().eq("status", "done");
     if (error) console.error("[orders] clearDone failed", error);
@@ -207,7 +226,29 @@ export function useOrders() {
     if (error) console.error("[orders] clearAll failed", error);
   }, []);
 
-  return { orders, addOrder, updateStatus, markNotified, rateOrder, clearDone, clearAll };
+  return { orders, addOrder, updateStatus, markNotified, rateOrder, callWaiter, clearWaiterCall, clearDone, clearAll };
+}
+
+// Estima o tempo de espera (em minutos) baseado na fila atual e no histórico
+// dos últimos pedidos concluídos. Cai em 8min como fallback.
+export function estimateWaitMinutes(orders: Order[]): number {
+  const completed = orders
+    .filter((o) => o.status === "done" && o.doneAt)
+    .slice(0, 10);
+  let avgPerOrder = 8;
+  if (completed.length >= 2) {
+    const totalMs = completed.reduce(
+      (s, o) => s + Math.max(0, (o.doneAt ?? 0) - o.createdAt),
+      0
+    );
+    avgPerOrder = Math.max(4, Math.round(totalMs / completed.length / 60000));
+  }
+  const queue =
+    orders.filter((o) => o.status === "pending" || o.status === "preparing").length;
+  // Assume duas estações em paralelo na simulação
+  const parallel = 2;
+  const positions = Math.ceil((queue + 1) / parallel);
+  return Math.max(3, positions * avgPerOrder);
 }
 
 // Cleanup do canal global (opcional, mas evita leaks em HMR)

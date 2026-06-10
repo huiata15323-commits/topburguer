@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useMenu, type EditableMenuItem } from "@/lib/menu-store";
 import { MENU as SEED } from "@/lib/menu";
 import { TableQRGenerator } from "@/components/TableQRGenerator";
+import { EndOfDayCard } from "@/components/EndOfDayCard";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -105,7 +106,10 @@ function AdminPage() {
       </header>
 
       <div className="mx-auto max-w-6xl px-4 py-8 space-y-8">
+        <EndOfDayCard />
         <TableQRGenerator />
+
+
 
         <div className="grid gap-8 lg:grid-cols-[400px_1fr]">
         <aside className="lg:sticky lg:top-6 lg:self-start">
