@@ -242,7 +242,9 @@ function KitchenPage() {
           </div>
         )}
       </div>
+      </div>
     </main>
+
   );
 }
 
