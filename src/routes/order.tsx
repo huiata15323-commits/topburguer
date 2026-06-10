@@ -1,13 +1,19 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
+import { z } from "zod";
 import { type MenuItem } from "@/lib/menu";
 import { useMenu } from "@/lib/menu-store";
 import { useOrders, type OrderItem } from "@/lib/orders-store";
 import { formatPhoneBR, normalizePhoneBR } from "@/lib/whatsapp";
 
+const search = z.object({
+  mesa: z.coerce.number().int().positive().max(999).optional().catch(undefined),
+});
+
 export const Route = createFileRoute("/order")({
+  validateSearch: search,
   head: () => ({
     meta: [
       { title: "Pedido — Fast Order" },
@@ -26,6 +32,7 @@ const CATEGORIES: { key: MenuItem["category"]; label: string; emoji: string }[] 
 type CartEntry = { qty: number; notes?: string };
 
 function OrderPage() {
+  const { mesa } = useSearch({ from: "/order" });
   const { addOrder } = useOrders();
   const { items: menu } = useMenu();
   const navigate = useNavigate();
