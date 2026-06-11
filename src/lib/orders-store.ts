@@ -1,9 +1,12 @@
-// Estado compartilhado de pedidos em tempo real via Lovable Cloud (Supabase Realtime).
-// Funciona em múltiplos dispositivos: cliente no celular, cozinha no PC, painel na TV.
+// Estado compartilhado de pedidos via Lovable Cloud.
+// Realtime foi removido (broadcast vazava PII); usamos polling leve (4s).
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getStaffPin } from "@/components/StaffGate";
+import { staffUpdateStatus, staffClearOrders } from "@/lib/staff.functions";
 
 export type OrderStatus = "pending" | "preparing" | "done";
+
 
 export type OrderItem = {
   menuId: string;
