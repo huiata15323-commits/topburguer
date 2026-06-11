@@ -267,13 +267,14 @@ export function estimateWaitMinutes(orders: Order[]): number {
   return Math.max(3, positions * avgPerOrder);
 }
 
-// Cleanup do canal global (opcional, mas evita leaks em HMR)
+// Para o polling quando a aba é fechada
 if (typeof window !== "undefined") {
   window.addEventListener("beforeunload", () => {
-    if (realtimeChannel) {
-      void supabase.removeChannel(realtimeChannel);
-      realtimeChannel = null;
+    if (pollTimer) {
+      clearInterval(pollTimer);
+      pollTimer = null;
       initialized = false;
     }
   });
+
 }
