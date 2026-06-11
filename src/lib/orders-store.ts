@@ -82,7 +82,7 @@ function rowToOrder(r: DbRow): Order {
 let cache: Order[] = [];
 const listeners = new Set<(o: Order[]) => void>();
 let initialized = false;
-let realtimeChannel: ReturnType<typeof supabase.channel> | null = null;
+let pollTimer: ReturnType<typeof setInterval> | null = null;
 
 function notify() {
   for (const fn of listeners) fn(cache);
@@ -91,7 +91,7 @@ function notify() {
 async function fetchAll() {
   const { data, error } = await supabase
     .from("orders")
-    .select("*")
+    .select("id, number, customer, table_number, items, notes, total, status, created_at, done_at, notified_at, rating, review, rated_at, waiter_called_at")
     .order("created_at", { ascending: false });
   if (error) {
     console.error("[orders] fetch failed", error);
@@ -101,34 +101,20 @@ async function fetchAll() {
   notify();
 }
 
-function ensureRealtime() {
+function ensurePolling() {
   if (initialized) return;
   initialized = true;
   void fetchAll();
-  realtimeChannel = supabase
-    .channel("orders-stream")
-    .on(
-      "postgres_changes",
-      { event: "*", schema: "public", table: "orders" },
-      (payload) => {
-        if (payload.eventType === "INSERT") {
-          const row = rowToOrder(payload.new as DbRow);
-          if (!cache.some((o) => o.id === row.id)) cache = [row, ...cache];
-        } else if (payload.eventType === "UPDATE") {
-          const row = rowToOrder(payload.new as DbRow);
-          cache = cache.map((o) => (o.id === row.id ? row : o));
-        } else if (payload.eventType === "DELETE") {
-          const oldId = (payload.old as { id: string }).id;
-          cache = cache.filter((o) => o.id !== oldId);
-        }
-        notify();
-      }
-    )
-    .subscribe();
+  // Polling leve substitui o realtime (que vazava PII para todos os assinantes anon)
+  pollTimer = setInterval(() => {
+    if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
+    void fetchAll();
+  }, 4000);
 }
 
 export function useOrders() {
   const [orders, setOrders] = useState<Order[]>(cache);
+
 
   useEffect(() => {
     ensureRealtime();
