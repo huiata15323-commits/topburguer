@@ -160,10 +160,17 @@ export function useOrders() {
   );
 
   const updateStatus = useCallback(async (id: string, status: OrderStatus) => {
-    const patch: { status: OrderStatus; done_at?: string } = { status };
-    if (status === "done") patch.done_at = new Date().toISOString();
-    const { error } = await supabase.from("orders").update(patch).eq("id", id);
-    if (error) console.error("[orders] updateStatus failed", error);
+    const pin = getStaffPin();
+    if (!pin) {
+      console.warn("[orders] updateStatus blocked: staff PIN required");
+      return;
+    }
+    try {
+      await staffUpdateStatus({ data: { pin, id, status } });
+      void fetchAll();
+    } catch (e) {
+      console.error("[orders] updateStatus failed", e);
+    }
   }, []);
 
   const markNotified = useCallback(async (id: string) => {
@@ -207,14 +214,33 @@ export function useOrders() {
   }, []);
 
   const clearDone = useCallback(async () => {
-    const { error } = await supabase.from("orders").delete().eq("status", "done");
-    if (error) console.error("[orders] clearDone failed", error);
+    const pin = getStaffPin();
+    if (!pin) {
+      console.warn("[orders] clearDone blocked: staff PIN required");
+      return;
+    }
+    try {
+      await staffClearOrders({ data: { pin, scope: "done" } });
+      void fetchAll();
+    } catch (e) {
+      console.error("[orders] clearDone failed", e);
+    }
   }, []);
 
   const clearAll = useCallback(async () => {
-    const { error } = await supabase.from("orders").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-    if (error) console.error("[orders] clearAll failed", error);
+    const pin = getStaffPin();
+    if (!pin) {
+      console.warn("[orders] clearAll blocked: staff PIN required");
+      return;
+    }
+    try {
+      await staffClearOrders({ data: { pin, scope: "all" } });
+      void fetchAll();
+    } catch (e) {
+      console.error("[orders] clearAll failed", e);
+    }
   }, []);
+
 
   return { orders, addOrder, updateStatus, markNotified, rateOrder, callWaiter, clearWaiterCall, clearDone, clearAll };
 }
