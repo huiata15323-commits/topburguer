@@ -91,6 +91,9 @@ export function StaffGate({ allow, title = "Área restrita", children }: Props) 
     localStorage.setItem(PIN_KEY, pin.trim());
     setRole(r);
     setErr("");
+  };
+
+
 
 
   return (
