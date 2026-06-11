@@ -6,6 +6,7 @@ import { useMenu, type EditableMenuItem } from "@/lib/menu-store";
 import { MENU as SEED } from "@/lib/menu";
 import { TableQRGenerator } from "@/components/TableQRGenerator";
 import { EndOfDayCard } from "@/components/EndOfDayCard";
+import { StaffGate } from "@/components/StaffGate";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -14,7 +15,11 @@ export const Route = createFileRoute("/admin")({
       { name: "description", content: "Painel administrativo do cardápio da Top Burguer." },
     ],
   }),
-  component: AdminPage,
+  component: () => (
+    <StaffGate allow={["admin"]} title="Administração">
+      <AdminPage />
+    </StaffGate>
+  ),
 });
 
 type FormState = {

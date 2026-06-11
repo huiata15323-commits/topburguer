@@ -9,6 +9,7 @@ import {
 import { useOrders, type Order } from "@/lib/orders-store";
 import { useExpenses } from "@/lib/expenses-store";
 import { generateReportPDF } from "@/lib/report-pdf";
+import { StaffGate } from "@/components/StaffGate";
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({
@@ -17,7 +18,11 @@ export const Route = createFileRoute("/dashboard")({
       { name: "description", content: "Painel interativo com métricas, gráficos e relatórios." },
     ],
   }),
-  component: DashboardPage,
+  component: () => (
+    <StaffGate allow={["admin"]} title="Dashboard">
+      <DashboardPage />
+    </StaffGate>
+  ),
 });
 
 type Range = "today" | "7d" | "30d" | "all";

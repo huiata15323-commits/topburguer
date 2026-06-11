@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useOrders } from "@/lib/orders-store";
 import { useExpenses, CATEGORY_LABEL, type ExpenseCategory } from "@/lib/expenses-store";
 import { generateReportPDF } from "@/lib/report-pdf";
+import { StaffGate } from "@/components/StaffGate";
 
 export const Route = createFileRoute("/finance")({
   head: () => ({
@@ -13,7 +14,11 @@ export const Route = createFileRoute("/finance")({
       { name: "description", content: "Controle de despesas, lucro e relatórios financeiros." },
     ],
   }),
-  component: FinancePage,
+  component: () => (
+    <StaffGate allow={["admin", "caixa"]} title="Financeiro / Caixa">
+      <FinancePage />
+    </StaffGate>
+  ),
 });
 
 function startOfDay(d: Date) { const c = new Date(d); c.setHours(0,0,0,0); return c.getTime(); }
