@@ -1,9 +1,12 @@
-// Estado compartilhado de pedidos em tempo real via Lovable Cloud (Supabase Realtime).
-// Funciona em múltiplos dispositivos: cliente no celular, cozinha no PC, painel na TV.
+// Estado compartilhado de pedidos via Lovable Cloud.
+// Realtime foi removido (broadcast vazava PII); usamos polling leve (4s).
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getStaffPin } from "@/components/StaffGate";
+import { staffUpdateStatus, staffClearOrders } from "@/lib/staff.functions";
 
 export type OrderStatus = "pending" | "preparing" | "done";
+
 
 export type OrderItem = {
   menuId: string;
@@ -79,7 +82,7 @@ function rowToOrder(r: DbRow): Order {
 let cache: Order[] = [];
 const listeners = new Set<(o: Order[]) => void>();
 let initialized = false;
-let realtimeChannel: ReturnType<typeof supabase.channel> | null = null;
+let pollTimer: ReturnType<typeof setInterval> | null = null;
 
 function notify() {
   for (const fn of listeners) fn(cache);
@@ -88,7 +91,7 @@ function notify() {
 async function fetchAll() {
   const { data, error } = await supabase
     .from("orders")
-    .select("*")
+    .select("id, number, customer, table_number, items, notes, total, status, created_at, done_at, notified_at, rating, review, rated_at, waiter_called_at")
     .order("created_at", { ascending: false });
   if (error) {
     console.error("[orders] fetch failed", error);
@@ -98,37 +101,24 @@ async function fetchAll() {
   notify();
 }
 
-function ensureRealtime() {
+function ensurePolling() {
   if (initialized) return;
   initialized = true;
   void fetchAll();
-  realtimeChannel = supabase
-    .channel("orders-stream")
-    .on(
-      "postgres_changes",
-      { event: "*", schema: "public", table: "orders" },
-      (payload) => {
-        if (payload.eventType === "INSERT") {
-          const row = rowToOrder(payload.new as DbRow);
-          if (!cache.some((o) => o.id === row.id)) cache = [row, ...cache];
-        } else if (payload.eventType === "UPDATE") {
-          const row = rowToOrder(payload.new as DbRow);
-          cache = cache.map((o) => (o.id === row.id ? row : o));
-        } else if (payload.eventType === "DELETE") {
-          const oldId = (payload.old as { id: string }).id;
-          cache = cache.filter((o) => o.id !== oldId);
-        }
-        notify();
-      }
-    )
-    .subscribe();
+  // Polling leve substitui o realtime (que vazava PII para todos os assinantes anon)
+  pollTimer = setInterval(() => {
+    if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
+    void fetchAll();
+  }, 4000);
 }
 
 export function useOrders() {
   const [orders, setOrders] = useState<Order[]>(cache);
 
+
   useEffect(() => {
-    ensureRealtime();
+    ensurePolling();
+
     const fn = (o: Order[]) => setOrders(o);
     listeners.add(fn);
     setOrders(cache);
@@ -170,10 +160,17 @@ export function useOrders() {
   );
 
   const updateStatus = useCallback(async (id: string, status: OrderStatus) => {
-    const patch: { status: OrderStatus; done_at?: string } = { status };
-    if (status === "done") patch.done_at = new Date().toISOString();
-    const { error } = await supabase.from("orders").update(patch).eq("id", id);
-    if (error) console.error("[orders] updateStatus failed", error);
+    const pin = getStaffPin();
+    if (!pin) {
+      console.warn("[orders] updateStatus blocked: staff PIN required");
+      return;
+    }
+    try {
+      await staffUpdateStatus({ data: { pin, id, status } });
+      void fetchAll();
+    } catch (e) {
+      console.error("[orders] updateStatus failed", e);
+    }
   }, []);
 
   const markNotified = useCallback(async (id: string) => {
@@ -217,14 +214,33 @@ export function useOrders() {
   }, []);
 
   const clearDone = useCallback(async () => {
-    const { error } = await supabase.from("orders").delete().eq("status", "done");
-    if (error) console.error("[orders] clearDone failed", error);
+    const pin = getStaffPin();
+    if (!pin) {
+      console.warn("[orders] clearDone blocked: staff PIN required");
+      return;
+    }
+    try {
+      await staffClearOrders({ data: { pin, scope: "done" } });
+      void fetchAll();
+    } catch (e) {
+      console.error("[orders] clearDone failed", e);
+    }
   }, []);
 
   const clearAll = useCallback(async () => {
-    const { error } = await supabase.from("orders").delete().neq("id", "00000000-0000-0000-0000-000000000000");
-    if (error) console.error("[orders] clearAll failed", error);
+    const pin = getStaffPin();
+    if (!pin) {
+      console.warn("[orders] clearAll blocked: staff PIN required");
+      return;
+    }
+    try {
+      await staffClearOrders({ data: { pin, scope: "all" } });
+      void fetchAll();
+    } catch (e) {
+      console.error("[orders] clearAll failed", e);
+    }
   }, []);
+
 
   return { orders, addOrder, updateStatus, markNotified, rateOrder, callWaiter, clearWaiterCall, clearDone, clearAll };
 }
@@ -251,13 +267,14 @@ export function estimateWaitMinutes(orders: Order[]): number {
   return Math.max(3, positions * avgPerOrder);
 }
 
-// Cleanup do canal global (opcional, mas evita leaks em HMR)
+// Para o polling quando a aba é fechada
 if (typeof window !== "undefined") {
   window.addEventListener("beforeunload", () => {
-    if (realtimeChannel) {
-      void supabase.removeChannel(realtimeChannel);
-      realtimeChannel = null;
+    if (pollTimer) {
+      clearInterval(pollTimer);
+      pollTimer = null;
       initialized = false;
     }
   });
+
 }

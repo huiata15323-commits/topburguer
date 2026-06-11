@@ -20,9 +20,35 @@ const SummaryInput = z.object({
   hourlyCounts: z.array(z.number().int().nonnegative()).max(24),
 });
 
+// Rate limit simples em memória (best-effort no worker): 6 chamadas/minuto/IP.
+const rl = new Map<string, { count: number; resetAt: number }>();
+function rateLimit(ip: string) {
+  const now = Date.now();
+  const cur = rl.get(ip);
+  if (!cur || cur.resetAt < now) {
+    rl.set(ip, { count: 1, resetAt: now + 60_000 });
+    return true;
+  }
+  cur.count++;
+  return cur.count <= 6;
+}
+
 export const generateDaySummary = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => SummaryInput.parse(input))
   .handler(async ({ data }) => {
+    // Bloqueia abuso de chamadas vazias contra crédito de IA
+    if (data.totalCount === 0 && data.doneCount === 0 && data.revenue === 0) {
+      return { summary: "Sem pedidos hoje ainda — gere o resumo depois do primeiro pedido." };
+    }
+    try {
+      const { getRequestIP } = await import("@tanstack/react-start/server");
+      const ip = getRequestIP({ xForwardedFor: true }) ?? "unknown";
+      if (!rateLimit(ip)) {
+        return { summary: "⏳ Muitos resumos solicitados. Aguarde 1 minuto." };
+      }
+    } catch {
+      /* getRequestIP fora de contexto — ignora */
+    }
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) {
       return {
@@ -30,6 +56,7 @@ export const generateDaySummary = createServerFn({ method: "POST" })
           "⚠️ Chave da IA não configurada (LOVABLE_API_KEY). Ative o Lovable Cloud para gerar o resumo.",
       };
     }
+
 
     const prompt = `Você é o gerente experiente de uma hamburgueria chamada Top Burguer. Resuma o desempenho do dia em **português brasileiro** de forma direta e útil, em no máximo 6 linhas, usando markdown leve (negrito e bullets). Inclua:
 - 1 frase de cabeçalho com o "humor" do dia (foi forte, fraco, regular?)
