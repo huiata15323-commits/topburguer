@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useOrders, type Order, type OrderStatus } from "@/lib/orders-store";
 import { buildReadyMessage, waLink, formatPhoneBR } from "@/lib/whatsapp";
+import { StaffGate } from "@/components/StaffGate";
 
 export const Route = createFileRoute("/kitchen")({
   head: () => ({
