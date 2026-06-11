@@ -88,9 +88,10 @@ export function StaffGate({ allow, title = "Área restrita", children }: Props) 
       return;
     }
     localStorage.setItem(STORAGE_KEY, r);
+    localStorage.setItem(PIN_KEY, pin.trim());
     setRole(r);
     setErr("");
-  };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/30 p-4">
