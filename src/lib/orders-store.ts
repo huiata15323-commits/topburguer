@@ -117,7 +117,8 @@ export function useOrders() {
 
 
   useEffect(() => {
-    ensureRealtime();
+    ensurePolling();
+
     const fn = (o: Order[]) => setOrders(o);
     listeners.add(fn);
     setOrders(cache);
