@@ -11,7 +11,11 @@ export const Route = createFileRoute("/kitchen")({
       { name: "description", content: "Painel de cozinha em tempo real da Top Burguer." },
     ],
   }),
-  component: KitchenPage,
+  component: () => (
+    <StaffGate allow={["admin", "cozinha", "caixa"]} title="Painel da Cozinha">
+      <KitchenPage />
+    </StaffGate>
+  ),
 });
 
 function elapsed(ms: number) {
