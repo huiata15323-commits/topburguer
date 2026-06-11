@@ -12,6 +12,7 @@ const PINS: Record<string, StaffRole> = {
 };
 
 const STORAGE_KEY = "topburguer.staff.role";
+const PIN_KEY = "topburguer.staff.pin";
 
 export function getStaffRole(): StaffRole | null {
   if (typeof window === "undefined") return null;
@@ -19,10 +20,17 @@ export function getStaffRole(): StaffRole | null {
   return r === "admin" || r === "cozinha" || r === "caixa" ? r : null;
 }
 
+export function getStaffPin(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(PIN_KEY);
+}
+
 export function staffLogout() {
   localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(PIN_KEY);
   window.location.reload();
 }
+
 
 interface Props {
   allow: StaffRole[];
