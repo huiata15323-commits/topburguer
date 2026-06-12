@@ -243,7 +243,7 @@ function OrderPage() {
                         {soldOut && (
                           <div className="absolute inset-0 bg-black/55 grid place-items-center">
                             <span className="px-3 py-1 rounded-full bg-red-500 text-white text-xs font-black uppercase tracking-widest">
-                              Esgotado hoje
+                              {t("menu.soldout")}
                             </span>
                           </div>
                         )}
