@@ -170,7 +170,7 @@ function OrderPage() {
                   : "bg-white/5 text-white/70 hover:bg-white/10"
               }`}
             >
-              {c.emoji} {c.label}
+              {c.emoji} {t(c.tKey)}
             </button>
           ))}
         </div>
