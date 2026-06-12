@@ -369,7 +369,17 @@ function OrderCard({ order, onStatus, onNotified }: { order: Order; onStatus: (s
             ↺ Reabrir
           </button>
         )}
+        <a
+          href={`/receipt?n=${order.number}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white/80 text-xs font-bold transition"
+          title="Imprimir comanda 80mm"
+        >
+          🖨
+        </a>
       </div>
+
 
       {order.status === "done" && order.phone && (
         <a
