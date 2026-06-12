@@ -7,6 +7,8 @@ import { MENU as SEED } from "@/lib/menu";
 import { TableQRGenerator } from "@/components/TableQRGenerator";
 import { EndOfDayCard } from "@/components/EndOfDayCard";
 import { StaffGate } from "@/components/StaffGate";
+import { PromosAdmin } from "@/components/PromosAdmin";
+import { TableHeatmap } from "@/components/TableHeatmap";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
