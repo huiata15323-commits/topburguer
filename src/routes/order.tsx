@@ -402,30 +402,44 @@ function OrderPage() {
 }
 
 
+type LoyaltyInfo = { count: number; toNext: number; eligible: boolean; e164: string | null };
+
 function CartCard({
-  customer, setCustomer, phone, setPhone, notes, setNotes, items, total, submitting, onSubmit, embedded,
+  customer, setCustomer, phone, setPhone, notes, setNotes,
+  items, subtotal, total, discountAmount, discountLabel,
+  submitting, onSubmit, embedded,
+  couponInput, setCouponInput, appliedCoupon, onApplyCoupon, onClearCoupon,
+  loyalty, t,
 }: {
   customer: string; setCustomer: (s: string) => void;
   phone: string; setPhone: (s: string) => void;
   notes: string; setNotes: (s: string) => void;
-  items: OrderItem[]; total: number; submitting: boolean; onSubmit: () => void;
+  items: OrderItem[];
+  subtotal: number; total: number;
+  discountAmount: number; discountLabel: string;
+  submitting: boolean; onSubmit: () => void;
+  couponInput: string; setCouponInput: (s: string) => void;
+  appliedCoupon: Coupon | null;
+  onApplyCoupon: () => void; onClearCoupon: () => void;
+  loyalty: LoyaltyInfo;
+  t: (key: string) => string;
   embedded?: boolean;
 }) {
   return (
     <div className={embedded ? "" : "rounded-3xl bg-card border border-border p-5 shadow-card-soft"}>
-      {!embedded && <h3 className="font-black text-lg mb-4">Seu pedido</h3>}
+      {!embedded && <h3 className="font-black text-lg mb-4">{t("order.your")}</h3>}
 
-      <label className="block text-xs font-medium text-muted-foreground mb-1">Nome</label>
+      <label className="block text-xs font-medium text-muted-foreground mb-1">{t("order.name")}</label>
       <input
         value={customer}
         onChange={(e) => setCustomer(e.target.value)}
         maxLength={50}
-        placeholder="Como te chamamos?"
+        placeholder={t("order.namePh")}
         className="w-full px-3 py-2.5 rounded-xl border border-border focus:border-ember focus:outline-none mb-3 bg-background"
       />
 
       <label className="block text-xs font-medium text-muted-foreground mb-1">
-        WhatsApp <span className="text-muted-foreground/60">(opcional — avisamos quando ficar pronto)</span>
+        {t("order.phone")} <span className="text-muted-foreground/60">{t("order.phoneHelp")}</span>
       </label>
       <input
         value={phone}
@@ -436,9 +450,34 @@ function CartCard({
         className="w-full px-3 py-2.5 rounded-xl border border-border focus:border-ember focus:outline-none mb-3 bg-background"
       />
 
+      {/* Fidelidade */}
+      {loyalty.e164 && (
+        <div className={`mb-3 rounded-xl p-3 text-xs border ${
+          loyalty.eligible
+            ? "border-emerald-400/40 bg-emerald-500/10"
+            : "border-amber-warm/30 bg-amber-warm/5"
+        }`}>
+          <div className="flex items-center gap-2 font-bold">
+            <span>🏆</span>
+            <span>{t("order.loyalty")}: {loyalty.count}/{REWARD_EVERY}</span>
+          </div>
+          <div className="mt-1 text-muted-foreground">
+            {loyalty.eligible
+              ? t("order.loyaltyReward")
+              : `${loyalty.toNext} ${t("order.loyaltyProgress")}`}
+          </div>
+          <div className="mt-2 h-1.5 rounded-full bg-background overflow-hidden">
+            <div
+              className="h-full bg-gradient-ember transition-all"
+              style={{ width: `${((loyalty.count % REWARD_EVERY) / REWARD_EVERY) * 100}%` }}
+            />
+          </div>
+        </div>
+      )}
+
       <div className="space-y-2 max-h-64 overflow-y-auto">
         {items.length === 0 && (
-          <p className="text-sm text-muted-foreground italic py-4 text-center">Carrinho vazio</p>
+          <p className="text-sm text-muted-foreground italic py-4 text-center">{t("order.empty")}</p>
         )}
         <AnimatePresence initial={false}>
           {items.map((i) => (
@@ -461,19 +500,59 @@ function CartCard({
         </AnimatePresence>
       </div>
 
-      <label className="block text-xs font-medium text-muted-foreground mt-4 mb-1">Observações gerais</label>
+      {/* Cupom */}
+      <div className="mt-4">
+        <label className="block text-xs font-medium text-muted-foreground mb-1">{t("order.coupon")}</label>
+        {appliedCoupon ? (
+          <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-fuchsia-500/15 border border-fuchsia-400/40">
+            <span className="font-bold text-sm font-mono">🎟 {appliedCoupon.code} <span className="opacity-70">−{appliedCoupon.percentOff}%</span></span>
+            <button onClick={onClearCoupon} className="text-xs text-fuchsia-600 hover:text-red-500 font-bold">×</button>
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <input
+              value={couponInput}
+              onChange={(e) => setCouponInput(e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 20))}
+              placeholder={t("order.couponPh")}
+              className="flex-1 px-3 py-2 rounded-xl border border-border bg-background font-mono uppercase text-sm"
+            />
+            <button
+              type="button"
+              onClick={onApplyCoupon}
+              className="px-3 py-2 rounded-xl bg-muted hover:bg-secondary font-bold text-xs"
+            >
+              {t("order.couponApply")}
+            </button>
+          </div>
+        )}
+      </div>
+
+      <label className="block text-xs font-medium text-muted-foreground mt-4 mb-1">{t("order.notes")}</label>
       <textarea
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
         maxLength={300}
         rows={2}
-        placeholder="Ex: para viagem, mesa 5…"
         className="w-full px-3 py-2 rounded-xl border border-border focus:border-ember focus:outline-none text-sm bg-background"
       />
 
-      <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
-        <span className="text-muted-foreground">Total</span>
-        <span className="text-2xl font-black text-ember">R$ {total.toFixed(2)}</span>
+      <div className="mt-4 pt-4 border-t border-border space-y-1">
+        {discountAmount > 0 && (
+          <>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">{t("order.subtotal")}</span>
+              <span className="font-semibold tabular-nums">R$ {subtotal.toFixed(2)}</span>
+            </div>
+            <div className="flex items-center justify-between text-sm text-emerald-600 dark:text-emerald-400">
+              <span className="font-bold">{t("order.discount")} {discountLabel}</span>
+              <span className="font-bold tabular-nums">−R$ {discountAmount.toFixed(2)}</span>
+            </div>
+          </>
+        )}
+        <div className="flex items-center justify-between pt-1">
+          <span className="text-muted-foreground">{t("order.total")}</span>
+          <span className="text-2xl font-black text-ember">R$ {total.toFixed(2)}</span>
+        </div>
       </div>
 
       <button
@@ -481,8 +560,10 @@ function CartCard({
         disabled={submitting || items.length === 0}
         className="mt-4 w-full py-3.5 rounded-2xl bg-gradient-ember text-ember-foreground font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] shadow-ember"
       >
-        {submitting ? "Enviando…" : "⚡ Pagar com PIX e enviar"}
+        {submitting ? t("order.sending") : t("order.send")}
       </button>
     </div>
   );
+}
+
 }
