@@ -177,16 +177,29 @@ function OrderPage() {
       </header>
 
       {/* Estimativa de tempo de espera */}
-      <div className="mx-auto max-w-6xl px-4 pt-4">
+      <div className="mx-auto max-w-6xl px-4 pt-4 space-y-3">
         <div className="rounded-2xl border border-amber-warm/30 bg-gradient-to-r from-amber-warm/10 via-ember/5 to-transparent px-4 py-3 flex items-center gap-3">
           <span className="text-2xl">⏱️</span>
           <div className="flex-1 text-sm">
-            <span className="font-bold">Tempo estimado de preparo: </span>
+            <span className="font-bold">{t("order.wait")}: </span>
             <span className="text-ember font-black">~{waitMin} min</span>
-            <span className="text-muted-foreground"> · baseado na fila atual</span>
           </div>
         </div>
+        {isHappyHourNow && (
+          <div className="rounded-2xl border-2 border-fuchsia-400/50 bg-gradient-to-r from-fuchsia-500/20 via-purple-500/10 to-transparent px-4 py-3 flex items-center gap-3 animate-pulse">
+            <span className="text-2xl">🎉</span>
+            <div className="flex-1 text-sm">
+              <span className="font-black text-fuchsia-600 dark:text-fuchsia-300">
+                {t("order.happyHour")}
+              </span>
+              <span className="ml-2 text-muted-foreground">
+                −{promos.happyHour.percentOff}% automático no total
+              </span>
+            </div>
+          </div>
+        )}
       </div>
+
 
       <div className="mx-auto max-w-6xl px-4 py-6 grid gap-6 lg:grid-cols-[1fr_380px]">
 
