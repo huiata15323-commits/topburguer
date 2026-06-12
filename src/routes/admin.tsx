@@ -114,6 +114,8 @@ function AdminPage() {
 
       <div className="mx-auto max-w-6xl px-4 py-8 space-y-8">
         <EndOfDayCard />
+        <PromosAdmin />
+        <TableHeatmap />
         <TableQRGenerator />
 
 
