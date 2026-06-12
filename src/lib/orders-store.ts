@@ -140,9 +140,8 @@ export function useOrders() {
           items: data.items,
           notes: data.notes ?? null,
           total: data.total,
-          status: "pending",
         })
-        .select("*")
+        .select("id, number, customer, table_number, items, notes, total, status, created_at, done_at, notified_at, rating, review, rated_at, waiter_called_at")
         .single();
       if (error || !inserted) {
         console.error("[orders] insert failed", error);
