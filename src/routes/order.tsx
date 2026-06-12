@@ -148,11 +148,11 @@ function OrderPage() {
           <div className="flex items-center gap-3 text-xs">
             {mesa && (
               <span className="px-2.5 py-1 rounded-full bg-amber-warm text-charcoal font-black text-[11px]">
-                🪑 MESA {mesa}
+                🪑 {t("order.table")} {mesa}
               </span>
             )}
-            <Link to="/status" className="text-white/70 hover:text-amber-warm">Status</Link>
-            <Link to="/kitchen" className="text-white/70 hover:text-amber-warm">Cozinha</Link>
+            <LanguageToggle />
+            <Link to="/status" className="text-white/70 hover:text-amber-warm hidden sm:inline">Status</Link>
           </div>
         </div>
         {/* Category tabs */}
