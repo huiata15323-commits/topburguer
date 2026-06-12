@@ -215,30 +215,6 @@ export function EndOfDayCard() {
         </div>
       </div>
 
-      {/* Resumo executivo por IA */}
-      <div className="mt-4 rounded-2xl border border-purple-400/30 bg-gradient-to-br from-purple-500/10 via-fuchsia-500/5 to-transparent p-4">
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">🤖</span>
-            <div>
-              <div className="font-bold text-sm">Resumo do dia (IA)</div>
-              <div className="text-[11px] text-muted-foreground">Análise executiva gerada por inteligência artificial</div>
-            </div>
-          </div>
-          <button
-            onClick={handleAiSummary}
-            disabled={aiBusy || orders.length === 0}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white font-bold text-xs shadow-md hover:brightness-110 disabled:opacity-40 transition"
-          >
-            {aiBusy ? "Analisando…" : aiSummary ? "↻ Gerar de novo" : "✨ Gerar resumo"}
-          </button>
-        </div>
-        {aiSummary && (
-          <div className="mt-3 text-sm leading-relaxed whitespace-pre-wrap text-foreground/90 bg-background/50 rounded-xl p-3 border border-border">
-            {aiSummary}
-          </div>
-        )}
-      </div>
 
       <div className="mt-4 flex gap-2 flex-wrap">
         <button
