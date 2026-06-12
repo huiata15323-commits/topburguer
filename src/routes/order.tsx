@@ -316,7 +316,23 @@ function OrderPage() {
             customer={customer} setCustomer={setCustomer}
             phone={phone} setPhone={setPhone}
             notes={notes} setNotes={setNotes}
-            items={items} total={total} submitting={submitting} onSubmit={submit}
+            items={items}
+            subtotal={subtotal}
+            total={total}
+            discountAmount={discountAmount}
+            discountLabel={bestDiscount.label}
+            submitting={submitting} onSubmit={submit}
+            couponInput={couponInput} setCouponInput={setCouponInput}
+            appliedCoupon={appliedCoupon}
+            onApplyCoupon={() => {
+              const c = findCoupon(promos.coupons, couponInput);
+              if (!c) { setAppliedCoupon(null); toast.error(t("order.couponInvalid")); return; }
+              setAppliedCoupon(c);
+              toast.success(`${t("order.couponOk")} (−${c.percentOff}%)`);
+            }}
+            onClearCoupon={() => { setAppliedCoupon(null); setCouponInput(""); }}
+            loyalty={loyalty}
+            t={t}
           />
         </aside>
       </div>
@@ -339,7 +355,7 @@ function OrderPage() {
                     </span>
                   </div>
                   <div>
-                    <div className="text-xs text-muted-foreground">Total</div>
+                    <div className="text-xs text-muted-foreground">{t("order.total")}</div>
                     <div className="font-black text-ember text-lg">R$ {total.toFixed(2)}</div>
                   </div>
                 </div>
@@ -350,7 +366,23 @@ function OrderPage() {
                   customer={customer} setCustomer={setCustomer}
                   phone={phone} setPhone={setPhone}
                   notes={notes} setNotes={setNotes}
-                  items={items} total={total} submitting={submitting} onSubmit={submit}
+                  items={items}
+                  subtotal={subtotal}
+                  total={total}
+                  discountAmount={discountAmount}
+                  discountLabel={bestDiscount.label}
+                  submitting={submitting} onSubmit={submit}
+                  couponInput={couponInput} setCouponInput={setCouponInput}
+                  appliedCoupon={appliedCoupon}
+                  onApplyCoupon={() => {
+                    const c = findCoupon(promos.coupons, couponInput);
+                    if (!c) { setAppliedCoupon(null); toast.error(t("order.couponInvalid")); return; }
+                    setAppliedCoupon(c);
+                    toast.success(`${t("order.couponOk")} (−${c.percentOff}%)`);
+                  }}
+                  onClearCoupon={() => { setAppliedCoupon(null); setCouponInput(""); }}
+                  loyalty={loyalty}
+                  t={t}
                   embedded
                 />
               </div>
@@ -368,6 +400,7 @@ function OrderPage() {
     </main>
   );
 }
+
 
 function CartCard({
   customer, setCustomer, phone, setPhone, notes, setNotes, items, total, submitting, onSubmit, embedded,
