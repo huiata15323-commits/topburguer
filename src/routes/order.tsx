@@ -28,10 +28,10 @@ export const Route = createFileRoute("/order")({
   component: OrderPage,
 });
 
-const CATEGORIES: { key: MenuItem["category"]; label: string; emoji: string }[] = [
-  { key: "burger", label: "Hambúrgueres", emoji: "🍔" },
-  { key: "side", label: "Acompanhamentos", emoji: "🍟" },
-  { key: "drink", label: "Bebidas", emoji: "🥤" },
+const CATEGORIES: { key: MenuItem["category"]; tKey: string; emoji: string }[] = [
+  { key: "burger", tKey: "menu.burger", emoji: "🍔" },
+  { key: "side",   tKey: "menu.side",   emoji: "🍟" },
+  { key: "drink",  tKey: "menu.drink",  emoji: "🥤" },
 ];
 
 type CartEntry = { qty: number; notes?: string };
