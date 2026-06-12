@@ -8,6 +8,10 @@ import { useMenu } from "@/lib/menu-store";
 import { useOrders, estimateWaitMinutes, type OrderItem } from "@/lib/orders-store";
 import { formatPhoneBR, normalizePhoneBR } from "@/lib/whatsapp";
 import { PaymentModal } from "@/components/PaymentModal";
+import { usePromos, findCoupon, type Coupon } from "@/lib/promos";
+import { useLoyaltyStatus, REWARD_EVERY, REWARD_PERCENT } from "@/lib/loyalty";
+import { useLang } from "@/lib/i18n";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
 const search = z.object({
   mesa: z.coerce.number().int().positive().max(999).optional().catch(undefined),
