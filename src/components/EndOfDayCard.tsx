@@ -155,9 +155,6 @@ function buildPdf(orders: Order[]): jsPDF {
 export function EndOfDayCard() {
   const { orders, clearAll } = useOrders();
   const [busy, setBusy] = useState(false);
-  const [aiBusy, setAiBusy] = useState(false);
-  const [aiSummary, setAiSummary] = useState<string | null>(null);
-  const fetchSummary = useServerFn(generateDaySummary);
 
   const summary = useMemo(() => {
     const done = orders.filter((o) => o.status === "done");
@@ -197,62 +194,6 @@ export function EndOfDayCard() {
     doc.output("dataurlnewwindow");
   };
 
-  const handleAiSummary = async () => {
-    if (orders.length === 0) return toast.error("Sem pedidos para resumir.");
-    setAiBusy(true);
-    setAiSummary(null);
-    try {
-      const done = orders.filter((o) => o.status === "done");
-      const revenue = done.reduce((s, o) => s + o.total, 0);
-      const avgTicket = done.length ? revenue / done.length : 0;
-      const avgPrepMin = done.length
-        ? done.reduce((s, o) => s + ((o.doneAt ?? o.createdAt) - o.createdAt), 0) / done.length / 60000
-        : 0;
-      const rated = done.filter((o) => o.rating);
-      const avgRating = rated.length
-        ? rated.reduce((s, o) => s + (o.rating ?? 0), 0) / rated.length
-        : 0;
-      const hourly = new Array(24).fill(0) as number[];
-      for (const o of orders) hourly[new Date(o.createdAt).getHours()]++;
-      let peakHour: number | null = null;
-      let peakHourCount = 0;
-      hourly.forEach((c, h) => {
-        if (c > peakHourCount) { peakHourCount = c; peakHour = h; }
-      });
-      const counts = new Map<string, { name: string; qty: number; revenue: number }>();
-      for (const o of done) {
-        for (const it of o.items) {
-          const cur = counts.get(it.menuId) ?? { name: it.name, qty: 0, revenue: 0 };
-          cur.qty += it.quantity;
-          cur.revenue += it.price * it.quantity;
-          counts.set(it.menuId, cur);
-        }
-      }
-      const topItems = [...counts.values()].sort((a, b) => b.qty - a.qty).slice(0, 5);
-
-      const res = await fetchSummary({
-        data: {
-          doneCount: done.length,
-          totalCount: orders.length,
-          revenue,
-          avgTicket,
-          avgPrepMin,
-          avgRating,
-          ratingsCount: rated.length,
-          peakHour: peakHourCount > 0 ? peakHour : null,
-          peakHourCount,
-          topItems,
-          hourlyCounts: hourly,
-        },
-      });
-      setAiSummary(res.summary);
-    } catch (e) {
-      console.error(e);
-      toast.error("Falha ao gerar resumo com IA.");
-    } finally {
-      setAiBusy(false);
-    }
-  };
 
   return (
     <section className="rounded-3xl border-2 border-amber-warm/30 bg-gradient-to-br from-amber-warm/10 via-card to-card p-5 shadow-card-soft">
