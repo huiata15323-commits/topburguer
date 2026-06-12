@@ -194,7 +194,7 @@ function OrderPage() {
           {CATEGORIES.map((cat) => (
             <div key={cat.key} id={`cat-${cat.key}`} className="scroll-mt-32">
               <h2 className="text-xl font-black mb-4 flex items-center gap-2">
-                <span className="text-2xl">{cat.emoji}</span> {cat.label}
+                <span className="text-2xl">{cat.emoji}</span> {t(cat.tKey)}
               </h2>
               <div className="grid gap-3 sm:grid-cols-2">
                 {menu.filter((m) => m.category === cat.key).map((m, i) => {
