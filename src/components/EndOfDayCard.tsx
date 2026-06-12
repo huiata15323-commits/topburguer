@@ -1,12 +1,9 @@
 // Encerramento do dia: gera um PDF-resumo de todos os pedidos
 // e, em seguida, zera a base — pronto pra próxima simulação.
-// Inclui também um resumo executivo gerado por IA (Lovable AI Gateway).
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import jsPDF from "jspdf";
-import { useServerFn } from "@tanstack/react-start";
 import { useOrders, type Order } from "@/lib/orders-store";
-import { generateDaySummary } from "@/lib/ai-summary.functions";
 
 function fmtDate(d: Date) {
   return d.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
