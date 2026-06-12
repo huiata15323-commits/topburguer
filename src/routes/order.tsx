@@ -42,6 +42,8 @@ function OrderPage() {
   const waitMin = useMemo(() => estimateWaitMinutes(orders), [orders]);
   const { items: menu, decrementStock } = useMenu();
   const navigate = useNavigate();
+  const { t } = useLang();
+  const { cfg: promos, isHappyHourNow } = usePromos();
   const [cart, setCart] = useState<Record<string, CartEntry>>({});
   const [customer, setCustomer] = useState("");
   const [phone, setPhone] = useState("");
@@ -49,6 +51,8 @@ function OrderPage() {
   const [submitting, setSubmitting] = useState(false);
   const [activeCat, setActiveCat] = useState<MenuItem["category"]>("burger");
   const [payOpen, setPayOpen] = useState(false);
+  const [couponInput, setCouponInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
 
   const items: OrderItem[] = useMemo(() => {
     const out: OrderItem[] = [];
@@ -61,8 +65,28 @@ function OrderPage() {
     return out;
   }, [cart, menu]);
 
-  const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
+  const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
   const itemCount = items.reduce((s, i) => s + i.quantity, 0);
+
+  // Fidelidade
+  const loyalty = useLoyaltyStatus(phone);
+
+  // Desconto efetivo: pega o maior entre cupom aplicado, happy hour ativo, fidelidade
+  const discountSources: { label: string; percent: number }[] = useMemo(() => {
+    const arr: { label: string; percent: number }[] = [];
+    if (appliedCoupon) arr.push({ label: `🎟 ${appliedCoupon.code}`, percent: appliedCoupon.percentOff });
+    if (isHappyHourNow) arr.push({ label: t("order.happyHour"), percent: promos.happyHour.percentOff });
+    if (loyalty.eligible) arr.push({ label: `🏆 ${t("order.loyalty")}`, percent: REWARD_PERCENT });
+    return arr;
+  }, [appliedCoupon, isHappyHourNow, promos.happyHour.percentOff, loyalty.eligible, t]);
+
+  const bestDiscount = discountSources.reduce(
+    (best, cur) => (cur.percent > best.percent ? cur : best),
+    { label: "", percent: 0 }
+  );
+  const discountAmount = Math.round(((subtotal * bestDiscount.percent) / 100) * 100) / 100;
+  const total = Math.max(0, subtotal - discountAmount);
+
 
   const inc = (id: string) => setCart((c) => ({ ...c, [id]: { ...c[id], qty: (c[id]?.qty || 0) + 1 } }));
   const dec = (id: string) =>
