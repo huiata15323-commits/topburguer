@@ -7,6 +7,8 @@ import { MENU as SEED } from "@/lib/menu";
 import { TableQRGenerator } from "@/components/TableQRGenerator";
 import { EndOfDayCard } from "@/components/EndOfDayCard";
 import { StaffGate } from "@/components/StaffGate";
+import { PromosAdmin } from "@/components/PromosAdmin";
+import { TableHeatmap } from "@/components/TableHeatmap";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -112,6 +114,8 @@ function AdminPage() {
 
       <div className="mx-auto max-w-6xl px-4 py-8 space-y-8">
         <EndOfDayCard />
+        <PromosAdmin />
+        <TableHeatmap />
         <TableQRGenerator />
 
 

@@ -8,6 +8,10 @@ import { useMenu } from "@/lib/menu-store";
 import { useOrders, estimateWaitMinutes, type OrderItem } from "@/lib/orders-store";
 import { formatPhoneBR, normalizePhoneBR } from "@/lib/whatsapp";
 import { PaymentModal } from "@/components/PaymentModal";
+import { usePromos, findCoupon, type Coupon } from "@/lib/promos";
+import { useLoyaltyStatus, REWARD_EVERY, REWARD_PERCENT } from "@/lib/loyalty";
+import { useLang } from "@/lib/i18n";
+import { LanguageToggle } from "@/components/LanguageToggle";
 
 const search = z.object({
   mesa: z.coerce.number().int().positive().max(999).optional().catch(undefined),
@@ -24,10 +28,10 @@ export const Route = createFileRoute("/order")({
   component: OrderPage,
 });
 
-const CATEGORIES: { key: MenuItem["category"]; label: string; emoji: string }[] = [
-  { key: "burger", label: "Hambúrgueres", emoji: "🍔" },
-  { key: "side", label: "Acompanhamentos", emoji: "🍟" },
-  { key: "drink", label: "Bebidas", emoji: "🥤" },
+const CATEGORIES: { key: MenuItem["category"]; tKey: string; emoji: string }[] = [
+  { key: "burger", tKey: "menu.burger", emoji: "🍔" },
+  { key: "side",   tKey: "menu.side",   emoji: "🍟" },
+  { key: "drink",  tKey: "menu.drink",  emoji: "🥤" },
 ];
 
 type CartEntry = { qty: number; notes?: string };
@@ -38,6 +42,8 @@ function OrderPage() {
   const waitMin = useMemo(() => estimateWaitMinutes(orders), [orders]);
   const { items: menu, decrementStock } = useMenu();
   const navigate = useNavigate();
+  const { t } = useLang();
+  const { cfg: promos, isHappyHourNow } = usePromos();
   const [cart, setCart] = useState<Record<string, CartEntry>>({});
   const [customer, setCustomer] = useState("");
   const [phone, setPhone] = useState("");
@@ -45,6 +51,8 @@ function OrderPage() {
   const [submitting, setSubmitting] = useState(false);
   const [activeCat, setActiveCat] = useState<MenuItem["category"]>("burger");
   const [payOpen, setPayOpen] = useState(false);
+  const [couponInput, setCouponInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
 
   const items: OrderItem[] = useMemo(() => {
     const out: OrderItem[] = [];
@@ -57,8 +65,28 @@ function OrderPage() {
     return out;
   }, [cart, menu]);
 
-  const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
+  const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
   const itemCount = items.reduce((s, i) => s + i.quantity, 0);
+
+  // Fidelidade
+  const loyalty = useLoyaltyStatus(phone);
+
+  // Desconto efetivo: pega o maior entre cupom aplicado, happy hour ativo, fidelidade
+  const discountSources: { label: string; percent: number }[] = useMemo(() => {
+    const arr: { label: string; percent: number }[] = [];
+    if (appliedCoupon) arr.push({ label: `🎟 ${appliedCoupon.code}`, percent: appliedCoupon.percentOff });
+    if (isHappyHourNow) arr.push({ label: t("order.happyHour"), percent: promos.happyHour.percentOff });
+    if (loyalty.eligible) arr.push({ label: `🏆 ${t("order.loyalty")}`, percent: REWARD_PERCENT });
+    return arr;
+  }, [appliedCoupon, isHappyHourNow, promos.happyHour.percentOff, loyalty.eligible, t]);
+
+  const bestDiscount = discountSources.reduce(
+    (best, cur) => (cur.percent > best.percent ? cur : best),
+    { label: "", percent: 0 }
+  );
+  const discountAmount = Math.round(((subtotal * bestDiscount.percent) / 100) * 100) / 100;
+  const total = Math.max(0, subtotal - discountAmount);
+
 
   const inc = (id: string) => setCart((c) => ({ ...c, [id]: { ...c[id], qty: (c[id]?.qty || 0) + 1 } }));
   const dec = (id: string) =>
@@ -120,11 +148,11 @@ function OrderPage() {
           <div className="flex items-center gap-3 text-xs">
             {mesa && (
               <span className="px-2.5 py-1 rounded-full bg-amber-warm text-charcoal font-black text-[11px]">
-                🪑 MESA {mesa}
+                🪑 {t("order.table")} {mesa}
               </span>
             )}
-            <Link to="/status" className="text-white/70 hover:text-amber-warm">Status</Link>
-            <Link to="/kitchen" className="text-white/70 hover:text-amber-warm">Cozinha</Link>
+            <LanguageToggle />
+            <Link to="/status" className="text-white/70 hover:text-amber-warm hidden sm:inline">Status</Link>
           </div>
         </div>
         {/* Category tabs */}
@@ -142,23 +170,36 @@ function OrderPage() {
                   : "bg-white/5 text-white/70 hover:bg-white/10"
               }`}
             >
-              {c.emoji} {c.label}
+              {c.emoji} {t(c.tKey)}
             </button>
           ))}
         </div>
       </header>
 
       {/* Estimativa de tempo de espera */}
-      <div className="mx-auto max-w-6xl px-4 pt-4">
+      <div className="mx-auto max-w-6xl px-4 pt-4 space-y-3">
         <div className="rounded-2xl border border-amber-warm/30 bg-gradient-to-r from-amber-warm/10 via-ember/5 to-transparent px-4 py-3 flex items-center gap-3">
           <span className="text-2xl">⏱️</span>
           <div className="flex-1 text-sm">
-            <span className="font-bold">Tempo estimado de preparo: </span>
+            <span className="font-bold">{t("order.wait")}: </span>
             <span className="text-ember font-black">~{waitMin} min</span>
-            <span className="text-muted-foreground"> · baseado na fila atual</span>
           </div>
         </div>
+        {isHappyHourNow && (
+          <div className="rounded-2xl border-2 border-fuchsia-400/50 bg-gradient-to-r from-fuchsia-500/20 via-purple-500/10 to-transparent px-4 py-3 flex items-center gap-3 animate-pulse">
+            <span className="text-2xl">🎉</span>
+            <div className="flex-1 text-sm">
+              <span className="font-black text-fuchsia-600 dark:text-fuchsia-300">
+                {t("order.happyHour")}
+              </span>
+              <span className="ml-2 text-muted-foreground">
+                −{promos.happyHour.percentOff}% automático no total
+              </span>
+            </div>
+          </div>
+        )}
       </div>
+
 
       <div className="mx-auto max-w-6xl px-4 py-6 grid gap-6 lg:grid-cols-[1fr_380px]">
 
@@ -166,7 +207,7 @@ function OrderPage() {
           {CATEGORIES.map((cat) => (
             <div key={cat.key} id={`cat-${cat.key}`} className="scroll-mt-32">
               <h2 className="text-xl font-black mb-4 flex items-center gap-2">
-                <span className="text-2xl">{cat.emoji}</span> {cat.label}
+                <span className="text-2xl">{cat.emoji}</span> {t(cat.tKey)}
               </h2>
               <div className="grid gap-3 sm:grid-cols-2">
                 {menu.filter((m) => m.category === cat.key).map((m, i) => {
@@ -202,7 +243,7 @@ function OrderPage() {
                         {soldOut && (
                           <div className="absolute inset-0 bg-black/55 grid place-items-center">
                             <span className="px-3 py-1 rounded-full bg-red-500 text-white text-xs font-black uppercase tracking-widest">
-                              Esgotado hoje
+                              {t("menu.soldout")}
                             </span>
                           </div>
                         )}
@@ -275,7 +316,23 @@ function OrderPage() {
             customer={customer} setCustomer={setCustomer}
             phone={phone} setPhone={setPhone}
             notes={notes} setNotes={setNotes}
-            items={items} total={total} submitting={submitting} onSubmit={submit}
+            items={items}
+            subtotal={subtotal}
+            total={total}
+            discountAmount={discountAmount}
+            discountLabel={bestDiscount.label}
+            submitting={submitting} onSubmit={submit}
+            couponInput={couponInput} setCouponInput={setCouponInput}
+            appliedCoupon={appliedCoupon}
+            onApplyCoupon={() => {
+              const c = findCoupon(promos.coupons, couponInput);
+              if (!c) { setAppliedCoupon(null); toast.error(t("order.couponInvalid")); return; }
+              setAppliedCoupon(c);
+              toast.success(`${t("order.couponOk")} (−${c.percentOff}%)`);
+            }}
+            onClearCoupon={() => { setAppliedCoupon(null); setCouponInput(""); }}
+            loyalty={loyalty}
+            t={t}
           />
         </aside>
       </div>
@@ -298,7 +355,7 @@ function OrderPage() {
                     </span>
                   </div>
                   <div>
-                    <div className="text-xs text-muted-foreground">Total</div>
+                    <div className="text-xs text-muted-foreground">{t("order.total")}</div>
                     <div className="font-black text-ember text-lg">R$ {total.toFixed(2)}</div>
                   </div>
                 </div>
@@ -309,7 +366,23 @@ function OrderPage() {
                   customer={customer} setCustomer={setCustomer}
                   phone={phone} setPhone={setPhone}
                   notes={notes} setNotes={setNotes}
-                  items={items} total={total} submitting={submitting} onSubmit={submit}
+                  items={items}
+                  subtotal={subtotal}
+                  total={total}
+                  discountAmount={discountAmount}
+                  discountLabel={bestDiscount.label}
+                  submitting={submitting} onSubmit={submit}
+                  couponInput={couponInput} setCouponInput={setCouponInput}
+                  appliedCoupon={appliedCoupon}
+                  onApplyCoupon={() => {
+                    const c = findCoupon(promos.coupons, couponInput);
+                    if (!c) { setAppliedCoupon(null); toast.error(t("order.couponInvalid")); return; }
+                    setAppliedCoupon(c);
+                    toast.success(`${t("order.couponOk")} (−${c.percentOff}%)`);
+                  }}
+                  onClearCoupon={() => { setAppliedCoupon(null); setCouponInput(""); }}
+                  loyalty={loyalty}
+                  t={t}
                   embedded
                 />
               </div>
@@ -328,30 +401,45 @@ function OrderPage() {
   );
 }
 
+
+type LoyaltyInfo = { count: number; toNext: number; eligible: boolean; e164: string | null };
+
 function CartCard({
-  customer, setCustomer, phone, setPhone, notes, setNotes, items, total, submitting, onSubmit, embedded,
+  customer, setCustomer, phone, setPhone, notes, setNotes,
+  items, subtotal, total, discountAmount, discountLabel,
+  submitting, onSubmit, embedded,
+  couponInput, setCouponInput, appliedCoupon, onApplyCoupon, onClearCoupon,
+  loyalty, t,
 }: {
   customer: string; setCustomer: (s: string) => void;
   phone: string; setPhone: (s: string) => void;
   notes: string; setNotes: (s: string) => void;
-  items: OrderItem[]; total: number; submitting: boolean; onSubmit: () => void;
+  items: OrderItem[];
+  subtotal: number; total: number;
+  discountAmount: number; discountLabel: string;
+  submitting: boolean; onSubmit: () => void;
+  couponInput: string; setCouponInput: (s: string) => void;
+  appliedCoupon: Coupon | null;
+  onApplyCoupon: () => void; onClearCoupon: () => void;
+  loyalty: LoyaltyInfo;
+  t: (key: string) => string;
   embedded?: boolean;
 }) {
   return (
     <div className={embedded ? "" : "rounded-3xl bg-card border border-border p-5 shadow-card-soft"}>
-      {!embedded && <h3 className="font-black text-lg mb-4">Seu pedido</h3>}
+      {!embedded && <h3 className="font-black text-lg mb-4">{t("order.your")}</h3>}
 
-      <label className="block text-xs font-medium text-muted-foreground mb-1">Nome</label>
+      <label className="block text-xs font-medium text-muted-foreground mb-1">{t("order.name")}</label>
       <input
         value={customer}
         onChange={(e) => setCustomer(e.target.value)}
         maxLength={50}
-        placeholder="Como te chamamos?"
+        placeholder={t("order.namePh")}
         className="w-full px-3 py-2.5 rounded-xl border border-border focus:border-ember focus:outline-none mb-3 bg-background"
       />
 
       <label className="block text-xs font-medium text-muted-foreground mb-1">
-        WhatsApp <span className="text-muted-foreground/60">(opcional — avisamos quando ficar pronto)</span>
+        {t("order.phone")} <span className="text-muted-foreground/60">{t("order.phoneHelp")}</span>
       </label>
       <input
         value={phone}
@@ -362,9 +450,34 @@ function CartCard({
         className="w-full px-3 py-2.5 rounded-xl border border-border focus:border-ember focus:outline-none mb-3 bg-background"
       />
 
+      {/* Fidelidade */}
+      {loyalty.e164 && (
+        <div className={`mb-3 rounded-xl p-3 text-xs border ${
+          loyalty.eligible
+            ? "border-emerald-400/40 bg-emerald-500/10"
+            : "border-amber-warm/30 bg-amber-warm/5"
+        }`}>
+          <div className="flex items-center gap-2 font-bold">
+            <span>🏆</span>
+            <span>{t("order.loyalty")}: {loyalty.count}/{REWARD_EVERY}</span>
+          </div>
+          <div className="mt-1 text-muted-foreground">
+            {loyalty.eligible
+              ? t("order.loyaltyReward")
+              : `${loyalty.toNext} ${t("order.loyaltyProgress")}`}
+          </div>
+          <div className="mt-2 h-1.5 rounded-full bg-background overflow-hidden">
+            <div
+              className="h-full bg-gradient-ember transition-all"
+              style={{ width: `${((loyalty.count % REWARD_EVERY) / REWARD_EVERY) * 100}%` }}
+            />
+          </div>
+        </div>
+      )}
+
       <div className="space-y-2 max-h-64 overflow-y-auto">
         {items.length === 0 && (
-          <p className="text-sm text-muted-foreground italic py-4 text-center">Carrinho vazio</p>
+          <p className="text-sm text-muted-foreground italic py-4 text-center">{t("order.empty")}</p>
         )}
         <AnimatePresence initial={false}>
           {items.map((i) => (
@@ -387,19 +500,59 @@ function CartCard({
         </AnimatePresence>
       </div>
 
-      <label className="block text-xs font-medium text-muted-foreground mt-4 mb-1">Observações gerais</label>
+      {/* Cupom */}
+      <div className="mt-4">
+        <label className="block text-xs font-medium text-muted-foreground mb-1">{t("order.coupon")}</label>
+        {appliedCoupon ? (
+          <div className="flex items-center justify-between gap-2 px-3 py-2 rounded-xl bg-fuchsia-500/15 border border-fuchsia-400/40">
+            <span className="font-bold text-sm font-mono">🎟 {appliedCoupon.code} <span className="opacity-70">−{appliedCoupon.percentOff}%</span></span>
+            <button onClick={onClearCoupon} className="text-xs text-fuchsia-600 hover:text-red-500 font-bold">×</button>
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            <input
+              value={couponInput}
+              onChange={(e) => setCouponInput(e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 20))}
+              placeholder={t("order.couponPh")}
+              className="flex-1 px-3 py-2 rounded-xl border border-border bg-background font-mono uppercase text-sm"
+            />
+            <button
+              type="button"
+              onClick={onApplyCoupon}
+              className="px-3 py-2 rounded-xl bg-muted hover:bg-secondary font-bold text-xs"
+            >
+              {t("order.couponApply")}
+            </button>
+          </div>
+        )}
+      </div>
+
+      <label className="block text-xs font-medium text-muted-foreground mt-4 mb-1">{t("order.notes")}</label>
       <textarea
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
         maxLength={300}
         rows={2}
-        placeholder="Ex: para viagem, mesa 5…"
         className="w-full px-3 py-2 rounded-xl border border-border focus:border-ember focus:outline-none text-sm bg-background"
       />
 
-      <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
-        <span className="text-muted-foreground">Total</span>
-        <span className="text-2xl font-black text-ember">R$ {total.toFixed(2)}</span>
+      <div className="mt-4 pt-4 border-t border-border space-y-1">
+        {discountAmount > 0 && (
+          <>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">{t("order.subtotal")}</span>
+              <span className="font-semibold tabular-nums">R$ {subtotal.toFixed(2)}</span>
+            </div>
+            <div className="flex items-center justify-between text-sm text-emerald-600 dark:text-emerald-400">
+              <span className="font-bold">{t("order.discount")} {discountLabel}</span>
+              <span className="font-bold tabular-nums">−R$ {discountAmount.toFixed(2)}</span>
+            </div>
+          </>
+        )}
+        <div className="flex items-center justify-between pt-1">
+          <span className="text-muted-foreground">{t("order.total")}</span>
+          <span className="text-2xl font-black text-ember">R$ {total.toFixed(2)}</span>
+        </div>
       </div>
 
       <button
@@ -407,8 +560,9 @@ function CartCard({
         disabled={submitting || items.length === 0}
         className="mt-4 w-full py-3.5 rounded-2xl bg-gradient-ember text-ember-foreground font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98] shadow-ember"
       >
-        {submitting ? "Enviando…" : "⚡ Pagar com PIX e enviar"}
+        {submitting ? t("order.sending") : t("order.send")}
       </button>
     </div>
   );
 }
+
