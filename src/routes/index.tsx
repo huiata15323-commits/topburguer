@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import topBacon from "@/assets/menu/top-bacon.jpg";
 import topCheddar from "@/assets/menu/top-cheddar.jpg";
 import topClassic from "@/assets/menu/top-classic.jpg";
+import { useBranding } from "@/lib/branding";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -20,6 +21,7 @@ const fadeUp = {
 };
 
 function Landing() {
+  const { branding } = useBranding();
   return (
     <main className="min-h-screen bg-gradient-night text-white overflow-hidden relative">
       {/* Decorative grain layer */}
@@ -28,8 +30,8 @@ function Landing() {
       {/* Top bar */}
       <nav className="relative z-10 mx-auto max-w-7xl px-6 py-5 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-xl bg-gradient-ember grid place-items-center font-black text-lg shadow-ember">T</div>
-          <span className="font-black tracking-tight">Top Burguer</span>
+          <div className="w-9 h-9 rounded-xl bg-gradient-ember grid place-items-center font-black text-lg shadow-ember">{branding.emoji}</div>
+          <span className="font-black tracking-tight">{branding.name}</span>
         </div>
         <div className="flex items-center gap-3 text-xs">
           <Link to="/admin" className="hidden sm:inline text-white/60 hover:text-amber-warm transition">⚙️ Admin</Link>
