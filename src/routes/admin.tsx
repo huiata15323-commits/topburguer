@@ -9,6 +9,7 @@ import { EndOfDayCard } from "@/components/EndOfDayCard";
 import { StaffGate } from "@/components/StaffGate";
 import { PromosAdmin } from "@/components/PromosAdmin";
 import { TableHeatmap } from "@/components/TableHeatmap";
+import { BrandingAdmin } from "@/components/BrandingAdmin";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -113,6 +114,7 @@ function AdminPage() {
       </header>
 
       <div className="mx-auto max-w-6xl px-4 py-8 space-y-8">
+        <BrandingAdmin />
         <EndOfDayCard />
         <PromosAdmin />
         <TableHeatmap />

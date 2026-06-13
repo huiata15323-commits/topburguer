@@ -105,6 +105,89 @@
   --chart-5: oklch(0.6 0.2 320);
 }
 
+/* ====== Theme presets (configuráveis pelo dono) ====== */
+/* Diner Americano: vermelho cereja + amarelo mostarda */
+:root[data-theme="diner"] {
+  --background: oklch(0.97 0.02 60);
+  --foreground: oklch(0.18 0.03 25);
+  --card: oklch(1 0 0);
+  --primary: oklch(0.52 0.24 25);
+  --primary-foreground: oklch(0.99 0 0);
+  --ember: oklch(0.52 0.24 25);
+  --ember-foreground: oklch(0.99 0 0);
+  --amber-warm: oklch(0.86 0.18 95);
+  --accent: oklch(0.86 0.18 95);
+  --ring: oklch(0.52 0.24 25);
+  --gradient-ember: linear-gradient(135deg, oklch(0.52 0.24 25), oklch(0.65 0.22 35));
+  --gradient-night: linear-gradient(160deg, oklch(0.22 0.08 25), oklch(0.1 0.04 25));
+  --gradient-amber: linear-gradient(135deg, oklch(0.86 0.18 95), oklch(0.74 0.2 75));
+  --shadow-ember: 0 20px 50px -20px color-mix(in oklab, oklch(0.52 0.24 25) 55%, transparent);
+}
+
+/* Street Food: neon rosa + azul elétrico, urbano noturno */
+:root[data-theme="street"] {
+  --background: oklch(0.12 0.03 280);
+  --foreground: oklch(0.97 0.01 280);
+  --card: oklch(0.18 0.04 280);
+  --card-foreground: oklch(0.97 0.01 280);
+  --popover: oklch(0.18 0.04 280);
+  --popover-foreground: oklch(0.97 0.01 280);
+  --primary: oklch(0.68 0.28 350);
+  --primary-foreground: oklch(0.99 0 0);
+  --ember: oklch(0.68 0.28 350);
+  --ember-foreground: oklch(0.99 0 0);
+  --amber-warm: oklch(0.78 0.18 220);
+  --accent: oklch(0.78 0.18 220);
+  --secondary: oklch(0.22 0.05 280);
+  --secondary-foreground: oklch(0.97 0.01 280);
+  --muted: oklch(0.22 0.05 280);
+  --muted-foreground: oklch(0.72 0.04 280);
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.68 0.28 350);
+  --gradient-ember: linear-gradient(135deg, oklch(0.68 0.28 350), oklch(0.6 0.25 320));
+  --gradient-night: linear-gradient(160deg, oklch(0.12 0.05 280), oklch(0.06 0.03 280));
+  --gradient-amber: linear-gradient(135deg, oklch(0.78 0.18 220), oklch(0.68 0.28 350));
+  --shadow-ember: 0 20px 60px -15px color-mix(in oklab, oklch(0.68 0.28 350) 70%, transparent);
+  --shadow-tv: 0 0 60px -10px color-mix(in oklab, oklch(0.78 0.18 220) 60%, transparent);
+}
+
+/* Gourmet: verde esmeralda + dourado */
+:root[data-theme="gourmet"] {
+  --background: oklch(0.97 0.01 140);
+  --foreground: oklch(0.18 0.03 160);
+  --card: oklch(1 0 0);
+  --primary: oklch(0.45 0.13 160);
+  --primary-foreground: oklch(0.99 0 0);
+  --ember: oklch(0.45 0.13 160);
+  --ember-foreground: oklch(0.99 0 0);
+  --amber-warm: oklch(0.78 0.13 85);
+  --accent: oklch(0.78 0.13 85);
+  --ring: oklch(0.45 0.13 160);
+  --gradient-ember: linear-gradient(135deg, oklch(0.45 0.13 160), oklch(0.35 0.1 170));
+  --gradient-night: linear-gradient(160deg, oklch(0.18 0.04 160), oklch(0.08 0.02 160));
+  --gradient-amber: linear-gradient(135deg, oklch(0.78 0.13 85), oklch(0.68 0.15 75));
+  --shadow-ember: 0 20px 50px -20px color-mix(in oklab, oklch(0.45 0.13 160) 50%, transparent);
+}
+
+/* Boteco Brasileiro: verde-amarelo + madeira */
+:root[data-theme="boteco"] {
+  --background: oklch(0.95 0.025 80);
+  --foreground: oklch(0.2 0.04 50);
+  --card: oklch(0.99 0.01 80);
+  --primary: oklch(0.5 0.17 145);
+  --primary-foreground: oklch(0.99 0 0);
+  --ember: oklch(0.5 0.17 145);
+  --ember-foreground: oklch(0.99 0 0);
+  --amber-warm: oklch(0.82 0.18 90);
+  --accent: oklch(0.82 0.18 90);
+  --ring: oklch(0.5 0.17 145);
+  --gradient-ember: linear-gradient(135deg, oklch(0.5 0.17 145), oklch(0.42 0.15 130));
+  --gradient-night: linear-gradient(160deg, oklch(0.25 0.06 60), oklch(0.12 0.04 50));
+  --gradient-amber: linear-gradient(135deg, oklch(0.82 0.18 90), oklch(0.7 0.18 80));
+  --shadow-ember: 0 20px 50px -20px color-mix(in oklab, oklch(0.5 0.17 145) 55%, transparent);
+}
+
 .dark {
   --background: oklch(0.1 0.015 30);
   --foreground: oklch(0.97 0.01 60);
