@@ -12,6 +12,9 @@ import { usePromos, findCoupon, type Coupon } from "@/lib/promos";
 import { useLoyaltyStatus, REWARD_EVERY, REWARD_PERCENT } from "@/lib/loyalty";
 import { useLang } from "@/lib/i18n";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { VoiceOrderButton } from "@/components/VoiceOrderButton";
+import { useComboSuggestions } from "@/lib/combos";
+import { useBranding } from "@/lib/branding";
 
 const search = z.object({
   mesa: z.coerce.number().int().positive().max(999).optional().catch(undefined),
@@ -43,6 +46,7 @@ function OrderPage() {
   const { items: menu, decrementStock } = useMenu();
   const navigate = useNavigate();
   const { t } = useLang();
+  const { branding } = useBranding();
   const { cfg: promos, isHappyHourNow } = usePromos();
   const [cart, setCart] = useState<Record<string, CartEntry>>({});
   const [customer, setCustomer] = useState("");
@@ -86,6 +90,21 @@ function OrderPage() {
   );
   const discountAmount = Math.round(((subtotal * bestDiscount.percent) / 100) * 100) / 100;
   const total = Math.max(0, subtotal - discountAmount);
+
+  // Sugestões de combo baseadas no histórico
+  const cartIds = useMemo(() => items.map((i) => i.menuId), [items]);
+  const combos = useComboSuggestions(cartIds, menu, 3);
+
+  // Adiciona vários itens de uma vez (usado pelo VoiceOrderButton)
+  const addMany = (toAdd: { menuId: string; quantity: number }[]) => {
+    setCart((c) => {
+      const next = { ...c };
+      for (const a of toAdd) {
+        next[a.menuId] = { ...next[a.menuId], qty: (next[a.menuId]?.qty || 0) + a.quantity };
+      }
+      return next;
+    });
+  };
 
 
   const inc = (id: string) => setCart((c) => ({ ...c, [id]: { ...c[id], qty: (c[id]?.qty || 0) + 1 } }));
@@ -137,9 +156,9 @@ function OrderPage() {
       <header className="sticky top-0 z-20 bg-gradient-night text-white shadow-lg">
         <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-gradient-ember grid place-items-center font-black shadow-ember">T</div>
+            <div className="w-9 h-9 rounded-xl bg-gradient-ember grid place-items-center font-black shadow-ember">{branding.emoji}</div>
             <div>
-              <div className="font-black leading-none">Top Burguer</div>
+              <div className="font-black leading-none">{branding.name}</div>
               <div className="text-[10px] text-amber-warm uppercase tracking-widest">
                 {mesa ? `Mesa ${mesa} · Faça seu pedido` : "Faça seu pedido"}
               </div>
