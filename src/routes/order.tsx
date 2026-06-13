@@ -217,6 +217,33 @@ function OrderPage() {
             </div>
           </div>
         )}
+
+        {/* Pedir por voz */}
+        <div className="rounded-2xl border border-indigo-400/30 bg-gradient-to-br from-indigo-500/5 via-card to-card p-3">
+          <VoiceOrderButton menu={menu} onAdd={addMany} />
+        </div>
+
+        {/* Combos sugeridos baseados no histórico */}
+        {combos.length > 0 && (
+          <div className="rounded-2xl border border-amber-warm/30 bg-amber-warm/5 p-3">
+            <div className="text-[10px] font-black uppercase tracking-widest text-amber-warm mb-2 flex items-center gap-1">
+              ✨ Quem pediu isso também levou
+            </div>
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {combos.map((c) => (
+                <button
+                  key={c.menuId}
+                  onClick={() => addMany([{ menuId: c.menuId, quantity: 1 }])}
+                  className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl bg-card border border-border hover:border-ember/40 hover:shadow-card-soft transition-all text-sm font-semibold"
+                >
+                  <span className="text-lg">{c.emoji}</span>
+                  <span>{c.name}</span>
+                  <span className="ml-1 text-[10px] font-black text-ember">+</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
 
