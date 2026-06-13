@@ -10,6 +10,13 @@ import {
 
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
+import { useBranding } from "@/lib/branding";
+import { InstallPwaPrompt } from "@/components/InstallPwaPrompt";
+
+function BrandingMount() {
+  useBranding(); // aplica data-theme no <html> e sincroniza entre abas
+  return null;
+}
 
 function NotFoundComponent() {
   return (
@@ -118,8 +125,10 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <BrandingMount />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
+      <InstallPwaPrompt />
       <Toaster richColors position="top-center" />
     </QueryClientProvider>
   );

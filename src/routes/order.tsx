@@ -12,6 +12,9 @@ import { usePromos, findCoupon, type Coupon } from "@/lib/promos";
 import { useLoyaltyStatus, REWARD_EVERY, REWARD_PERCENT } from "@/lib/loyalty";
 import { useLang } from "@/lib/i18n";
 import { LanguageToggle } from "@/components/LanguageToggle";
+import { VoiceOrderButton } from "@/components/VoiceOrderButton";
+import { useComboSuggestions } from "@/lib/combos";
+import { useBranding } from "@/lib/branding";
 
 const search = z.object({
   mesa: z.coerce.number().int().positive().max(999).optional().catch(undefined),
@@ -43,6 +46,7 @@ function OrderPage() {
   const { items: menu, decrementStock } = useMenu();
   const navigate = useNavigate();
   const { t } = useLang();
+  const { branding } = useBranding();
   const { cfg: promos, isHappyHourNow } = usePromos();
   const [cart, setCart] = useState<Record<string, CartEntry>>({});
   const [customer, setCustomer] = useState("");
@@ -86,6 +90,21 @@ function OrderPage() {
   );
   const discountAmount = Math.round(((subtotal * bestDiscount.percent) / 100) * 100) / 100;
   const total = Math.max(0, subtotal - discountAmount);
+
+  // Sugestões de combo baseadas no histórico
+  const cartIds = useMemo(() => items.map((i) => i.menuId), [items]);
+  const combos = useComboSuggestions(cartIds, menu, 3);
+
+  // Adiciona vários itens de uma vez (usado pelo VoiceOrderButton)
+  const addMany = (toAdd: { menuId: string; quantity: number }[]) => {
+    setCart((c) => {
+      const next = { ...c };
+      for (const a of toAdd) {
+        next[a.menuId] = { ...next[a.menuId], qty: (next[a.menuId]?.qty || 0) + a.quantity };
+      }
+      return next;
+    });
+  };
 
 
   const inc = (id: string) => setCart((c) => ({ ...c, [id]: { ...c[id], qty: (c[id]?.qty || 0) + 1 } }));
@@ -137,9 +156,9 @@ function OrderPage() {
       <header className="sticky top-0 z-20 bg-gradient-night text-white shadow-lg">
         <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-gradient-ember grid place-items-center font-black shadow-ember">T</div>
+            <div className="w-9 h-9 rounded-xl bg-gradient-ember grid place-items-center font-black shadow-ember">{branding.emoji}</div>
             <div>
-              <div className="font-black leading-none">Top Burguer</div>
+              <div className="font-black leading-none">{branding.name}</div>
               <div className="text-[10px] text-amber-warm uppercase tracking-widest">
                 {mesa ? `Mesa ${mesa} · Faça seu pedido` : "Faça seu pedido"}
               </div>
@@ -195,6 +214,33 @@ function OrderPage() {
               <span className="ml-2 text-muted-foreground">
                 −{promos.happyHour.percentOff}% automático no total
               </span>
+            </div>
+          </div>
+        )}
+
+        {/* Pedir por voz */}
+        <div className="rounded-2xl border border-indigo-400/30 bg-gradient-to-br from-indigo-500/5 via-card to-card p-3">
+          <VoiceOrderButton menu={menu} onAdd={addMany} />
+        </div>
+
+        {/* Combos sugeridos baseados no histórico */}
+        {combos.length > 0 && (
+          <div className="rounded-2xl border border-amber-warm/30 bg-amber-warm/5 p-3">
+            <div className="text-[10px] font-black uppercase tracking-widest text-amber-warm mb-2 flex items-center gap-1">
+              ✨ Quem pediu isso também levou
+            </div>
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {combos.map((c) => (
+                <button
+                  key={c.menuId}
+                  onClick={() => addMany([{ menuId: c.menuId, quantity: 1 }])}
+                  className="shrink-0 flex items-center gap-2 px-3 py-2 rounded-xl bg-card border border-border hover:border-ember/40 hover:shadow-card-soft transition-all text-sm font-semibold"
+                >
+                  <span className="text-lg">{c.emoji}</span>
+                  <span>{c.name}</span>
+                  <span className="ml-1 text-[10px] font-black text-ember">+</span>
+                </button>
+              ))}
             </div>
           </div>
         )}
