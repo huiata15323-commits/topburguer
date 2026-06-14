@@ -346,6 +346,26 @@ function PainelPage() {
           >
             {voiceOn ? "🔊" : "🔇"}
           </button>
+          <div className="hidden md:flex items-center gap-3 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10">
+            <div className="text-center">
+              <div className="text-[9px] uppercase tracking-widest text-white/40 font-bold">Prontos</div>
+              <div className="text-lg font-black text-emerald-400 tabular-nums leading-none">{ready.length}</div>
+            </div>
+            <div className="w-px h-7 bg-white/10" />
+            <div className="text-center">
+              <div className="text-[9px] uppercase tracking-widest text-white/40 font-bold">Preparo</div>
+              <div className="text-lg font-black text-amber-warm tabular-nums leading-none">{preparing.length}</div>
+            </div>
+            {avgPrepMin != null && (
+              <>
+                <div className="w-px h-7 bg-white/10" />
+                <div className="text-center">
+                  <div className="text-[9px] uppercase tracking-widest text-white/40 font-bold">Médio</div>
+                  <div className="text-lg font-black text-white/90 tabular-nums leading-none">{avgPrepMin}m</div>
+                </div>
+              </>
+            )}
+          </div>
           <div className="text-right">
             <div className="text-2xl sm:text-3xl font-black tabular-nums">{new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</div>
             <div className="text-[10px] uppercase tracking-widest text-white/40 hidden sm:block">
