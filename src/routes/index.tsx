@@ -79,11 +79,16 @@ function Landing() {
 
             <motion.h1
               initial="hidden" animate="show" variants={fadeUp} custom={1}
-              className="mt-6 font-black text-5xl md:text-7xl tracking-tight text-balance leading-[0.95]"
+              className="mt-6 text-display text-balance text-[clamp(3.5rem,9vw,7.5rem)]"
             >
-              Do toque <br />
-              à <span className="bg-gradient-to-r from-amber-warm to-ember bg-clip-text text-transparent">chapa</span> em segundos.
+              <span className="block">DO TOQUE</span>
+              <span className="block">
+                <span className="text-outline">À</span>{" "}
+                <span className="bg-gradient-to-br from-amber-warm via-gold to-ember bg-clip-text text-transparent">CHAPA</span>
+              </span>
+              <span className="block text-[0.55em] font-medium tracking-tight text-white/70 mt-2">em segundos.</span>
             </motion.h1>
+
 
             <motion.p
               initial="hidden" animate="show" variants={fadeUp} custom={2}
