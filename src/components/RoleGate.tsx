@@ -44,12 +44,6 @@ export function RoleGate({ roles, children }: Props) {
       </main>
     );
   }
-    return (
-      <main className="min-h-dvh grid place-items-center bg-background text-foreground">
-        <div className="text-sm text-muted-foreground animate-pulse">Carregando…</div>
-      </main>
-    );
-  }
 
   if (!user) {
     return (
