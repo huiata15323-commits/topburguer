@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StatusRouteImport } from './routes/status'
+import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as ReceiptRouteImport } from './routes/receipt'
 import { Route as PainelRouteImport } from './routes/painel'
 import { Route as OrderRouteImport } from './routes/order'
@@ -23,6 +24,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const StatusRoute = StatusRouteImport.update({
   id: '/status',
   path: '/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SobreRoute = SobreRouteImport.update({
+  id: '/sobre',
+  path: '/sobre',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReceiptRoute = ReceiptRouteImport.update({
@@ -81,6 +87,7 @@ export interface FileRoutesByFullPath {
   '/order': typeof OrderRoute
   '/painel': typeof PainelRoute
   '/receipt': typeof ReceiptRoute
+  '/sobre': typeof SobreRoute
   '/status': typeof StatusRoute
 }
 export interface FileRoutesByTo {
@@ -93,6 +100,7 @@ export interface FileRoutesByTo {
   '/order': typeof OrderRoute
   '/painel': typeof PainelRoute
   '/receipt': typeof ReceiptRoute
+  '/sobre': typeof SobreRoute
   '/status': typeof StatusRoute
 }
 export interface FileRoutesById {
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   '/order': typeof OrderRoute
   '/painel': typeof PainelRoute
   '/receipt': typeof ReceiptRoute
+  '/sobre': typeof SobreRoute
   '/status': typeof StatusRoute
 }
 export interface FileRouteTypes {
@@ -120,6 +129,7 @@ export interface FileRouteTypes {
     | '/order'
     | '/painel'
     | '/receipt'
+    | '/sobre'
     | '/status'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -132,6 +142,7 @@ export interface FileRouteTypes {
     | '/order'
     | '/painel'
     | '/receipt'
+    | '/sobre'
     | '/status'
   id:
     | '__root__'
@@ -144,6 +155,7 @@ export interface FileRouteTypes {
     | '/order'
     | '/painel'
     | '/receipt'
+    | '/sobre'
     | '/status'
   fileRoutesById: FileRoutesById
 }
@@ -157,6 +169,7 @@ export interface RootRouteChildren {
   OrderRoute: typeof OrderRoute
   PainelRoute: typeof PainelRoute
   ReceiptRoute: typeof ReceiptRoute
+  SobreRoute: typeof SobreRoute
   StatusRoute: typeof StatusRoute
 }
 
@@ -167,6 +180,13 @@ declare module '@tanstack/react-router' {
       path: '/status'
       fullPath: '/status'
       preLoaderRoute: typeof StatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sobre': {
+      id: '/sobre'
+      path: '/sobre'
+      fullPath: '/sobre'
+      preLoaderRoute: typeof SobreRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/receipt': {
@@ -245,6 +265,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrderRoute: OrderRoute,
   PainelRoute: PainelRoute,
   ReceiptRoute: ReceiptRoute,
+  SobreRoute: SobreRoute,
   StatusRoute: StatusRoute,
 }
 export const routeTree = rootRouteImport
