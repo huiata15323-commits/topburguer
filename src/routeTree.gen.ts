@@ -13,6 +13,7 @@ import { Route as StatusRouteImport } from './routes/status'
 import { Route as ReceiptRouteImport } from './routes/receipt'
 import { Route as PainelRouteImport } from './routes/painel'
 import { Route as OrderRouteImport } from './routes/order'
+import { Route as MesaRouteImport } from './routes/mesa'
 import { Route as KitchenRouteImport } from './routes/kitchen'
 import { Route as FinanceRouteImport } from './routes/finance'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -37,6 +38,11 @@ const PainelRoute = PainelRouteImport.update({
 const OrderRoute = OrderRouteImport.update({
   id: '/order',
   path: '/order',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MesaRoute = MesaRouteImport.update({
+  id: '/mesa',
+  path: '/mesa',
   getParentRoute: () => rootRouteImport,
 } as any)
 const KitchenRoute = KitchenRouteImport.update({
@@ -71,6 +77,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/finance': typeof FinanceRoute
   '/kitchen': typeof KitchenRoute
+  '/mesa': typeof MesaRoute
   '/order': typeof OrderRoute
   '/painel': typeof PainelRoute
   '/receipt': typeof ReceiptRoute
@@ -82,6 +89,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/finance': typeof FinanceRoute
   '/kitchen': typeof KitchenRoute
+  '/mesa': typeof MesaRoute
   '/order': typeof OrderRoute
   '/painel': typeof PainelRoute
   '/receipt': typeof ReceiptRoute
@@ -94,6 +102,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/finance': typeof FinanceRoute
   '/kitchen': typeof KitchenRoute
+  '/mesa': typeof MesaRoute
   '/order': typeof OrderRoute
   '/painel': typeof PainelRoute
   '/receipt': typeof ReceiptRoute
@@ -107,6 +116,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/finance'
     | '/kitchen'
+    | '/mesa'
     | '/order'
     | '/painel'
     | '/receipt'
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/finance'
     | '/kitchen'
+    | '/mesa'
     | '/order'
     | '/painel'
     | '/receipt'
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/finance'
     | '/kitchen'
+    | '/mesa'
     | '/order'
     | '/painel'
     | '/receipt'
@@ -141,6 +153,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   FinanceRoute: typeof FinanceRoute
   KitchenRoute: typeof KitchenRoute
+  MesaRoute: typeof MesaRoute
   OrderRoute: typeof OrderRoute
   PainelRoute: typeof PainelRoute
   ReceiptRoute: typeof ReceiptRoute
@@ -175,6 +188,13 @@ declare module '@tanstack/react-router' {
       path: '/order'
       fullPath: '/order'
       preLoaderRoute: typeof OrderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mesa': {
+      id: '/mesa'
+      path: '/mesa'
+      fullPath: '/mesa'
+      preLoaderRoute: typeof MesaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/kitchen': {
@@ -221,6 +241,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   FinanceRoute: FinanceRoute,
   KitchenRoute: KitchenRoute,
+  MesaRoute: MesaRoute,
   OrderRoute: OrderRoute,
   PainelRoute: PainelRoute,
   ReceiptRoute: ReceiptRoute,
@@ -229,13 +250,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
