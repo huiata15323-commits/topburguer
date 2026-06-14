@@ -28,6 +28,7 @@ export const Route = createFileRoute("/admin")({
   ),
 });
 
+type AiStyle = "premium" | "rustic" | "minimal" | "neon" | "american" | "cartoon";
 type FormState = {
   id?: string;
   name: string;
@@ -36,9 +37,19 @@ type FormState = {
   emoji: string;
   description: string;
   image: string;
+  aiStyle: AiStyle;
 };
 
-const EMPTY: FormState = { name: "", price: "", category: "burger", emoji: "🍔", description: "", image: "" };
+const EMPTY: FormState = { name: "", price: "", category: "burger", emoji: "🍔", description: "", image: "", aiStyle: "premium" };
+
+const AI_STYLES: { key: AiStyle; label: string; emoji: string }[] = [
+  { key: "premium", label: "Premium", emoji: "🔥" },
+  { key: "rustic", label: "Rústico", emoji: "🪵" },
+  { key: "minimal", label: "Minimal", emoji: "⚪" },
+  { key: "neon", label: "Neon", emoji: "💜" },
+  { key: "american", label: "Diner US", emoji: "🇺🇸" },
+  { key: "cartoon", label: "Cartoon", emoji: "🎨" },
+];
 
 const CATS: { key: EditableMenuItem["category"]; label: string; emoji: string }[] = [
   { key: "burger", label: "Hambúrgueres", emoji: "🍔" },
