@@ -59,6 +59,34 @@ function PainelPage() {
   });
   const [demoOn, setDemoOn] = useState(false);
   const demoTimerRef = useRef<number | null>(null);
+  // Fila de pedidos a exibir em tela cheia (takeover cinematográfico)
+  const [spotlightQueue, setSpotlightQueue] = useState<Order[]>([]);
+  const currentSpotlight = spotlightQueue[0];
+
+  // Avança a fila do spotlight automaticamente (5.5s cada)
+  useEffect(() => {
+    if (!currentSpotlight) return;
+    // confetti dourado por cima
+    try {
+      const fire = (angle: number, originX: number) => {
+        confetti({
+          particleCount: 60,
+          spread: 70,
+          angle,
+          origin: { x: originX, y: 0.6 },
+          colors: ["#FFD700", "#FFA500", "#FF6B35", "#10b981"],
+          scalar: 1.2,
+          ticks: 200,
+        });
+      };
+      fire(60, 0.1);
+      fire(120, 0.9);
+    } catch {}
+    const t = setTimeout(() => {
+      setSpotlightQueue((q) => q.slice(1));
+    }, 5500);
+    return () => clearTimeout(t);
+  }, [currentSpotlight]);
 
   useEffect(() => { initVoice(); }, []);
   useEffect(() => {
