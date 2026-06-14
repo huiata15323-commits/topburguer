@@ -84,6 +84,7 @@ let cache: Order[] = [];
 const listeners = new Set<(o: Order[]) => void>();
 let initialized = false;
 let pollTimer: ReturnType<typeof setInterval> | null = null;
+let realtimeChannel: ReturnType<typeof supabase.channel> | null = null;
 
 function notify() {
   for (const fn of listeners) fn(cache);
@@ -102,15 +103,55 @@ async function fetchAll() {
   notify();
 }
 
-function ensurePolling() {
+function applyRealtimeChange(
+  event: "INSERT" | "UPDATE" | "DELETE",
+  newRow: DbRow | null,
+  oldRow: DbRow | null,
+) {
+  if (event === "DELETE" && oldRow) {
+    cache = cache.filter((o) => o.id !== oldRow.id);
+    notify();
+    return;
+  }
+  if (!newRow) return;
+  const order = rowToOrder(newRow);
+  const idx = cache.findIndex((o) => o.id === order.id);
+  if (idx === -1) {
+    cache = [order, ...cache];
+  } else {
+    const next = cache.slice();
+    next[idx] = order;
+    cache = next;
+  }
+  notify();
+}
+
+function ensureStreaming() {
   if (initialized) return;
   initialized = true;
   void fetchAll();
-  // Polling leve substitui o realtime (que vazava PII para todos os assinantes anon)
+
+  // Realtime: atualizações instantâneas via postgres_changes
+  realtimeChannel = supabase
+    .channel("orders-stream")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "orders" },
+      (payload) => {
+        applyRealtimeChange(
+          payload.eventType as "INSERT" | "UPDATE" | "DELETE",
+          (payload.new as DbRow) ?? null,
+          (payload.old as DbRow) ?? null,
+        );
+      },
+    )
+    .subscribe();
+
+  // Fallback de reconciliação a cada 30s (caso a subscription caia)
   pollTimer = setInterval(() => {
     if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
     void fetchAll();
-  }, 4000);
+  }, 30000);
 }
 
 export function useOrders() {
