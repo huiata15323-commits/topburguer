@@ -48,8 +48,8 @@ function Landing() {
           <span className="font-black tracking-tight truncate text-sm sm:text-base">Top Burguer System</span>
         </Link>
         <div className="flex items-center gap-2 text-xs shrink-0">
-          <Link to="/app" className="hidden sm:inline px-3 py-1.5 rounded-full border border-white/15 hover:bg-white/10 transition">Acessar painel</Link>
-          <Link to="/order" className="px-3 py-1.5 rounded-full bg-amber-warm/15 border border-amber-warm/40 text-amber-warm font-bold hover:bg-amber-warm/25 transition">Demo grátis →</Link>
+          <Link to="/app" className="hidden sm:inline px-3 py-1.5 rounded-full border border-white/15 hover:bg-white/10 transition">Painel</Link>
+          <Link to="/order" className="px-3 py-1.5 rounded-full bg-amber-warm/15 border border-amber-warm/40 text-amber-warm font-bold hover:bg-amber-warm/25 transition">Demonstração →</Link>
         </div>
       </nav>
 
@@ -59,16 +59,17 @@ function Landing() {
           className="inline-flex items-center gap-2 rounded-full border border-amber-warm/30 bg-amber-warm/10 px-3 py-1.5 text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-amber-warm"
         >
           <span className="w-1.5 h-1.5 rounded-full bg-amber-warm animate-live" />
-          Para hamburguerias que querem girar mais
+          Projeto SENAI · CEPI Elberto Alves
         </motion.div>
 
         <motion.h1
           initial="hidden" animate="show" variants={fade} custom={1}
           className="mt-5 font-black text-4xl sm:text-6xl md:text-7xl tracking-tight text-balance leading-[0.95]"
         >
-          O sistema que faz sua{" "}
-          <span className="bg-gradient-to-r from-amber-warm to-ember bg-clip-text text-transparent">cozinha voar</span>.
+          Um sistema completo pra{" "}
+          <span className="bg-gradient-to-r from-amber-warm to-ember bg-clip-text text-transparent">hamburgueria</span>.
         </motion.h1>
+
 
         <motion.p
           initial="hidden" animate="show" variants={fade} custom={2}
