@@ -76,7 +76,7 @@ function AdminPage() {
     const tid = toast.loading("🎨 IA gerando foto do prato…");
     try {
       const r = await callGenImage({
-        data: { dishName: form.name.trim(), description: form.description.trim() || undefined },
+        data: { dishName: form.name.trim(), description: form.description.trim() || undefined, kind: "dish", style: form.aiStyle },
       });
       if (r.error === "rate_limit") toast.error("⏳ Muitas gerações — aguarde 1min", { id: tid });
       else if (r.error === "no_credits") toast.error("💳 Sem créditos de IA", { id: tid });
