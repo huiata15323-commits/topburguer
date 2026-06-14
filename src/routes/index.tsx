@@ -241,7 +241,13 @@ function Landing() {
             <div className="text-[10px] uppercase tracking-widest text-amber-warm font-bold">Sobre o projeto</div>
             <h3 className="mt-2 text-2xl md:text-3xl font-black">Conhecendo os autores</h3>
             <p className="mt-3 text-white/70 leading-relaxed">
-              Este sistema foi desenvolvido pelos alunos do <strong className="text-amber-warm">Curso Técnico em Desenvolvimento de Sistemas</strong> — turmas do <strong>2º Ano A e B</strong>, como projeto integrador unindo tecnologia, design e a paixão por uma boa hamburgueria. 🍔
+              Somos alunos do <strong className="text-amber-warm">Curso Técnico em Desenvolvimento de Sistemas — SENAI</strong>, do <strong>CEPI Elberto Alves</strong>. Mesmo sem a infraestrutura adequada, mesmo sem computadores em sala, nunca nos faltou o que mais importa: <em className="text-white/90">vontade de aprender</em>.
+            </p>
+            <p className="mt-3 text-white/70 leading-relaxed">
+              Junto com o professor <strong className="text-amber-warm">Huiatã Ribeiro</strong>, formamos uma equipe que, aula após aula, foi virando muito mais do que uma turma — virou uma <strong>identidade de família</strong>. Do ano passado até agora, foram momentos intensos de aprendizagem para a vida: erros, acertos, risadas, descobertas e a certeza de que, juntos, a gente vai longe. 💛
+            </p>
+            <p className="mt-3 text-white/70 leading-relaxed">
+              Este Fast Order é parte desse caminho — código, sonho e gratidão impressos em cada tela. As turmas <strong>2º Ano A e B</strong> assinam, com orgulho, este projeto.
             </p>
             <div className="mt-6 grid grid-cols-2 gap-4">
               {[
@@ -255,9 +261,6 @@ function Landing() {
                   </figcaption>
                 </figure>
               ))}
-            </div>
-            <div className="mt-5 text-xs text-white/40 italic">
-              "Do toque à chapa em segundos." — feito com café, código e fritas.
             </div>
           </motion.div>
         </div>
