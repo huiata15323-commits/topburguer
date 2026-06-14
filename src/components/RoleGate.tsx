@@ -17,8 +17,33 @@ export function RoleGate({ roles, children }: Props) {
   const { user, loading: authLoading } = useAuth();
   const { roles: userRoles, loading: rolesLoading, hasAnyRole } = useUserRoles(user?.id);
   const navigate = useNavigate();
+  const [claiming, setClaiming] = useState(false);
+
+  const claimAdmin = async () => {
+    setClaiming(true);
+    try {
+      const { error } = await supabase.rpc("claim_first_admin");
+      if (error) throw error;
+      toast.success("Você agora é admin! Recarregando…");
+      setTimeout(() => window.location.reload(), 600);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      if (msg.includes("admin already exists")) {
+        toast.error("Já existe um admin. Peça para ele te liberar.");
+      } else {
+        toast.error("Não foi possível: " + msg);
+      }
+      setClaiming(false);
+    }
+  };
 
   if (authLoading || (user && rolesLoading)) {
+    return (
+      <main className="min-h-dvh grid place-items-center bg-background text-foreground">
+        <div className="text-sm text-muted-foreground animate-pulse">Carregando…</div>
+      </main>
+    );
+  }
     return (
       <main className="min-h-dvh grid place-items-center bg-background text-foreground">
         <div className="text-sm text-muted-foreground animate-pulse">Carregando…</div>
