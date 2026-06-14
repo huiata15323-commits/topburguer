@@ -445,7 +445,7 @@ export function TableQRGenerator() {
   };
 
   const renderCard = (n: number) => {
-    const url = effectiveBaseUrl ? `${effectiveBaseUrl}/mesa?n=${n}` : "";
+    const url = effectiveBaseUrl ? `${effectiveBaseUrl}/m?n=${n}` : "";
     return (
       <div key={n} className="card">
         {tpl.decor && <span className="decor tl">{tpl.decor}</span>}
@@ -467,7 +467,7 @@ export function TableQRGenerator() {
   };
 
   // Preview do pôster (escala reduzida)
-  const previewUrl = effectiveBaseUrl ? `${effectiveBaseUrl}/mesa?n=1` : "";
+  const previewUrl = effectiveBaseUrl ? `${effectiveBaseUrl}/m?n=1` : "";
   const themePreview = poster.useThemeColors ? themeColors() : { accent: tpl.accent, dark: tpl.bg, cream: "#FBEFD8" };
 
   return (
