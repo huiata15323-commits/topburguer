@@ -4,6 +4,7 @@ import autoTable from "jspdf-autotable";
 import type { Order } from "./orders-store";
 import type { Expense } from "./expenses-store";
 import { CATEGORY_LABEL } from "./expenses-store";
+import { getBranding } from "./branding";
 
 const BRL = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
