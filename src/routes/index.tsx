@@ -2,6 +2,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useBranding } from "@/lib/branding";
+import turma2a from "@/assets/turma-2a.jpg.asset.json";
+import turma2b from "@/assets/turma-2b.jpg.asset.json";
+import qrMesa from "@/assets/qr-mesa.png.asset.json";
+import qrPrintPdf from "@/assets/qr-print.pdf.asset.json";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -153,20 +158,78 @@ function Landing() {
         </div>
       </section>
 
-      {/* Sobre o projeto escolar */}
-      <section className="relative z-10 mx-auto max-w-3xl px-4 sm:px-6 py-12 sm:py-16">
-        <div className="rounded-3xl border border-amber-warm/20 bg-gradient-to-br from-amber-warm/10 via-white/[0.03] to-ember/5 p-6 sm:p-10 text-center">
-          <div className="text-[10px] uppercase tracking-widest text-amber-warm font-bold">Projeto Escolar</div>
-          <h3 className="mt-2 text-2xl sm:text-3xl font-black text-balance">
-            Feito pelos alunos do <span className="text-amber-warm">SENAI / CEPI Elberto Alves</span>
-          </h3>
-          <p className="mt-4 text-sm sm:text-base text-white/70 leading-relaxed">
-            Turmas <strong>2º Ano A e B</strong> do Curso Técnico em Desenvolvimento de Sistemas,
-            sob orientação do professor <strong className="text-amber-warm">Huiatã Ribeiro</strong>.
-            Sem laboratório, sem computadores em sala — só vontade de aprender e fazer acontecer. 💛
-          </p>
+      {/* Sobre o projeto + autores + QR */}
+      <section id="sobre" className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 py-12 sm:py-16">
+        <div className="grid lg:grid-cols-[1fr_1.2fr] gap-6 sm:gap-10 items-start">
+          {/* QR Code */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="rounded-3xl border border-amber-warm/30 bg-gradient-to-br from-amber-warm/10 via-white/[0.03] to-ember/10 p-6 sm:p-8 shadow-ember"
+          >
+            <div className="text-[10px] uppercase tracking-widest text-amber-warm font-bold">QR Code da demonstração</div>
+            <h3 className="mt-2 text-xl sm:text-2xl font-black">Imprima e cole nas mesas</h3>
+            <p className="mt-2 text-sm text-white/60">
+              Aponte a câmera e abra o cardápio no celular — sem app, sem fila.
+            </p>
+            <div className="mt-6 flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+              <div className="rounded-2xl bg-cream p-3 shadow-lg">
+                <img src={qrMesa.url} alt="QR Code da mesa Top Burguer" className="w-32 h-32 sm:w-40 sm:h-40 block" />
+              </div>
+              <div className="flex-1 space-y-3 text-center sm:text-left">
+                <div className="text-xs uppercase tracking-widest text-amber-warm font-bold">Top Burguer</div>
+                <div className="text-sm text-white/70">Cliente escaneia e pede em segundos.</div>
+                <a
+                  href={qrPrintPdf.url}
+                  target="_blank"
+                  rel="noopener"
+                  className="inline-flex items-center gap-2 rounded-full bg-gradient-ember px-5 py-2.5 text-sm font-bold shadow-ember hover:scale-105 transition-transform"
+                >
+                  📄 Baixar PDF
+                </a>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Conhecendo os autores */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="rounded-3xl border border-white/10 bg-white/[0.03] p-6 sm:p-8"
+          >
+            <div className="text-[10px] uppercase tracking-widest text-amber-warm font-bold">Sobre o projeto</div>
+            <h3 className="mt-2 text-xl sm:text-2xl md:text-3xl font-black">Conhecendo os autores</h3>
+            <p className="mt-3 text-sm sm:text-base text-white/70 leading-relaxed">
+              Somos alunos do <strong className="text-amber-warm">Curso Técnico em Desenvolvimento de Sistemas — SENAI</strong>, do <strong>CEPI Elberto Alves</strong>. Mesmo sem a infraestrutura adequada, mesmo sem computadores em sala, nunca nos faltou o que mais importa: <em className="text-white/90">vontade de aprender</em>.
+            </p>
+            <p className="mt-3 text-sm sm:text-base text-white/70 leading-relaxed">
+              Junto com o professor <strong className="text-amber-warm">Huiatã Ribeiro</strong>, formamos uma equipe que, aula após aula, foi virando muito mais do que uma turma — virou uma <strong>identidade de família</strong>. Do ano passado até agora, foram momentos intensos de aprendizagem para a vida: erros, acertos, risadas, descobertas e a certeza de que, juntos, a gente vai longe. 💛
+            </p>
+            <p className="mt-3 text-sm sm:text-base text-white/70 leading-relaxed">
+              Este projeto é parte desse caminho — código, sonho e gratidão impressos em cada tela. As turmas <strong>2º Ano A e B</strong> assinam, com orgulho, este projeto.
+            </p>
+            <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4">
+              {[
+                { src: turma2b.url, label: "2º Ano A — Técnico" },
+                { src: turma2a.url, label: "2º Ano B — Técnico" },
+              ].map((t) => (
+                <figure key={t.label} className="group relative overflow-hidden rounded-2xl border border-white/10">
+                  <img src={t.src} alt={`Turma ${t.label}`} className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-2 sm:p-3 text-[11px] sm:text-xs font-bold text-white">
+                    {t.label}
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </section>
+
+
 
 
       <section className="relative z-10 mx-auto max-w-3xl px-4 sm:px-6 py-16 sm:py-20 text-center">
