@@ -219,7 +219,7 @@ function OrderPage() {
       </header>
 
       {/* Estimativa de tempo de espera */}
-      <div className="mx-auto max-w-6xl px-4 pt-4 space-y-3">
+      <div className="mx-auto max-w-6xl px-3 sm:px-4 pt-4 space-y-3">
         <div className="rounded-2xl border border-amber-warm/30 bg-gradient-to-r from-amber-warm/10 via-ember/5 to-transparent px-4 py-3 flex items-center gap-3">
           <span className="text-2xl">⏱️</span>
           <div className="flex-1 text-sm">
