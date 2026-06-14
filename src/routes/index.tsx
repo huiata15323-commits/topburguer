@@ -1,275 +1,213 @@
+// Landing comercial — vende o Top Burguer System para outras hamburguerias.
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import topBacon from "@/assets/menu/top-bacon.jpg";
-import topCheddar from "@/assets/menu/top-cheddar.jpg";
-import topClassic from "@/assets/menu/top-classic.jpg";
-import turma2a from "@/assets/turma-2a.jpg.asset.json";
-import turma2b from "@/assets/turma-2b.jpg.asset.json";
-import qrMesa from "@/assets/qr-mesa.png.asset.json";
-import qrPrintPdf from "@/assets/qr-print.pdf.asset.json";
 import { useBranding } from "@/lib/branding";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Top Burguer" },
-      { name: "description", content: "Sistema inteligente de pedidos da Top Burguer: cliente, status e cozinha conectados em tempo real." },
+      { title: "Top Burguer System — Sistema de pedidos para sua hamburgueria" },
+      {
+        name: "description",
+        content:
+          "Cardápio digital, QR de mesa, KDS para a cozinha, painel com voz e IA. Tudo num só lugar — sem mensalidade abusiva.",
+      },
+      { property: "og:title", content: "Top Burguer System — Para sua hamburgueria" },
+      {
+        property: "og:description",
+        content: "Garçom IA por voz, fotos geradas por IA, painel de chamadas, modo offline-ready.",
+      },
     ],
   }),
   component: Landing,
 });
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 20 },
-  show: (i = 0) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] as const } }),
+const PLANS = [
+  {
+    key: "starter", name: "Starter", price: "R$ 49", period: "/mês",
+    tagline: "Pra começar com cardápio digital",
+    features: ["Cardápio QR por mesa", "Pedidos via celular", "Pagamento PIX/Cartão", "Recibo digital", "Até 1 unidade"],
+    highlight: false,
+  },
+  {
+    key: "pro", name: "Pro", price: "R$ 149", period: "/mês",
+    tagline: "Para quem quer girar a cozinha",
+    features: ["Tudo do Starter, mais:", "KDS com voz", "Painel de chamadas", "Resumo do dia por IA", "Financeiro + PDF", "Heatmap de mesas", "Fidelidade"],
+    highlight: true,
+  },
+  {
+    key: "premium", name: "Premium", price: "R$ 299", period: "/mês",
+    tagline: "Para redes e operações sérias",
+    features: ["Tudo do Pro, mais:", "🎙️ Garçom IA por voz", "📸 Fotos por IA", "Multi-loja / franquia", "Integração iFood (em breve)", "White label", "Suporte prioritário"],
+    highlight: false,
+  },
+];
+
+const DIFFERENCES = [
+  { emoji: "🎙️", title: "Garçom IA por voz", desc: 'Cliente fala "dois X-Bacon e uma coca" — o pedido monta sozinho.' },
+  { emoji: "📸", title: "Fotos geradas por IA", desc: "Digite o nome do prato — a IA cria a foto profissional em segundos." },
+  { emoji: "🔊", title: "Chamada por voz", desc: "Painel anuncia: 'Mesa 5, pedido pronto!' — chega de gritar." },
+  { emoji: "🧠", title: "Resumo IA diário", desc: "Toda noite a IA te conta o que vendeu e o que melhorar amanhã." },
+  { emoji: "🎨", title: "Identidade própria", desc: "Mude nome, emoji e tema em 1 clique. Use seu domínio." },
+  { emoji: "📱", title: "Funciona como app", desc: "Cliente instala no celular. Sem download da Play Store." },
+];
+
+const fade = {
+  hidden: { opacity: 0, y: 24 },
+  show: (i = 0) => ({ opacity: 1, y: 0, transition: { delay: i * 0.06, duration: 0.55, ease: [0.22, 1, 0.36, 1] as const } }),
 };
 
 function Landing() {
   const { branding } = useBranding();
   return (
     <main className="min-h-screen bg-gradient-night text-white overflow-hidden relative">
-      {/* Decorative grain layer */}
       <div className="absolute inset-0 bg-grain pointer-events-none" />
 
-      {/* Top bar */}
-      <nav className="relative z-10 mx-auto max-w-7xl px-6 py-5 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-xl bg-gradient-ember grid place-items-center font-black text-lg shadow-ember">{branding.emoji}</div>
-          <span className="font-black tracking-tight">{branding.name}</span>
-        </div>
-        <div className="flex items-center gap-3 text-xs">
-          <Link to="/sobre" className="text-amber-warm/90 hover:text-amber-warm font-bold transition">💼 Para sua hamburgueria</Link>
-          <Link to="/admin" className="hidden sm:inline text-white/60 hover:text-amber-warm transition">⚙️ Admin</Link>
-          <Link to="/painel" className="hidden sm:inline text-white/60 hover:text-amber-warm transition">📺 Painel</Link>
-          <Link to="/dashboard" className="hidden sm:inline text-white/60 hover:text-amber-warm transition">📊 Dashboard</Link>
-          <Link to="/finance" className="hidden sm:inline text-white/60 hover:text-amber-warm transition">💰 Financeiro</Link>
-          <div className="hidden md:flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-live" />
-            <span className="text-white/60 uppercase tracking-widest">Sistema online</span>
-          </div>
+      <nav className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 py-4 flex items-center justify-between gap-3">
+        <Link to="/" className="flex items-center gap-2 min-w-0">
+          <div className="w-9 h-9 shrink-0 rounded-xl bg-gradient-ember grid place-items-center font-black text-lg shadow-ember">{branding.emoji}</div>
+          <span className="font-black tracking-tight truncate text-sm sm:text-base">Top Burguer System</span>
+        </Link>
+        <div className="flex items-center gap-2 text-xs shrink-0">
+          <Link to="/app" className="hidden sm:inline px-3 py-1.5 rounded-full border border-white/15 hover:bg-white/10 transition">Acessar painel</Link>
+          <Link to="/order" className="px-3 py-1.5 rounded-full bg-amber-warm/15 border border-amber-warm/40 text-amber-warm font-bold hover:bg-amber-warm/25 transition">Demo grátis →</Link>
         </div>
       </nav>
 
-      <section className="relative z-10 mx-auto max-w-7xl px-6 pt-10 pb-20 md:pt-20 md:pb-28">
-        <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
-          <div>
-            <motion.div
-              initial="hidden" animate="show" variants={fadeUp}
-              className="inline-flex items-center gap-2 rounded-full border border-amber-warm/30 bg-amber-warm/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-amber-warm"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-amber-warm animate-live" />
-              Pedidos em tempo real
-            </motion.div>
+      <section className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 pt-8 pb-14 sm:pt-14 sm:pb-20 text-center">
+        <motion.div
+          initial="hidden" animate="show" variants={fade}
+          className="inline-flex items-center gap-2 rounded-full border border-amber-warm/30 bg-amber-warm/10 px-3 py-1.5 text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-amber-warm"
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-warm animate-live" />
+          Para hamburguerias que querem girar mais
+        </motion.div>
 
-            <motion.h1
-              initial="hidden" animate="show" variants={fadeUp} custom={1}
-              className="mt-6 font-black text-5xl md:text-7xl tracking-tight text-balance leading-[0.95]"
-            >
-              Do toque <br />
-              à <span className="bg-gradient-to-r from-amber-warm to-ember bg-clip-text text-transparent">chapa</span> em segundos.
-            </motion.h1>
+        <motion.h1
+          initial="hidden" animate="show" variants={fade} custom={1}
+          className="mt-5 font-black text-4xl sm:text-6xl md:text-7xl tracking-tight text-balance leading-[0.95]"
+        >
+          O sistema que faz sua{" "}
+          <span className="bg-gradient-to-r from-amber-warm to-ember bg-clip-text text-transparent">cozinha voar</span>.
+        </motion.h1>
 
-            <motion.p
-              initial="hidden" animate="show" variants={fadeUp} custom={2}
-              className="mt-6 text-lg md:text-xl text-white/70 max-w-xl text-balance"
-            >
-              O Top Burguer conecta o cliente, o painel de status e a cozinha
-              numa única experiência. Pediu, fritou, entregou.
-            </motion.p>
+        <motion.p
+          initial="hidden" animate="show" variants={fade} custom={2}
+          className="mt-5 text-base sm:text-lg md:text-xl text-white/70 max-w-2xl mx-auto text-balance"
+        >
+          QR de mesa, KDS na cozinha, painel de chamadas com voz, IA que entende o cliente
+          e gera fotos dos pratos. Tudo numa plataforma só.
+        </motion.p>
 
-            <motion.div
-              initial="hidden" animate="show" variants={fadeUp} custom={3}
-              className="mt-10 flex flex-wrap gap-3"
-            >
-              <Link
-                to="/order"
-                className="group inline-flex items-center gap-2 rounded-2xl bg-gradient-ember px-6 py-4 font-bold shadow-ember hover:scale-[1.02] active:scale-[0.98] transition-transform"
-              >
-                Fazer pedido <span className="transition-transform group-hover:translate-x-1">→</span>
-              </Link>
-              <Link
-                to="/status"
-                className="inline-flex items-center gap-2 rounded-2xl border border-white/20 bg-white/5 px-6 py-4 font-semibold hover:bg-white/10 transition"
-              >
-                Acompanhar pedido
-              </Link>
-              <Link
-                to="/kitchen"
-                className="inline-flex items-center gap-2 rounded-2xl border border-amber-warm/30 bg-amber-warm/10 px-6 py-4 font-semibold text-amber-warm hover:bg-amber-warm/20 transition"
-              >
-                📺 Painel cozinha
-              </Link>
-            </motion.div>
-
-            <motion.div
-              initial="hidden" animate="show" variants={fadeUp} custom={4}
-              className="mt-12 grid grid-cols-3 gap-6 max-w-md"
-            >
-              {[
-                { k: "<3s", v: "Sincronização" },
-                { k: "10+", v: "Itens no cardápio" },
-                { k: "TV", v: "Display cozinha" },
-              ].map((s) => (
-                <div key={s.v}>
-                  <div className="text-3xl font-black text-amber-warm">{s.k}</div>
-                  <div className="text-[11px] uppercase tracking-widest text-white/50">{s.v}</div>
-                </div>
-              ))}
-            </motion.div>
-          </div>
-
-          {/* Burger composition */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.92, rotate: -4 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className="relative aspect-square max-w-md mx-auto"
-          >
-            <div className="absolute -inset-10 bg-gradient-ember blur-3xl opacity-30 rounded-full" />
-            <motion.img
-              src={topBacon}
-              alt="Top Bacon"
-              className="absolute inset-0 w-full h-full object-cover rounded-[2.5rem] shadow-2xl border border-white/10"
-              animate={{ y: [0, -8, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <motion.div
-              className="absolute -bottom-4 -left-4 w-28 h-28 rounded-2xl overflow-hidden border-4 border-background shadow-xl"
-              animate={{ rotate: [-3, 3, -3] }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <img src={topClassic} alt="" className="w-full h-full object-cover" />
-            </motion.div>
-            <motion.div
-              className="absolute -top-4 -right-4 w-24 h-24 rounded-2xl overflow-hidden border-4 border-background shadow-xl"
-              animate={{ rotate: [4, -4, 4] }}
-              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <img src={topCheddar} alt="" className="w-full h-full object-cover" />
-            </motion.div>
-
-            {/* Live order ticker */}
-            <motion.div
-              initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.6 }}
-              className="absolute -bottom-6 right-2 sm:right-6 bg-white/95 text-charcoal rounded-2xl shadow-2xl px-4 py-3 backdrop-blur"
-            >
-              <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-ember font-bold">
-                <span className="w-1.5 h-1.5 rounded-full bg-ember animate-live" /> Pedido #42
-              </div>
-              <div className="text-sm font-bold mt-0.5">2× Top Bacon + Batata</div>
-              <div className="text-[10px] text-muted-foreground">Pronto em ~6 min</div>
-            </motion.div>
-          </motion.div>
-        </div>
+        <motion.div
+          initial="hidden" animate="show" variants={fade} custom={3}
+          className="mt-8 flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto sm:max-w-none"
+        >
+          <Link to="/order" className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-ember px-6 py-4 font-bold shadow-ember hover:scale-[1.02] active:scale-[0.98] transition-transform">
+            Testar como cliente →
+          </Link>
+          <Link to="/app" className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/5 px-6 py-4 font-semibold hover:bg-white/10 transition">
+            Ver painel do restaurante
+          </Link>
+        </motion.div>
       </section>
 
-      {/* Three pillars */}
-      <section className="relative z-10 mx-auto max-w-7xl px-6 pb-20">
-        <div className="grid md:grid-cols-3 gap-4">
-          {[
-            { tag: "01 · Cliente", title: "Faz o pedido", desc: "Cardápio visual, carrinho com observações por item e envio instantâneo.", to: "/order", emoji: "📱" },
-            { tag: "02 · Painel", title: "Acompanha em tempo real", desc: "Status do pedido visível no balcão e no celular do cliente.", to: "/status", emoji: "⏱️" },
-            { tag: "03 · Cozinha", title: "Prepara e entrega", desc: "TV otimizada com fila, timer de urgência e som de notificação.", to: "/kitchen", emoji: "🔥" },
-          ].map((c, i) => (
+      <section className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 py-12 sm:py-16">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-center mb-2 text-balance">
+          O que torna o Top Burguer <span className="text-amber-warm">diferente</span>
+        </h2>
+        <p className="text-center text-sm sm:text-base text-white/60 max-w-2xl mx-auto mb-10">
+          Outros sistemas digitalizam o cardápio. O nosso usa IA pra vender mais.
+        </p>
+        <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {DIFFERENCES.map((d, i) => (
             <motion.div
-              key={c.title}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1, duration: 0.5 }}
+              key={d.title}
+              initial="hidden" whileInView="show" viewport={{ once: true, margin: "-50px" }}
+              variants={fade} custom={i}
+              className="rounded-2xl sm:rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur p-5 sm:p-6 hover:border-amber-warm/40 hover:bg-white/[0.06] transition-all"
             >
-              <Link
-                to={c.to}
-                className="group block h-full rounded-3xl border border-white/10 bg-white/[0.03] p-6 hover:bg-white/[0.06] hover:border-amber-warm/40 transition-all"
-              >
-                <div className="text-4xl">{c.emoji}</div>
-                <div className="mt-4 text-[10px] uppercase tracking-widest text-amber-warm font-bold">{c.tag}</div>
-                <h3 className="mt-1 text-xl font-bold">{c.title}</h3>
-                <p className="mt-2 text-sm text-white/60">{c.desc}</p>
-                <div className="mt-4 text-sm font-semibold text-amber-warm group-hover:translate-x-1 transition-transform inline-block">
-                  Abrir →
-                </div>
-              </Link>
+              <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">{d.emoji}</div>
+              <h3 className="font-black text-base sm:text-lg mb-1">{d.title}</h3>
+              <p className="text-xs sm:text-sm text-white/65 leading-relaxed">{d.desc}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
-      {/* Sobre / Conhecendo os autores */}
-      <section id="sobre" className="relative z-10 mx-auto max-w-7xl px-6 pb-24">
-        <div className="grid lg:grid-cols-[1fr_1.2fr] gap-10 items-start">
-          {/* QR Code card */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="rounded-3xl border border-amber-warm/30 bg-gradient-to-br from-amber-warm/10 via-white/[0.03] to-ember/10 p-8 shadow-ember"
-          >
-            <div className="text-[10px] uppercase tracking-widest text-amber-warm font-bold">QR Code das mesas</div>
-            <h3 className="mt-2 text-2xl font-black">Imprima e cole nas mesas</h3>
-            <p className="mt-2 text-sm text-white/60">
-              Cliente aponta a câmera, abre a comanda direto no celular — sem fila, sem app.
-            </p>
-            <div className="mt-6 flex flex-col sm:flex-row items-center gap-6">
-              <div className="rounded-2xl bg-cream p-3 shadow-lg">
-                <img src={qrMesa.url} alt="QR Code da mesa Top Burguer" className="w-40 h-40 block" />
-              </div>
-              <div className="flex-1 space-y-3 text-center sm:text-left">
-                <div className="text-xs uppercase tracking-widest text-amber-warm font-bold">Top Burguer</div>
-                <div className="text-sm text-white/70">Aponte a câmera, abra a comanda e peça da sua mesa em segundos.</div>
-                <a
-                  href={qrPrintPdf.url}
-                  target="_blank"
-                  rel="noopener"
-                  className="inline-flex items-center gap-2 rounded-full bg-gradient-ember px-5 py-2.5 text-sm font-bold shadow-ember hover:scale-105 transition-transform"
-                >
-                  📄 Baixar PDF para imprimir
-                </a>
-              </div>
-            </div>
-          </motion.div>
+      <section id="planos" className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 py-12 sm:py-16">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-center mb-2 text-balance">
+          Planos que <span className="text-amber-warm">cabem no caixa</span>
+        </h2>
+        <p className="text-center text-sm text-white/60 mb-10">Sem fidelidade. Cancele quando quiser.</p>
 
-          {/* Conhecendo os autores */}
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="rounded-3xl border border-white/10 bg-white/[0.03] p-8"
-          >
-            <div className="text-[10px] uppercase tracking-widest text-amber-warm font-bold">Sobre o projeto</div>
-            <h3 className="mt-2 text-2xl md:text-3xl font-black">Conhecendo os autores</h3>
-            <p className="mt-3 text-white/70 leading-relaxed">
-              Somos alunos do <strong className="text-amber-warm">Curso Técnico em Desenvolvimento de Sistemas — SENAI</strong>, do <strong>CEPI Elberto Alves</strong>. Mesmo sem a infraestrutura adequada, mesmo sem computadores em sala, nunca nos faltou o que mais importa: <em className="text-white/90">vontade de aprender</em>.
-            </p>
-            <p className="mt-3 text-white/70 leading-relaxed">
-              Junto com o professor <strong className="text-amber-warm">Huiatã Ribeiro</strong>, formamos uma equipe que, aula após aula, foi virando muito mais do que uma turma — virou uma <strong>identidade de família</strong>. Do ano passado até agora, foram momentos intensos de aprendizagem para a vida: erros, acertos, risadas, descobertas e a certeza de que, juntos, a gente vai longe. 💛
-            </p>
-            <p className="mt-3 text-white/70 leading-relaxed">
-              Este projeto é parte desse caminho — código, sonho e gratidão impressos em cada tela. As turmas <strong>2º Ano A e B</strong> assinam, com orgulho, este projeto.
-            </p>
-            <div className="mt-6 grid grid-cols-2 gap-4">
-              {[
-                { src: turma2b.url, label: "2º Ano A — Técnico" },
-                { src: turma2a.url, label: "2º Ano B — Técnico" },
-              ].map((t) => (
-                <figure key={t.label} className="group relative overflow-hidden rounded-2xl border border-white/10">
-                  <img src={t.src} alt={`Turma ${t.label}`} className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-700" />
-                  <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-3 text-xs font-bold text-white">
-                    {t.label}
-                  </figcaption>
-                </figure>
-              ))}
-            </div>
-          </motion.div>
+        <div className="grid gap-4 sm:gap-5 md:grid-cols-3">
+          {PLANS.map((p, i) => (
+            <motion.div
+              key={p.key}
+              initial="hidden" whileInView="show" viewport={{ once: true }}
+              variants={fade} custom={i}
+              className={`relative rounded-2xl sm:rounded-3xl p-5 sm:p-6 ${
+                p.highlight
+                  ? "bg-gradient-to-br from-ember/20 via-amber-warm/10 to-ember/5 border-2 border-amber-warm shadow-ember md:scale-[1.02]"
+                  : "bg-white/[0.03] border border-white/10"
+              }`}
+            >
+              {p.highlight && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-amber-warm text-charcoal text-[10px] font-black uppercase tracking-widest shadow-md whitespace-nowrap">
+                  ⭐ Mais escolhido
+                </div>
+              )}
+              <div className="text-xs sm:text-sm font-bold text-amber-warm uppercase tracking-wider">{p.name}</div>
+              <div className="mt-2 flex items-baseline gap-1">
+                <span className="text-4xl sm:text-5xl font-black">{p.price}</span>
+                <span className="text-white/50 text-sm">{p.period}</span>
+              </div>
+              <p className="mt-2 text-sm text-white/65">{p.tagline}</p>
+
+              <ul className="mt-5 space-y-2 text-sm">
+                {p.features.map((f) => (
+                  <li key={f} className="flex gap-2">
+                    <span className="text-amber-warm shrink-0">✓</span>
+                    <span className="text-white/85">{f}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <Link
+                to="/order"
+                className={`mt-6 block text-center py-3 rounded-2xl font-bold transition-all ${
+                  p.highlight
+                    ? "bg-gradient-ember text-ember-foreground shadow-ember hover:scale-[1.02]"
+                    : "border border-white/20 bg-white/5 hover:bg-white/10"
+                }`}
+              >
+                Testar grátis
+              </Link>
+            </motion.div>
+          ))}
         </div>
+
+        <p className="text-center text-xs text-white/40 mt-8 px-4">
+          Implantação personalizada: R$ 500 – R$ 1.500 (cardápio inicial, logo, treinamento).
+        </p>
       </section>
 
-      <footer className="relative z-10 border-t border-white/5 py-6 text-center text-xs text-white/40">
-        <div>Top Burguer — feito pra hamburgueria que voa.</div>
-        <div className="mt-1 text-white/25">Criado pelos alunos do Curso Técnico em Desenvolvimento de Sistemas — SENAI, CEPI Elberto Alves · 2º Ano A e B</div>
+      <section className="relative z-10 mx-auto max-w-3xl px-4 sm:px-6 py-16 sm:py-20 text-center">
+        <h2 className="text-2xl sm:text-3xl md:text-5xl font-black mb-4 text-balance">
+          Pronto pra ver sua hamburgueria <span className="text-amber-warm">no nível</span>?
+        </h2>
+        <p className="text-white/65 mb-6 sm:mb-8 text-sm sm:text-base">Sem cartão. Sem instalação. Em 5 minutos tá rodando.</p>
+        <Link
+          to="/order"
+          className="inline-flex items-center gap-2 rounded-2xl bg-gradient-ember px-6 sm:px-8 py-4 sm:py-5 font-bold text-base sm:text-lg shadow-ember hover:scale-[1.02] transition-transform"
+        >
+          Começar agora 🔥
+        </Link>
+      </section>
+
+      <footer className="relative z-10 border-t border-white/10 mt-8 py-8 px-4 text-center text-xs text-white/40">
+        © Top Burguer System • Feito com IA pelos alunos do CEPI Elberto Alves
       </footer>
     </main>
   );
