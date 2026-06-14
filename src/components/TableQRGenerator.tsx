@@ -384,7 +384,7 @@ export function TableQRGenerator() {
 
   // ===== Render do conteúdo de impressão (oculto) =====
   const renderPosterPage = (n: number) => {
-    const url = origin ? `${origin}/order?mesa=${n}` : "";
+    const url = baseUrl ? `${baseUrl}/order?mesa=${n}` : "";
     return (
       <div key={n} className="page">
         <div className="stripe" />
@@ -418,7 +418,7 @@ export function TableQRGenerator() {
   };
 
   const renderCard = (n: number) => {
-    const url = origin ? `${origin}/order?mesa=${n}` : "";
+    const url = baseUrl ? `${baseUrl}/order?mesa=${n}` : "";
     return (
       <div key={n} className="card">
         {tpl.decor && <span className="decor tl">{tpl.decor}</span>}
@@ -440,7 +440,7 @@ export function TableQRGenerator() {
   };
 
   // Preview do pôster (escala reduzida)
-  const previewUrl = origin ? `${origin}/order?mesa=1` : "";
+  const previewUrl = baseUrl ? `${baseUrl}/order?mesa=1` : "";
   const themePreview = poster.useThemeColors ? themeColors() : { accent: tpl.accent, dark: tpl.bg, cream: "#FBEFD8" };
 
   return (
