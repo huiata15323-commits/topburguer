@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
 import { useMenu, type EditableMenuItem } from "@/lib/menu-store";
 import { MENU as SEED } from "@/lib/menu";
 import { TableQRGenerator } from "@/components/TableQRGenerator";
@@ -11,6 +12,7 @@ import { PromosAdmin } from "@/components/PromosAdmin";
 import { TableHeatmap } from "@/components/TableHeatmap";
 import { BrandingAdmin } from "@/components/BrandingAdmin";
 import { AdminHeroHeader } from "@/components/AdminHeroHeader";
+import { generateDishImage } from "@/lib/ai-image.functions";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
@@ -51,6 +53,31 @@ function AdminPage() {
   const { items, addItem, updateItem, removeItem, toggleSoldOut, setStock, resetToDefaults } = useMenu();
   const [form, setForm] = useState<FormState>(EMPTY);
   const [editing, setEditing] = useState(false);
+  const [generatingImg, setGeneratingImg] = useState(false);
+  const callGenImage = useServerFn(generateDishImage);
+
+  const handleGenerateImage = async () => {
+    if (!form.name.trim()) {
+      toast.error("Digite o nome do prato primeiro");
+      return;
+    }
+    setGeneratingImg(true);
+    const tid = toast.loading("🎨 IA gerando foto do prato…");
+    try {
+      const r = await callGenImage({
+        data: { dishName: form.name.trim(), description: form.description.trim() || undefined },
+      });
+      if (r.error === "rate_limit") toast.error("⏳ Muitas gerações — aguarde 1min", { id: tid });
+      else if (r.error === "no_credits") toast.error("💳 Sem créditos de IA", { id: tid });
+      else if (r.error || !r.dataUrl) toast.error("Falhou. Tente novamente.", { id: tid });
+      else {
+        setForm((f) => ({ ...f, image: r.dataUrl! }));
+        toast.success("✨ Foto gerada!", { id: tid });
+      }
+    } finally {
+      setGeneratingImg(false);
+    }
+  };
 
   const startEdit = (m: EditableMenuItem) => {
     setForm({
@@ -183,15 +210,34 @@ function AdminPage() {
             </div>
 
             <div>
-              <label className="text-xs text-muted-foreground">URL da imagem (opcional)</label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs text-muted-foreground">Imagem do prato</label>
+                <button
+                  type="button"
+                  onClick={handleGenerateImage}
+                  disabled={generatingImg || !form.name.trim()}
+                  className="text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-lg bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white shadow-sm hover:scale-105 active:scale-95 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Gerar foto profissional do prato com IA"
+                >
+                  {generatingImg ? "🧠 Gerando…" : "✨ Gerar com IA"}
+                </button>
+              </div>
               <input
-                value={form.image}
+                value={form.image.startsWith("data:") ? "" : form.image}
                 onChange={(e) => setForm({ ...form, image: e.target.value })}
-                placeholder="https://… (deixe em branco para imagem padrão)"
-                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                placeholder={form.image.startsWith("data:") ? "Imagem gerada por IA ✨" : "URL ou cole link da imagem"}
+                disabled={form.image.startsWith("data:")}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background disabled:opacity-60"
               />
               {form.image && (
-                <img src={form.image} alt="" className="mt-2 w-full aspect-[4/3] object-cover rounded-xl border border-border" onError={(e) => (e.currentTarget.style.display = "none")} />
+                <div className="relative mt-2">
+                  <img src={form.image} alt="" className="w-full aspect-[4/3] object-cover rounded-xl border border-border" onError={(e) => (e.currentTarget.style.display = "none")} />
+                  {form.image.startsWith("data:") && (
+                    <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white text-[10px] font-black uppercase tracking-wider shadow-md">
+                      ✨ IA
+                    </span>
+                  )}
+                </div>
               )}
             </div>
 
