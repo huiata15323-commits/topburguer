@@ -10,6 +10,7 @@ import { StaffGate } from "@/components/StaffGate";
 import { PromosAdmin } from "@/components/PromosAdmin";
 import { TableHeatmap } from "@/components/TableHeatmap";
 import { BrandingAdmin } from "@/components/BrandingAdmin";
+import { AdminHeroHeader } from "@/components/AdminHeroHeader";
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
