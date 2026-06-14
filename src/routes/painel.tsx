@@ -11,6 +11,7 @@ import { useOrders, type Order } from "@/lib/orders-store";
 import { useMenu, type EditableMenuItem } from "@/lib/menu-store";
 import { initVoice, announceReady, announceWaiter, speak } from "@/lib/voice";
 import { spawnFakeOrder } from "@/lib/demo-mode";
+import confetti from "canvas-confetti";
 
 const search = z.object({
   view: z.enum(["all", "ready", "preparing"]).optional().default("all").catch("all"),
