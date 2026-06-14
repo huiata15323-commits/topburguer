@@ -78,6 +78,21 @@ export function RoleGate({ roles, children }: Props) {
             <br />
             Peça a um administrador para liberar seu acesso.
           </p>
+          {roles.includes("admin") && (
+            <div className="rounded-xl border border-amber-warm/40 bg-amber-warm/10 p-3 text-xs text-left">
+              <div className="font-bold text-amber-warm mb-1">🚀 Primeira vez aqui?</div>
+              <p className="text-muted-foreground mb-2">
+                Se ninguém ainda é admin, você pode reivindicar este papel agora (uma única vez).
+              </p>
+              <button
+                onClick={claimAdmin}
+                disabled={claiming}
+                className="w-full py-2 rounded-lg bg-gradient-ember text-ember-foreground font-bold text-xs disabled:opacity-50"
+              >
+                {claiming ? "Promovendo…" : "Sou o primeiro admin, me promova"}
+              </button>
+            </div>
+          )}
           <div className="flex gap-2 justify-center">
             <Link to="/" className="px-4 py-2 rounded-xl border border-border font-semibold">
               Início
