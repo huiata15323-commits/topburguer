@@ -114,63 +114,59 @@ function Landing() {
         </div>
       </section>
 
-      <section id="planos" className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 py-12 sm:py-16">
+      {/* Acessos rápidos da demo */}
+      <section className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 py-12 sm:py-16">
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-center mb-2 text-balance">
-          Planos que <span className="text-amber-warm">cabem no caixa</span>
+          Demonstração <span className="text-amber-warm">ao vivo</span>
         </h2>
-        <p className="text-center text-sm text-white/60 mb-10">Sem fidelidade. Cancele quando quiser.</p>
+        <p className="text-center text-sm text-white/60 mb-10 max-w-xl mx-auto">
+          Explore cada parte do sistema. Tudo conectado em tempo real — pediu, foi pra cozinha.
+        </p>
 
-        <div className="grid gap-4 sm:gap-5 md:grid-cols-3">
-          {PLANS.map((p, i) => (
-            <motion.div
-              key={p.key}
-              initial="hidden" whileInView="show" viewport={{ once: true }}
-              variants={fade} custom={i}
-              className={`relative rounded-2xl sm:rounded-3xl p-5 sm:p-6 ${
-                p.highlight
-                  ? "bg-gradient-to-br from-ember/20 via-amber-warm/10 to-ember/5 border-2 border-amber-warm shadow-ember md:scale-[1.02]"
-                  : "bg-white/[0.03] border border-white/10"
+        <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            { to: "/order" as const,   emoji: "📱", title: "Cliente pede",     desc: "Cardápio digital pelo celular.", accent: true },
+            { to: "/kitchen" as const, emoji: "🔥", title: "Cozinha recebe",   desc: "KDS com timer e voz." },
+            { to: "/painel" as const,  emoji: "📺", title: "Painel chama",     desc: "Anuncia pedidos prontos em voz alta." },
+            { to: "/admin" as const,   emoji: "⚙️", title: "Admin do menu",   desc: "Cardápio + fotos por IA." },
+            { to: "/dashboard" as const, emoji: "📊", title: "Dashboard",      desc: "Vendas, heatmap, picos." },
+            { to: "/app" as const,     emoji: "🏠", title: "Hub completo",    desc: "Todas as telas do projeto." },
+          ].map((t) => (
+            <Link
+              key={t.to}
+              to={t.to}
+              className={`group block rounded-2xl sm:rounded-3xl p-5 border transition-all active:scale-[0.98] ${
+                t.accent
+                  ? "border-amber-warm/40 bg-gradient-to-br from-amber-warm/15 to-ember/10 hover:border-amber-warm/70 shadow-ember/30 shadow-lg"
+                  : "border-white/10 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/20"
               }`}
             >
-              {p.highlight && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-amber-warm text-charcoal text-[10px] font-black uppercase tracking-widest shadow-md whitespace-nowrap">
-                  ⭐ Mais escolhido
-                </div>
-              )}
-              <div className="text-xs sm:text-sm font-bold text-amber-warm uppercase tracking-wider">{p.name}</div>
-              <div className="mt-2 flex items-baseline gap-1">
-                <span className="text-4xl sm:text-5xl font-black">{p.price}</span>
-                <span className="text-white/50 text-sm">{p.period}</span>
+              <div className="text-3xl sm:text-4xl">{t.emoji}</div>
+              <div className="mt-2 font-black text-base sm:text-lg">{t.title}</div>
+              <div className="mt-1 text-xs sm:text-sm text-white/60">{t.desc}</div>
+              <div className={`mt-3 text-xs font-bold ${t.accent ? "text-amber-warm" : "text-white/70"} group-hover:translate-x-1 transition-transform`}>
+                Abrir →
               </div>
-              <p className="mt-2 text-sm text-white/65">{p.tagline}</p>
-
-              <ul className="mt-5 space-y-2 text-sm">
-                {p.features.map((f) => (
-                  <li key={f} className="flex gap-2">
-                    <span className="text-amber-warm shrink-0">✓</span>
-                    <span className="text-white/85">{f}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <Link
-                to="/order"
-                className={`mt-6 block text-center py-3 rounded-2xl font-bold transition-all ${
-                  p.highlight
-                    ? "bg-gradient-ember text-ember-foreground shadow-ember hover:scale-[1.02]"
-                    : "border border-white/20 bg-white/5 hover:bg-white/10"
-                }`}
-              >
-                Testar grátis
-              </Link>
-            </motion.div>
+            </Link>
           ))}
         </div>
-
-        <p className="text-center text-xs text-white/40 mt-8 px-4">
-          Implantação personalizada: R$ 500 – R$ 1.500 (cardápio inicial, logo, treinamento).
-        </p>
       </section>
+
+      {/* Sobre o projeto escolar */}
+      <section className="relative z-10 mx-auto max-w-3xl px-4 sm:px-6 py-12 sm:py-16">
+        <div className="rounded-3xl border border-amber-warm/20 bg-gradient-to-br from-amber-warm/10 via-white/[0.03] to-ember/5 p-6 sm:p-10 text-center">
+          <div className="text-[10px] uppercase tracking-widest text-amber-warm font-bold">Projeto Escolar</div>
+          <h3 className="mt-2 text-2xl sm:text-3xl font-black text-balance">
+            Feito pelos alunos do <span className="text-amber-warm">SENAI / CEPI Elberto Alves</span>
+          </h3>
+          <p className="mt-4 text-sm sm:text-base text-white/70 leading-relaxed">
+            Turmas <strong>2º Ano A e B</strong> do Curso Técnico em Desenvolvimento de Sistemas,
+            sob orientação do professor <strong className="text-amber-warm">Huiatã Ribeiro</strong>.
+            Sem laboratório, sem computadores em sala — só vontade de aprender e fazer acontecer. 💛
+          </p>
+        </div>
+      </section>
+
 
       <section className="relative z-10 mx-auto max-w-3xl px-4 sm:px-6 py-16 sm:py-20 text-center">
         <h2 className="text-2xl sm:text-3xl md:text-5xl font-black mb-4 text-balance">
