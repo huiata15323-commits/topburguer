@@ -8,6 +8,25 @@ const STORAGE_KEY = "fast-order:tables";
 const TEMPLATE_KEY = "fast-order:qr-template";
 const POSTER_KEY = "fast-order:qr-poster";
 const BASEURL_KEY = "fast-order:qr-baseurl";
+const PUBLISHED_QR_BASE = "https://topburguer.lovable.app";
+
+function isPreviewLikeUrl(value: string): boolean {
+  if (!value) return false;
+  try {
+    const host = new URL(value).hostname.toLowerCase();
+    return (
+      host.includes("id-preview--") ||
+      host.endsWith(".sandbox.lovable.dev") ||
+      host.endsWith(".lovableproject.com") ||
+      host === "localhost" ||
+      host.startsWith("127.") ||
+      host.startsWith("192.168.") ||
+      host.endsWith(".local")
+    );
+  } catch {
+    return false;
+  }
+}
 
 // Detecta um URL público estável (publicado) para os QR codes.
 // Evita usar o domínio de preview do editor, que exige login e expira.
@@ -16,15 +35,21 @@ function suggestPublicBase(origin: string): string {
   try {
     const u = new URL(origin);
     const h = u.hostname;
-    // Domínios de preview do Lovable não são acessíveis ao público.
-    if (h.includes("id-preview--") || h.endsWith(".sandbox.lovable.dev") || h === "localhost" || h.startsWith("127.")) {
+    // Domínios de preview do editor e hosts locais não são acessíveis ao público.
+    if (isPreviewLikeUrl(origin)) {
       // Tenta extrair o ID do projeto do hostname de preview: id-preview--<id>.lovable.app
       const m = h.match(/id-preview--([a-z0-9-]+)\.lovable\.app/i);
       if (m) return `https://${m[1]}.lovable.app`;
-      return "https://topburguer.lovable.app";
+      return PUBLISHED_QR_BASE;
     }
     return origin;
   } catch { return origin; }
+}
+
+function sanitizeBaseUrl(value: string, origin: string): string {
+  const trimmed = value.trim().replace(/\/+$/, "");
+  if (!trimmed || isPreviewLikeUrl(trimmed)) return suggestPublicBase(origin);
+  return trimmed;
 }
 
 type TemplateId =
@@ -265,12 +290,15 @@ export function TableQRGenerator() {
     setTemplateId(readTemplate());
     setPoster(readPoster());
     const saved = localStorage.getItem(BASEURL_KEY) || "";
-    setBaseUrl(saved || suggestPublicBase(o));
+    const safe = sanitizeBaseUrl(saved, o);
+    setBaseUrl(safe);
+    if (saved !== safe) localStorage.setItem(BASEURL_KEY, safe);
   }, []);
 
   const tables = useMemo(() => Array.from({ length: count }, (_, i) => i + 1), [count]);
   const tpl = TEMPLATES.find((t) => t.id === templateId) ?? TEMPLATES[0];
   const isPoster = tpl.layout === "poster";
+  const effectiveBaseUrl = useMemo(() => sanitizeBaseUrl(baseUrl, origin), [baseUrl, origin]);
 
   const updateCount = (n: number) => {
     const safe = Math.max(1, Math.min(50, n));
@@ -384,7 +412,7 @@ export function TableQRGenerator() {
 
   // ===== Render do conteúdo de impressão (oculto) =====
   const renderPosterPage = (n: number) => {
-    const url = baseUrl ? `${baseUrl}/order?mesa=${n}` : "";
+    const url = effectiveBaseUrl ? `${effectiveBaseUrl}/order?mesa=${n}` : "";
     return (
       <div key={n} className="page">
         <div className="stripe" />
@@ -418,7 +446,7 @@ export function TableQRGenerator() {
   };
 
   const renderCard = (n: number) => {
-    const url = baseUrl ? `${baseUrl}/order?mesa=${n}` : "";
+    const url = effectiveBaseUrl ? `${effectiveBaseUrl}/order?mesa=${n}` : "";
     return (
       <div key={n} className="card">
         {tpl.decor && <span className="decor tl">{tpl.decor}</span>}
@@ -440,7 +468,7 @@ export function TableQRGenerator() {
   };
 
   // Preview do pôster (escala reduzida)
-  const previewUrl = baseUrl ? `${baseUrl}/order?mesa=1` : "";
+  const previewUrl = effectiveBaseUrl ? `${effectiveBaseUrl}/order?mesa=1` : "";
   const themePreview = poster.useThemeColors ? themeColors() : { accent: tpl.accent, dark: tpl.bg, cream: "#FBEFD8" };
 
   return (
