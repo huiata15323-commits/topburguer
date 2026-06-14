@@ -54,11 +54,18 @@ export function speak(text: string, opts?: { rate?: number; pitch?: number; volu
 }
 
 export function announceReady(orderNumber: number, table?: number, customer?: string) {
-  const parts: string[] = [`Pedido ${orderNumber},`];
-  if (table) parts.push(`mesa ${table},`);
-  else if (customer) parts.push(`${customer.split(" ")[0]},`);
-  parts.push("pronto para retirada!");
-  speak(parts.join(" "));
+  const firstName = customer?.trim().split(/\s+/)[0];
+  const parts: string[] = ["Atenção!", `Pedido número ${orderNumber}`];
+  if (firstName && table) {
+    parts.push(`do cliente ${firstName}, mesa ${table},`);
+  } else if (table) {
+    parts.push(`da mesa ${table},`);
+  } else if (firstName) {
+    parts.push(`do cliente ${firstName},`);
+  }
+  parts.push("está pronto para retirada!");
+  // Repete o número no final para clareza no balcão
+  speak(parts.join(" ") + ` Pedido ${orderNumber}.`);
 }
 
 export function announceWaiter(table?: number) {

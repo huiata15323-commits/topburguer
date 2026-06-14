@@ -448,8 +448,23 @@ function CategoryStrip({
 
 function FeaturedReady({ featured, big }: { featured?: Order; big?: boolean }) {
   return (
-    <section className="rounded-3xl bg-gradient-to-br from-emerald-600/25 via-emerald-500/10 to-transparent border border-emerald-500/30 grid place-items-center p-6 sm:p-8 relative overflow-hidden min-h-0">
+    <section className="rounded-3xl bg-gradient-to-br from-emerald-600/25 via-emerald-500/10 to-transparent border border-emerald-500/30 grid place-items-center p-6 sm:p-8 relative overflow-hidden min-h-0 shadow-[inset_0_0_120px_rgba(16,185,129,0.15)]">
       <div className="absolute inset-0 bg-grain opacity-50" />
+      {/* Auroras animadas */}
+      {featured && (
+        <>
+          <motion.div
+            className="absolute -top-32 -left-32 w-[480px] h-[480px] rounded-full bg-emerald-400/20 blur-3xl pointer-events-none"
+            animate={{ scale: [1, 1.2, 1], opacity: [0.4, 0.7, 0.4] }}
+            transition={{ duration: 6, repeat: Infinity }}
+          />
+          <motion.div
+            className="absolute -bottom-32 -right-32 w-[480px] h-[480px] rounded-full bg-amber-warm/20 blur-3xl pointer-events-none"
+            animate={{ scale: [1.2, 1, 1.2], opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: 7, repeat: Infinity }}
+          />
+        </>
+      )}
       <AnimatePresence mode="wait">
         {featured ? (
           <motion.div
@@ -460,8 +475,11 @@ function FeaturedReady({ featured, big }: { featured?: Order; big?: boolean }) {
             transition={{ type: "spring", damping: 16, stiffness: 200 }}
             className="text-center relative z-10"
           >
-            <div className="text-base sm:text-xl uppercase tracking-[0.4em] text-emerald-300 font-bold animate-live">
-              Pronto para retirar
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 backdrop-blur-sm">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-live" />
+              <span className="text-xs sm:text-sm uppercase tracking-[0.4em] text-emerald-200 font-black">
+                Pronto para retirar
+              </span>
             </div>
             <motion.div
               animate={{ scale: [1, 1.04, 1] }}
@@ -469,18 +487,23 @@ function FeaturedReady({ featured, big }: { featured?: Order; big?: boolean }) {
               className={`font-black tabular-nums leading-none mt-3 sm:mt-4 bg-gradient-to-br from-white via-amber-warm to-ember bg-clip-text text-transparent drop-shadow-2xl ${
                 big ? "text-[clamp(14rem,38vw,40rem)]" : "text-[clamp(10rem,24vw,24rem)]"
               }`}
+              style={{ textShadow: "0 0 80px rgba(245, 166, 35, 0.4)" }}
             >
               #{featured.number}
             </motion.div>
-            <div className="mt-3 text-2xl sm:text-3xl font-bold text-white/90 truncate max-w-[80vw] mx-auto">
+            <div className="mt-4 text-3xl sm:text-5xl font-black text-white truncate max-w-[80vw] mx-auto tracking-tight">
               {featured.customer}
-              {featured.tableNumber && (
-                <span className="ml-3 px-3 py-1 rounded-full bg-amber-warm text-charcoal text-base sm:text-lg font-black align-middle">
-                  🪑 MESA {featured.tableNumber}
-                </span>
-              )}
             </div>
-            <div className="mt-1 text-base sm:text-lg text-white/60">
+            {featured.tableNumber && (
+              <motion.div
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 1.6, repeat: Infinity }}
+                className="mt-4 inline-flex items-center gap-2 px-5 py-2 rounded-2xl bg-gradient-ember shadow-ember text-charcoal text-xl sm:text-2xl font-black"
+              >
+                🪑 MESA {featured.tableNumber}
+              </motion.div>
+            )}
+            <div className="mt-4 text-sm sm:text-base text-white/50 font-medium uppercase tracking-widest">
               {featured.items.reduce((s, i) => s + i.quantity, 0)} itens · pronto há {elapsedLabel(featured.doneAt ?? featured.createdAt)}
             </div>
           </motion.div>

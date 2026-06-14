@@ -1,4 +1,5 @@
 // Painel do admin: nome da hamburgueria, emoji do logo e tema visual.
+import { useState } from "react";
 import { useBranding, THEME_PRESETS } from "@/lib/branding";
 import { toast } from "sonner";
 
@@ -10,8 +11,18 @@ const PREVIEW: Record<string, string[]> = {
   boteco:  ["#1b3d0e", "#f4d35e", "#7a4a1e"],
 };
 
+const EMOJI_PICKER = [
+  "🔥", "🍔", "🍟", "🌭", "🥪", "🌮", "🌯", "🥙",
+  "🍕", "🥩", "🍗", "🥓", "🧀", "🥚", "🥞", "🧇",
+  "🍳", "🥗", "🍜", "🍝", "🍤", "🍣", "🍱", "🍛",
+  "🥤", "🍺", "🍻", "🍷", "🥂", "🍸", "☕", "🧋",
+  "🍰", "🍩", "🍪", "🍦", "🍫", "🍿", "🥨", "🥐",
+  "⭐", "💫", "✨", "👑", "🛵", "🏆", "💎", "🎯",
+];
+
 export function BrandingAdmin() {
   const { branding, save } = useBranding();
+  const [showPicker, setShowPicker] = useState(false);
 
   return (
     <section className="rounded-3xl border-2 border-ember/30 bg-gradient-to-br from-ember/10 via-card to-card p-5 shadow-card-soft">
@@ -21,14 +32,46 @@ export function BrandingAdmin() {
         </h2>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-[120px_1fr]">
-        <div>
-          <label className="text-xs text-muted-foreground">Emoji</label>
+      <div className="grid gap-4 sm:grid-cols-[140px_1fr]">
+        <div className="relative">
+          <label className="text-xs text-muted-foreground">Emoji do logo</label>
+          <button
+            type="button"
+            onClick={() => setShowPicker((v) => !v)}
+            className="w-full text-center text-4xl px-2 py-3 rounded-xl border-2 border-border bg-background hover:border-ember/60 hover:shadow-ember transition-all"
+            title="Clique para escolher um emoji"
+          >
+            {branding.emoji}
+          </button>
           <input
             value={branding.emoji}
             onChange={(e) => save({ emoji: e.target.value.slice(0, 4) })}
-            className="w-full text-center text-3xl px-2 py-3 rounded-xl border border-border bg-background"
+            placeholder="Ou digite"
+            className="mt-2 w-full text-center text-sm px-2 py-1.5 rounded-lg border border-border bg-background/60"
           />
+          {showPicker && (
+            <div className="absolute z-20 mt-2 left-0 right-0 sm:w-72 rounded-2xl border-2 border-ember/40 bg-card shadow-2xl p-3">
+              <div className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold mb-2">Escolha um emoji</div>
+              <div className="grid grid-cols-8 gap-1 max-h-60 overflow-y-auto">
+                {EMOJI_PICKER.map((e) => (
+                  <button
+                    key={e}
+                    type="button"
+                    onClick={() => {
+                      save({ emoji: e });
+                      setShowPicker(false);
+                      toast.success(`Emoji ${e} aplicado`);
+                    }}
+                    className={`text-2xl p-1.5 rounded-lg hover:bg-ember/20 transition ${
+                      branding.emoji === e ? "bg-ember/30 ring-2 ring-ember" : ""
+                    }`}
+                  >
+                    {e}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         <div>
           <label className="text-xs text-muted-foreground">Nome da hamburgueria</label>
@@ -39,6 +82,15 @@ export function BrandingAdmin() {
             placeholder="Ex: Top Burguer"
             className="w-full px-3 py-3 rounded-xl border border-border bg-background font-bold"
           />
+          <div className="mt-3 rounded-xl border border-border/60 bg-background/40 p-3 flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-gradient-ember grid place-items-center text-2xl shadow-ember">
+              {branding.emoji}
+            </div>
+            <div>
+              <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Pré-visualização</div>
+              <div className="font-black text-lg">{branding.name}</div>
+            </div>
+          </div>
         </div>
       </div>
 
