@@ -4,6 +4,7 @@ import autoTable from "jspdf-autotable";
 import type { Order } from "./orders-store";
 import type { Expense } from "./expenses-store";
 import { CATEGORY_LABEL } from "./expenses-store";
+import { getBranding } from "./branding";
 
 const BRL = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
@@ -15,6 +16,8 @@ export function generateReportPDF(opts: {
   range: ReportRange;
 }) {
   const { orders, expenses, range } = opts;
+  const brand = getBranding();
+  const brandName = (brand.name || "Loja").toUpperCase();
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const W = doc.internal.pageSize.getWidth();
 
@@ -24,7 +27,7 @@ export function generateReportPDF(opts: {
   doc.setTextColor(255, 168, 38);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(22);
-  doc.text("TOP BURGUER", 40, 38);
+  doc.text(brandName, 40, 38);
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(11);
   doc.setFont("helvetica", "normal");
@@ -204,13 +207,14 @@ export function generateReportPDF(opts: {
     doc.setFontSize(8);
     doc.setTextColor(150, 150, 150);
     doc.text(
-      `Top Burguer — página ${i}/${pages}`,
+      `${brand.whiteLabel ? brandName : brandName + " — Relatório"} — página ${i}/${pages}`,
       W / 2,
       doc.internal.pageSize.getHeight() - 18,
       { align: "center" }
     );
   }
 
-  const filename = `topburguer-relatorio-${range.label.toLowerCase().replace(/\s+/g, "-")}-${new Date().toISOString().slice(0, 10)}.pdf`;
+  const slug = (brand.name || "loja").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const filename = `${slug}-relatorio-${range.label.toLowerCase().replace(/\s+/g, "-")}-${new Date().toISOString().slice(0, 10)}.pdf`;
   doc.save(filename);
 }

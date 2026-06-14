@@ -2,6 +2,7 @@ import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { z } from "zod";
 import { useOrders, type Order } from "@/lib/orders-store";
+import { useBranding } from "@/lib/branding";
 
 const search = z.object({ n: z.coerce.number().int().positive().optional() });
 
@@ -25,6 +26,7 @@ const STATUS_LABEL = {
 function ReceiptPage() {
   const { n } = useSearch({ from: "/receipt" });
   const { orders } = useOrders();
+  const { branding } = useBranding();
   const order: Order | undefined = useMemo(
     () => (n ? orders.find((o) => o.number === n) : undefined),
     [orders, n]
@@ -89,8 +91,10 @@ function ReceiptPage() {
 
         <div className="p-6">
           <header className="text-center pb-3 border-b border-dashed border-charcoal/40">
-            <div className="text-2xl font-black tracking-tight">TOP BURGUER</div>
-            <div className="text-[11px] uppercase tracking-widest opacity-70">Top Burguer • Recibo</div>
+            <div className="text-2xl font-black tracking-tight uppercase">{branding.name}</div>
+            <div className="text-[11px] uppercase tracking-widest opacity-70">
+              {branding.whiteLabel ? "Recibo" : `${branding.name} • Recibo`}
+            </div>
             <div className="mt-1 text-[11px] opacity-70">{dateStr} • {timeStr}</div>
           </header>
 
