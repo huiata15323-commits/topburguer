@@ -114,7 +114,8 @@ function OrderPage() {
     setCart((c) => ({ ...c, [id]: { ...c[id], qty: c[id]?.qty || 0, notes: v.slice(0, 80) } }));
 
   const submit = () => {
-    if (!customer.trim()) return toast.error("Informe seu nome");
+    // Nome só é obrigatório quando o cliente NÃO está numa mesa
+    if (!mesa && !customer.trim()) return toast.error("Informe seu nome");
     if (customer.length > 50) return toast.error("Nome muito longo");
     if (items.length === 0) return toast.error("Adicione ao menos um item");
     if (notes.length > 300) return toast.error("Observações muito longas");
@@ -128,8 +129,9 @@ function OrderPage() {
     setSubmitting(true);
     try {
       const normalized = phone.trim() ? normalizePhoneBR(phone) ?? undefined : undefined;
+      const fallbackName = mesa ? `Mesa ${mesa}` : "Cliente";
       const order = await addOrder({
-        customer: customer.trim().slice(0, 50),
+        customer: (customer.trim() || fallbackName).slice(0, 50),
         phone: normalized,
         tableNumber: mesa,
         items,

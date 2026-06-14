@@ -1,5 +1,6 @@
 // Estado compartilhado de pedidos via Lovable Cloud.
-// Realtime foi removido (broadcast vazava PII); usamos polling leve (4s).
+// Usa Realtime (postgres_changes) com fallback de polling lento (30s)
+// só para garantir reconexão se a subscription cair.
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getStaffPin } from "@/components/StaffGate";
@@ -83,6 +84,7 @@ let cache: Order[] = [];
 const listeners = new Set<(o: Order[]) => void>();
 let initialized = false;
 let pollTimer: ReturnType<typeof setInterval> | null = null;
+let realtimeChannel: ReturnType<typeof supabase.channel> | null = null;
 
 function notify() {
   for (const fn of listeners) fn(cache);
@@ -101,15 +103,55 @@ async function fetchAll() {
   notify();
 }
 
-function ensurePolling() {
+function applyRealtimeChange(
+  event: "INSERT" | "UPDATE" | "DELETE",
+  newRow: DbRow | null,
+  oldRow: DbRow | null,
+) {
+  if (event === "DELETE" && oldRow) {
+    cache = cache.filter((o) => o.id !== oldRow.id);
+    notify();
+    return;
+  }
+  if (!newRow) return;
+  const order = rowToOrder(newRow);
+  const idx = cache.findIndex((o) => o.id === order.id);
+  if (idx === -1) {
+    cache = [order, ...cache];
+  } else {
+    const next = cache.slice();
+    next[idx] = order;
+    cache = next;
+  }
+  notify();
+}
+
+function ensureStreaming() {
   if (initialized) return;
   initialized = true;
   void fetchAll();
-  // Polling leve substitui o realtime (que vazava PII para todos os assinantes anon)
+
+  // Realtime: atualizações instantâneas via postgres_changes
+  realtimeChannel = supabase
+    .channel("orders-stream")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "orders" },
+      (payload) => {
+        applyRealtimeChange(
+          payload.eventType as "INSERT" | "UPDATE" | "DELETE",
+          (payload.new as DbRow) ?? null,
+          (payload.old as DbRow) ?? null,
+        );
+      },
+    )
+    .subscribe();
+
+  // Fallback de reconciliação a cada 30s (caso a subscription caia)
   pollTimer = setInterval(() => {
     if (typeof document !== "undefined" && document.visibilityState === "hidden") return;
     void fetchAll();
-  }, 4000);
+  }, 30000);
 }
 
 export function useOrders() {
@@ -117,7 +159,7 @@ export function useOrders() {
 
 
   useEffect(() => {
-    ensurePolling();
+    ensureStreaming();
 
     const fn = (o: Order[]) => setOrders(o);
     listeners.add(fn);
@@ -266,14 +308,17 @@ export function estimateWaitMinutes(orders: Order[]): number {
   return Math.max(3, positions * avgPerOrder);
 }
 
-// Para o polling quando a aba é fechada
+// Para realtime e polling quando a aba é fechada
 if (typeof window !== "undefined") {
   window.addEventListener("beforeunload", () => {
     if (pollTimer) {
       clearInterval(pollTimer);
       pollTimer = null;
-      initialized = false;
     }
+    if (realtimeChannel) {
+      void supabase.removeChannel(realtimeChannel);
+      realtimeChannel = null;
+    }
+    initialized = false;
   });
-
 }
