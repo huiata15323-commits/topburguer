@@ -11,6 +11,7 @@ import { useOrders, type Order } from "@/lib/orders-store";
 import { useMenu, type EditableMenuItem } from "@/lib/menu-store";
 import { initVoice, announceReady, announceWaiter, speak } from "@/lib/voice";
 import { spawnFakeOrder } from "@/lib/demo-mode";
+import confetti from "canvas-confetti";
 
 const search = z.object({
   view: z.enum(["all", "ready", "preparing"]).optional().default("all").catch("all"),
@@ -58,6 +59,34 @@ function PainelPage() {
   });
   const [demoOn, setDemoOn] = useState(false);
   const demoTimerRef = useRef<number | null>(null);
+  // Fila de pedidos a exibir em tela cheia (takeover cinematográfico)
+  const [spotlightQueue, setSpotlightQueue] = useState<Order[]>([]);
+  const currentSpotlight = spotlightQueue[0];
+
+  // Avança a fila do spotlight automaticamente (5.5s cada)
+  useEffect(() => {
+    if (!currentSpotlight) return;
+    // confetti dourado por cima
+    try {
+      const fire = (angle: number, originX: number) => {
+        confetti({
+          particleCount: 60,
+          spread: 70,
+          angle,
+          origin: { x: originX, y: 0.6 },
+          colors: ["#FFD700", "#FFA500", "#FF6B35", "#10b981"],
+          scalar: 1.2,
+          ticks: 200,
+        });
+      };
+      fire(60, 0.1);
+      fire(120, 0.9);
+    } catch {}
+    const t = setTimeout(() => {
+      setSpotlightQueue((q) => q.slice(1));
+    }, 5500);
+    return () => clearTimeout(t);
+  }, [currentSpotlight]);
 
   useEffect(() => { initVoice(); }, []);
   useEffect(() => {
@@ -136,11 +165,12 @@ function PainelPage() {
           o.stop(ctx.currentTime + i * 0.16 + 0.18);
         });
       } catch {}
-      // Anúncio por voz logo após o sino
+      // Anúncio por voz + takeover na tela
+      const newOrders = newOnes
+        .map((id) => orders.find((o) => o.id === id))
+        .filter((o): o is Order => !!o);
+      setSpotlightQueue((q) => [...q, ...newOrders]);
       if (voiceOn) {
-        const newOrders = newOnes
-          .map((id) => orders.find((o) => o.id === id))
-          .filter((o): o is Order => !!o);
         newOrders.forEach((o, i) => {
           setTimeout(() => announceReady(o.number, o.tableNumber, o.customer), 700 + i * 2200);
         });
@@ -385,7 +415,117 @@ function PainelPage() {
       <div className="px-6 py-2 text-center text-[10px] uppercase tracking-widest text-white/30 border-t border-white/5">
         Top Burguer · Atualização em tempo real · /painel?view=ready para modo TV
       </div>
+
+      <SpotlightTakeover order={currentSpotlight} />
     </main>
+  );
+}
+
+function SpotlightTakeover({ order }: { order?: Order }) {
+  return (
+    <AnimatePresence>
+      {order && (
+        <motion.div
+          key={order.id}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.4 }}
+          className="fixed inset-0 z-50 grid place-items-center overflow-hidden"
+          style={{
+            background:
+              "radial-gradient(ellipse at center, rgba(16,72,52,0.95) 0%, rgba(5,15,12,0.98) 60%, #000 100%)",
+          }}
+        >
+          {/* Raios de luz girando */}
+          <motion.div
+            className="absolute inset-0 pointer-events-none"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            style={{
+              background:
+                "conic-gradient(from 0deg, transparent 0deg, rgba(255,215,0,0.08) 20deg, transparent 40deg, transparent 180deg, rgba(16,185,129,0.08) 200deg, transparent 220deg)",
+            }}
+          />
+          {/* Aurora dourada pulsante */}
+          <motion.div
+            className="absolute w-[700px] h-[700px] rounded-full bg-amber-warm/20 blur-3xl pointer-events-none"
+            animate={{ scale: [1, 1.3, 1], opacity: [0.5, 0.9, 0.5] }}
+            transition={{ duration: 2.5, repeat: Infinity }}
+          />
+
+          <motion.div
+            initial={{ scale: 0.4, opacity: 0, y: 40 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 1.2, opacity: 0 }}
+            transition={{ type: "spring", damping: 14, stiffness: 180 }}
+            className="relative text-center px-6"
+          >
+            {/* Badge superior */}
+            <motion.div
+              animate={{ scale: [1, 1.04, 1] }}
+              transition={{ duration: 1.4, repeat: Infinity }}
+              className="inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-emerald-500/30 border-2 border-emerald-400/60 backdrop-blur-md mb-6 shadow-[0_0_60px_rgba(16,185,129,0.5)]"
+            >
+              <span className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-sm sm:text-base uppercase tracking-[0.5em] text-emerald-100 font-black">
+                Pedido Pronto
+              </span>
+              <span className="w-3 h-3 rounded-full bg-emerald-400 animate-pulse" />
+            </motion.div>
+
+            {/* Número gigante */}
+            <motion.div
+              animate={{ scale: [1, 1.03, 1] }}
+              transition={{ duration: 1.6, repeat: Infinity }}
+              className="font-black tabular-nums leading-none text-[clamp(10rem,28vw,32rem)] bg-gradient-to-br from-amber-200 via-amber-warm to-ember bg-clip-text text-transparent"
+              style={{
+                textShadow: "0 0 120px rgba(255,180,80,0.7)",
+                filter: "drop-shadow(0 0 40px rgba(255,200,100,0.5))",
+              }}
+            >
+              #{order.number}
+            </motion.div>
+
+            {/* Nome do cliente */}
+            <div className="mt-6 text-4xl sm:text-6xl md:text-7xl font-black text-white tracking-tight max-w-[90vw] mx-auto truncate"
+              style={{ textShadow: "0 4px 30px rgba(0,0,0,0.6)" }}>
+              {order.customer}
+            </div>
+
+            {/* Mesa + Retirada */}
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+              {order.tableNumber ? (
+                <motion.div
+                  animate={{ scale: [1, 1.06, 1] }}
+                  transition={{ duration: 1.4, repeat: Infinity }}
+                  className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-gradient-ember shadow-ember text-charcoal text-2xl sm:text-3xl font-black"
+                >
+                  🪑 MESA {order.tableNumber}
+                </motion.div>
+              ) : (
+                <motion.div
+                  animate={{ scale: [1, 1.06, 1] }}
+                  transition={{ duration: 1.4, repeat: Infinity }}
+                  className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-amber-warm shadow-tv-glow text-charcoal text-2xl sm:text-3xl font-black"
+                >
+                  🛍 RETIRAR NO BALCÃO
+                </motion.div>
+              )}
+              {order.tableNumber && (
+                <div className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-white/10 border border-white/20 text-white text-xl sm:text-2xl font-black backdrop-blur-sm">
+                  🛎 LEVAR À MESA
+                </div>
+              )}
+            </div>
+
+            <div className="mt-8 text-xs sm:text-sm uppercase tracking-[0.4em] text-white/50 font-bold">
+              {order.items.reduce((s, i) => s + i.quantity, 0)} itens · Top Burguer
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
