@@ -216,8 +216,8 @@ function Landing() {
                 <img src={qrMesa.url} alt="QR Code da mesa Top Burguer" className="w-40 h-40 block" />
               </div>
               <div className="flex-1 space-y-3 text-center sm:text-left">
-                <div className="text-xs text-white/50">Aponta para</div>
-                <div className="font-mono text-sm text-amber-warm break-all">topburguer.lovable.app/mesa</div>
+                <div className="text-xs uppercase tracking-widest text-amber-warm font-bold">Top Burguer</div>
+                <div className="text-sm text-white/70">Aponte a câmera, abra a comanda e peça da sua mesa em segundos.</div>
                 <a
                   href={qrPrintPdf.url}
                   target="_blank"
