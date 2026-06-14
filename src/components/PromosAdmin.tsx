@@ -9,6 +9,32 @@ export function PromosAdmin() {
   const { cfg, addCoupon, removeCoupon, setHappyHour, isHappyHourNow } = usePromos();
   const [code, setCode] = useState("");
   const [percent, setPercent] = useState("10");
+  const [bannerPrompt, setBannerPrompt] = useState("");
+  const [bannerImg, setBannerImg] = useState<string | null>(null);
+  const [genBanner, setGenBanner] = useState(false);
+  const callGen = useServerFn(generateDishImage);
+
+  async function generateBanner() {
+    if (!bannerPrompt.trim()) { toast.error("Descreva a promoção"); return; }
+    setGenBanner(true);
+    const tid = toast.loading("🎨 IA criando o banner…");
+    try {
+      const r = await callGen({ data: { dishName: "Promo", description: bannerPrompt.trim(), kind: "promo", style: "neon" } });
+      if (r.error === "rate_limit") toast.error("⏳ Aguarde 1min", { id: tid });
+      else if (r.error === "no_credits") toast.error("💳 Sem créditos", { id: tid });
+      else if (r.error || !r.dataUrl) toast.error("Falhou — tente de novo", { id: tid });
+      else { setBannerImg(r.dataUrl); toast.success("✨ Banner pronto!", { id: tid }); }
+    } finally { setGenBanner(false); }
+  }
+
+  function downloadBanner() {
+    if (!bannerImg) return;
+    const a = document.createElement("a");
+    a.href = bannerImg;
+    a.download = `promo-${Date.now()}.png`;
+    a.click();
+  }
+
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
