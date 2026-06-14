@@ -234,6 +234,25 @@ function AdminPage() {
                   {generatingImg ? "🧠 Gerando…" : "✨ Gerar com IA"}
                 </button>
               </div>
+              <div className="mb-2">
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Estilo visual da IA</div>
+                <div className="flex flex-wrap gap-1">
+                  {AI_STYLES.map((s) => (
+                    <button
+                      key={s.key}
+                      type="button"
+                      onClick={() => setForm({ ...form, aiStyle: s.key })}
+                      className={`text-[10px] font-bold px-2 py-1 rounded-lg border transition ${
+                        form.aiStyle === s.key
+                          ? "border-fuchsia-500 bg-fuchsia-500/20 text-fuchsia-700 dark:text-fuchsia-300"
+                          : "border-border bg-background hover:border-fuchsia-400/40"
+                      }`}
+                    >
+                      {s.emoji} {s.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <input
                 value={form.image.startsWith("data:") ? "" : form.image}
                 onChange={(e) => setForm({ ...form, image: e.target.value })}
