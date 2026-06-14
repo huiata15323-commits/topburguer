@@ -2,6 +2,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useBranding } from "@/lib/branding";
+import turma2a from "@/assets/turma-2a.jpg.asset.json";
+import turma2b from "@/assets/turma-2b.jpg.asset.json";
+import qrMesa from "@/assets/qr-mesa.png.asset.json";
+import qrPrintPdf from "@/assets/qr-print.pdf.asset.json";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
