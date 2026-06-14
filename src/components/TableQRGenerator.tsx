@@ -2,9 +2,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import QRCode from "react-qr-code";
 import { useBranding } from "@/lib/branding";
+import { toast } from "sonner";
 
 const STORAGE_KEY = "fast-order:tables";
 const TEMPLATE_KEY = "fast-order:qr-template";
+const POSTER_KEY = "fast-order:qr-poster";
 
 type TemplateId =
   | "classic"
@@ -16,24 +18,39 @@ type TemplateId =
   | "christmas"
   | "junina"
   | "carnival"
-  | "newyear";
+  | "newyear"
+  | "student";
 
 type Template = {
   id: TemplateId;
   label: string;
   emoji: string;
   occasion: string;
-  // estilos do cartão impresso
-  bg: string; // background CSS
-  color: string; // cor principal do texto
-  accent: string; // cor de destaque (borda, brand)
-  border: string; // border CSS
-  decor?: string; // emoji decorativo no canto
-  topLabel?: string; // texto pequeno no topo (ocasião)
-  hint: string; // instrução para o cliente
+  bg: string;
+  color: string;
+  accent: string;
+  border: string;
+  decor?: string;
+  topLabel?: string;
+  hint: string;
+  layout?: "card" | "poster"; // poster = 1 por página A4 cheia
 };
 
 const TEMPLATES: Template[] = [
+  {
+    id: "student",
+    label: "Pôster Escolar",
+    emoji: "🎓",
+    occasion: "Projeto / Estudantil — A4 cheio",
+    bg: "#231510",
+    color: "#FFFFFF",
+    accent: "#E85D3A",
+    border: "0",
+    decor: "★",
+    topLabel: "APONTE A CÂMERA",
+    hint: "Faça seu pedido direto pelo celular",
+    layout: "poster",
+  },
   {
     id: "classic",
     label: "Clássico",
@@ -160,6 +177,33 @@ const TEMPLATES: Template[] = [
   },
 ];
 
+type Poster = {
+  projectTitle: string;
+  projectCaption: string;
+  footerLine: string;
+  photo1: string;
+  photo2: string;
+  useThemeColors: boolean;
+};
+
+const POSTER_DEFAULT: Poster = {
+  projectTitle: "PROJETO DESENVOLVIDO PELOS ALUNOS",
+  projectCaption: "2º Ano A e B — Curso Técnico",
+  footerLine: "★ Bem-vindo ★",
+  photo1: "",
+  photo2: "",
+  useThemeColors: true,
+};
+
+function readPoster(): Poster {
+  if (typeof window === "undefined") return POSTER_DEFAULT;
+  try {
+    const raw = localStorage.getItem(POSTER_KEY);
+    if (!raw) return POSTER_DEFAULT;
+    return { ...POSTER_DEFAULT, ...(JSON.parse(raw) as Partial<Poster>) };
+  } catch { return POSTER_DEFAULT; }
+}
+
 function readCount(): number {
   if (typeof window === "undefined") return 6;
   const v = parseInt(localStorage.getItem(STORAGE_KEY) || "6", 10);
@@ -167,26 +211,43 @@ function readCount(): number {
 }
 
 function readTemplate(): TemplateId {
-  if (typeof window === "undefined") return "classic";
+  if (typeof window === "undefined") return "student";
   const v = localStorage.getItem(TEMPLATE_KEY) as TemplateId | null;
-  return v && TEMPLATES.find((t) => t.id === v) ? v : "classic";
+  return v && TEMPLATES.find((t) => t.id === v) ? v : "student";
+}
+
+// Pega cores efetivas do tema CSS atual
+function themeColors(): { accent: string; dark: string; cream: string } {
+  if (typeof window === "undefined") return { accent: "#E85D3A", dark: "#231510", cream: "#FBEFD8" };
+  const cs = getComputedStyle(document.documentElement);
+  const ember = cs.getPropertyValue("--ember").trim() || "oklch(0.62 0.22 35)";
+  return {
+    accent: `oklch(from ${ember} 0.62 0.22 h)`,
+    dark: `oklch(from ${ember} 0.18 0.05 h)`,
+    cream: `oklch(from ${ember} 0.95 0.04 h)`,
+  };
 }
 
 export function TableQRGenerator() {
   const [count, setCount] = useState<number>(6);
   const [origin, setOrigin] = useState<string>("");
-  const [templateId, setTemplateId] = useState<TemplateId>("classic");
+  const [templateId, setTemplateId] = useState<TemplateId>("student");
+  const [poster, setPoster] = useState<Poster>(POSTER_DEFAULT);
   const { branding } = useBranding();
   const printRef = useRef<HTMLDivElement>(null);
+  const photo1Ref = useRef<HTMLInputElement>(null);
+  const photo2Ref = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setCount(readCount());
     setOrigin(window.location.origin);
     setTemplateId(readTemplate());
+    setPoster(readPoster());
   }, []);
 
   const tables = useMemo(() => Array.from({ length: count }, (_, i) => i + 1), [count]);
   const tpl = TEMPLATES.find((t) => t.id === templateId) ?? TEMPLATES[0];
+  const isPoster = tpl.layout === "poster";
 
   const updateCount = (n: number) => {
     const safe = Math.max(1, Math.min(50, n));
@@ -199,34 +260,85 @@ export function TableQRGenerator() {
     localStorage.setItem(TEMPLATE_KEY, id);
   };
 
+  const updatePoster = (patch: Partial<Poster>) => {
+    const next = { ...poster, ...patch };
+    setPoster(next);
+    localStorage.setItem(POSTER_KEY, JSON.stringify(next));
+  };
+
+  const onPhotoFile = (slot: "photo1" | "photo2") => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (f.size > 800_000) { toast.error("Foto muito grande (máx 800KB)"); return; }
+    const r = new FileReader();
+    r.onload = () => { updatePoster({ [slot]: String(r.result || "") } as Partial<Poster>); toast.success("Foto aplicada"); };
+    r.readAsDataURL(f);
+  };
+
+  const brand = branding.name || "Top Burguer";
+  const initials = brand.replace(/[^A-Za-z]/g, "").slice(0, 2).toUpperCase() || "TB";
+
   const handlePrint = () => {
     const node = printRef.current;
     if (!node) return;
-    const brand = branding.name || "Top Burguer";
-    const html = `<!doctype html><html><head><title>QR Codes — Mesas (${tpl.label})</title>
-<style>
+
+    // Cores derivadas do tema ativo (se for pôster e usuário quiser)
+    const { accent, dark, cream } = isPoster && poster.useThemeColors
+      ? themeColors()
+      : { accent: tpl.accent, dark: tpl.bg, cream: "#FBEFD8" };
+
+    const posterCSS = `
+  @page { size: A4 portrait; margin: 0; }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: "Inter", ui-sans-serif, system-ui, sans-serif; margin: 0; padding: 0; background: ${dark}; color: #fff; }
+  .page { width: 210mm; height: 297mm; padding: 0; page-break-after: always; position: relative; background: ${dark}; display: flex; flex-direction: column; }
+  .page:last-child { page-break-after: auto; }
+  .stripe { height: 9mm; background: ${accent}; position: relative; }
+  .stripe::after { content: ""; position: absolute; left: 0; right: 0; bottom: -2mm; height: 2mm; background: #F4C430; }
+  .stripe.bottom { margin-top: auto; }
+  .stripe.bottom::after { top: -2mm; bottom: auto; }
+  .body { flex: 1; padding: 10mm 14mm; display: flex; flex-direction: column; align-items: center; }
+  h1.title { font-family: "Bricolage Grotesque", "Inter", sans-serif; font-weight: 900; font-size: 56pt; letter-spacing: -0.02em; margin: 4mm 0 1mm; color: #fff; text-align: center; line-height: 0.95; }
+  .slogan { font-style: italic; color: ${accent}; font-size: 14pt; margin-bottom: 6mm; letter-spacing: 0.02em; }
+  .slogan::before { content: "— "; } .slogan::after { content: " —"; }
+  .card {
+    background: ${cream}; color: #1a1a1a; border-radius: 16mm;
+    width: 150mm; padding: 9mm 9mm 8mm; text-align: center; flex-shrink: 0;
+  }
+  .card .label { font-weight: 900; font-size: 18pt; letter-spacing: 0.02em; margin-bottom: 1mm; color: #1a1a1a; }
+  .card .sub { font-size: 10pt; color: #444; margin-bottom: 5mm; }
+  .qr-holder { position: relative; width: 110mm; height: 110mm; margin: 0 auto; background: #fff; padding: 4mm; border-radius: 4mm; }
+  .qr-holder svg { width: 100% !important; height: 100% !important; display: block; }
+  .qr-badge {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 18mm; height: 18mm; background: ${accent}; color: #fff;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 14pt; letter-spacing: 0.05em; box-shadow: 0 0 0 3mm #fff;
+  }
+  .mesa-line { margin-top: 6mm; font-weight: 900; font-size: 14pt; letter-spacing: 0.08em; color: #1a1a1a; }
+  .mesa-line .num { display: inline-block; min-width: 28mm; border-bottom: 0.6mm solid #1a1a1a; padding-bottom: 0.5mm; }
+  .project { margin-top: 8mm; text-align: center; }
+  .project .ptitle { color: ${accent}; font-weight: 900; letter-spacing: 0.05em; font-size: 12pt; }
+  .project .pcap { color: #ddd; font-size: 9.5pt; margin-top: 1mm; }
+  .photos { display: flex; gap: 6mm; justify-content: center; margin-top: 4mm; }
+  .photos .ph { width: 50mm; height: 36mm; border-radius: 4mm; overflow: hidden; background: #1a1a1a; display: flex; align-items: center; justify-content: center; color: #555; font-size: 9pt; border: 1mm solid #fff; }
+  .photos .ph img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .footer-line { text-align: center; padding: 5mm 0; color: #fff; font-weight: 800; letter-spacing: 0.04em; font-size: 12pt; }
+`;
+
+    const cardCSS = `
   @page { size: A4; margin: 10mm; }
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   body { font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; margin: 0; padding: 0; }
   .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8mm; }
   .card {
-    position: relative;
-    border-radius: 14px;
-    padding: 8mm 6mm;
-    text-align: center;
-    page-break-inside: avoid;
-    background: ${tpl.bg};
-    color: ${tpl.color};
-    border: ${tpl.border};
-    min-height: 105mm;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    overflow: hidden;
+    position: relative; border-radius: 14px; padding: 8mm 6mm; text-align: center;
+    page-break-inside: avoid; background: ${tpl.bg}; color: ${tpl.color};
+    border: ${tpl.border}; min-height: 105mm; display: flex; flex-direction: column;
+    justify-content: space-between; overflow: hidden;
   }
   .decor { position: absolute; font-size: 30px; opacity: 0.85; }
-  .decor.tl { top: 4mm; left: 5mm; }
-  .decor.br { bottom: 4mm; right: 5mm; }
+  .decor.tl { top: 4mm; left: 5mm; } .decor.br { bottom: 4mm; right: 5mm; }
   .top { font-size: 10px; letter-spacing: 4px; font-weight: 800; opacity: 0.85; }
   .brand { font-size: 13px; text-transform: uppercase; letter-spacing: 5px; font-weight: 900; color: ${tpl.accent}; margin-top: 2mm; }
   .num-label { font-size: 11px; letter-spacing: 3px; font-weight: 700; opacity: 0.7; margin-top: 4mm; }
@@ -235,18 +347,78 @@ export function TableQRGenerator() {
   .qr-box { background: #fff; padding: 3mm; border-radius: 8px; }
   .qr-box svg { width: 42mm; height: 42mm; display: block; }
   .hint { font-size: 10px; opacity: 0.85; line-height: 1.35; padding: 0 4mm; font-weight: 600; }
-</style></head><body>${node.innerHTML}</body></html>`;
+`;
+
+    const css = isPoster ? posterCSS : cardCSS;
+    const html = `<!doctype html><html><head><title>QR Codes — Mesas (${tpl.label})</title>
+<style>${css}</style></head><body>${node.innerHTML}</body></html>`;
     const w = window.open("", "_blank", "width=900,height=1200");
     if (!w) return;
     w.document.write(html);
     w.document.close();
-    setTimeout(() => {
-      w.focus();
-      w.print();
-    }, 350);
+    setTimeout(() => { w.focus(); w.print(); }, 400);
   };
 
-  const brand = branding.name || "Top Burguer";
+  // ===== Render do conteúdo de impressão (oculto) =====
+  const renderPosterPage = (n: number) => {
+    const url = origin ? `${origin}/order?mesa=${n}` : "";
+    return (
+      <div key={n} className="page">
+        <div className="stripe" />
+        <div className="body">
+          <h1 className="title">{brand.toUpperCase()}</h1>
+          {branding.slogan && <div className="slogan">{branding.slogan}</div>}
+          <div className="card">
+            <div className="label">APONTE A CÂMERA</div>
+            <div className="sub">{tpl.hint}</div>
+            <div className="qr-holder">
+              {url && <QRCode value={url} size={400} level="H" />}
+              <div className="qr-badge">{initials}</div>
+            </div>
+            <div className="mesa-line">MESA Nº <span className="num">{n}</span></div>
+          </div>
+          <div className="project">
+            <div className="ptitle">{poster.projectTitle}</div>
+            <div className="pcap">{poster.projectCaption}</div>
+            {(poster.photo1 || poster.photo2) && (
+              <div className="photos">
+                <div className="ph">{poster.photo1 ? <img src={poster.photo1} alt="" /> : "foto 1"}</div>
+                <div className="ph">{poster.photo2 ? <img src={poster.photo2} alt="" /> : "foto 2"}</div>
+              </div>
+            )}
+          </div>
+          <div className="footer-line">{poster.footerLine}</div>
+        </div>
+        <div className="stripe bottom" />
+      </div>
+    );
+  };
+
+  const renderCard = (n: number) => {
+    const url = origin ? `${origin}/order?mesa=${n}` : "";
+    return (
+      <div key={n} className="card">
+        {tpl.decor && <span className="decor tl">{tpl.decor}</span>}
+        {tpl.decor && <span className="decor br">{tpl.decor}</span>}
+        <div>
+          {tpl.topLabel && <div className="top">{tpl.topLabel}</div>}
+          <div className="brand">{brand}</div>
+        </div>
+        <div>
+          <div className="num-label">MESA</div>
+          <div className="num">{n}</div>
+        </div>
+        <div className="qr-wrap">
+          <div className="qr-box">{url && <QRCode value={url} size={160} level="M" />}</div>
+        </div>
+        <div className="hint">{tpl.hint}</div>
+      </div>
+    );
+  };
+
+  // Preview do pôster (escala reduzida)
+  const previewUrl = origin ? `${origin}/order?mesa=1` : "";
+  const themePreview = poster.useThemeColors ? themeColors() : { accent: tpl.accent, dark: tpl.bg, cream: "#FBEFD8" };
 
   return (
     <section className="rounded-3xl bg-card border border-border p-5 shadow-card-soft">
@@ -262,10 +434,7 @@ export function TableQRGenerator() {
         <div className="flex items-center gap-2">
           <label className="text-xs text-muted-foreground">Mesas:</label>
           <input
-            type="number"
-            min={1}
-            max={50}
-            value={count}
+            type="number" min={1} max={50} value={count}
             onChange={(e) => updateCount(parseInt(e.target.value || "1", 10))}
             className="w-20 px-2 py-1.5 rounded-lg border border-border bg-background text-center font-bold"
           />
@@ -296,81 +465,149 @@ export function TableQRGenerator() {
             >
               <div className="text-2xl">{t.emoji}</div>
               <div className="text-xs font-black mt-1">{t.label}</div>
-              <div className="text-[10px] text-muted-foreground leading-tight mt-0.5">
-                {t.occasion}
-              </div>
+              <div className="text-[10px] text-muted-foreground leading-tight mt-0.5">{t.occasion}</div>
             </button>
           ))}
         </div>
       </div>
 
-      {/* Preview de uma placa */}
+      {/* Painel de edição do pôster */}
+      {isPoster && (
+        <div className="mb-5 rounded-2xl border-2 border-ember/30 bg-ember/5 p-4 space-y-3">
+          <div className="font-black text-sm flex items-center gap-2">
+            <span>🎓</span> Editar pôster escolar
+          </div>
+          <label className="flex items-center gap-2 text-xs cursor-pointer">
+            <input
+              type="checkbox" checked={poster.useThemeColors}
+              onChange={(e) => updatePoster({ useThemeColors: e.target.checked })}
+              className="accent-ember w-4 h-4"
+            />
+            <span>Usar cores do tema ativo (recomendado)</span>
+          </label>
+          <div className="grid sm:grid-cols-2 gap-2">
+            <div>
+              <label className="text-[10px] uppercase font-bold text-muted-foreground">Título do projeto</label>
+              <input
+                value={poster.projectTitle}
+                onChange={(e) => updatePoster({ projectTitle: e.target.value.slice(0, 60) })}
+                className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm font-bold"
+              />
+            </div>
+            <div>
+              <label className="text-[10px] uppercase font-bold text-muted-foreground">Legenda (turma/curso)</label>
+              <input
+                value={poster.projectCaption}
+                onChange={(e) => updatePoster({ projectCaption: e.target.value.slice(0, 80) })}
+                className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm"
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="text-[10px] uppercase font-bold text-muted-foreground">Frase do rodapé</label>
+              <input
+                value={poster.footerLine}
+                onChange={(e) => updatePoster({ footerLine: e.target.value.slice(0, 80) })}
+                className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm font-bold"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {(["photo1", "photo2"] as const).map((slot, i) => (
+              <div key={slot} className="rounded-xl border border-border bg-background p-2">
+                <div className="text-[10px] uppercase font-bold text-muted-foreground mb-1">Foto {i + 1}</div>
+                {poster[slot] ? (
+                  <div className="relative">
+                    <img src={poster[slot]} alt="" className="w-full h-20 object-cover rounded-lg" />
+                    <button
+                      onClick={() => updatePoster({ [slot]: "" } as Partial<Poster>)}
+                      className="absolute top-1 right-1 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded"
+                    >✕</button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => (slot === "photo1" ? photo1Ref : photo2Ref).current?.click()}
+                    className="w-full h-20 rounded-lg border-2 border-dashed border-border hover:border-ember/40 text-xs text-muted-foreground"
+                  >📷 Enviar foto</button>
+                )}
+              </div>
+            ))}
+            <input ref={photo1Ref} type="file" accept="image/*" onChange={onPhotoFile("photo1")} className="hidden" />
+            <input ref={photo2Ref} type="file" accept="image/*" onChange={onPhotoFile("photo2")} className="hidden" />
+          </div>
+        </div>
+      )}
+
+      {/* Pré-visualização */}
       <div className="mb-4">
         <div className="text-[11px] uppercase tracking-widest font-black text-muted-foreground mb-2">
-          Pré-visualização (Mesa 1)
+          Pré-visualização (Mesa 1) — 1 placa por folha A4
         </div>
-        <div
-          className="mx-auto max-w-[260px] rounded-2xl p-5 text-center"
-          style={{
-            background: tpl.bg,
-            color: tpl.color,
-            border: tpl.border,
-          }}
-        >
-          {tpl.topLabel && (
-            <div className="text-[10px] tracking-[0.3em] font-black opacity-80">
-              {tpl.topLabel}
-            </div>
-          )}
+        {isPoster ? (
           <div
-            className="text-[11px] tracking-[0.35em] font-black uppercase mt-1"
-            style={{ color: tpl.accent }}
+            className="mx-auto rounded-lg overflow-hidden shadow-2xl"
+            style={{ width: 210, aspectRatio: "210 / 297", background: themePreview.dark, color: "#fff", fontFamily: "Inter, sans-serif" }}
           >
-            {brand}
-          </div>
-          <div className="text-[10px] tracking-[0.25em] mt-3 opacity-70 font-bold">
-            MESA
-          </div>
-          <div className="text-5xl font-black leading-none">1</div>
-          <div className="bg-white p-2 rounded-lg inline-block mt-3">
-            {origin && <QRCode value={`${origin}/order?mesa=1`} size={110} level="M" />}
-          </div>
-          <div className="text-[10px] mt-2 opacity-85 font-semibold px-2">{tpl.hint}</div>
-        </div>
-      </div>
-
-      {/* Conteúdo para impressão (oculto visualmente, mas presente no DOM) */}
-      <div ref={printRef} className="hidden">
-        <div className="grid">
-          {tables.map((n) => {
-            const url = origin ? `${origin}/order?mesa=${n}` : "";
-            return (
-              <div key={n} className="card">
-                {tpl.decor && <span className="decor tl">{tpl.decor}</span>}
-                {tpl.decor && <span className="decor br">{tpl.decor}</span>}
-                <div>
-                  {tpl.topLabel && <div className="top">{tpl.topLabel}</div>}
-                  <div className="brand">{brand}</div>
-                </div>
-                <div>
-                  <div className="num-label">MESA</div>
-                  <div className="num">{n}</div>
-                </div>
-                <div className="qr-wrap">
-                  <div className="qr-box">
-                    {url && <QRCode value={url} size={160} level="M" />}
+            <div style={{ height: 6, background: themePreview.accent, borderBottom: "1.5px solid #F4C430" }} />
+            <div style={{ padding: "8px 10px", display: "flex", flexDirection: "column", alignItems: "center", height: "calc(100% - 12px)" }}>
+              <div style={{ fontWeight: 900, fontSize: 18, letterSpacing: "-0.02em", lineHeight: 0.95, textAlign: "center" }}>
+                {brand.toUpperCase()}
+              </div>
+              {branding.slogan && (
+                <div style={{ fontStyle: "italic", color: themePreview.accent, fontSize: 7, marginTop: 2 }}>— {branding.slogan} —</div>
+              )}
+              <div style={{ background: themePreview.cream, color: "#1a1a1a", borderRadius: 10, padding: "6px 6px 5px", width: "85%", marginTop: 6, textAlign: "center" }}>
+                <div style={{ fontWeight: 900, fontSize: 8 }}>APONTE A CÂMERA</div>
+                <div style={{ fontSize: 5, color: "#444", marginBottom: 3 }}>{tpl.hint}</div>
+                <div style={{ position: "relative", width: 78, height: 78, margin: "0 auto", background: "#fff", padding: 2, borderRadius: 3 }}>
+                  {previewUrl && <QRCode value={previewUrl} size={74} level="H" />}
+                  <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 16, height: 16, borderRadius: "50%", background: themePreview.accent, color: "#fff", fontWeight: 900, fontSize: 7, display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 0 2px #fff" }}>
+                    {initials}
                   </div>
                 </div>
-                <div className="hint">{tpl.hint}</div>
+                <div style={{ marginTop: 5, fontWeight: 900, fontSize: 7, letterSpacing: "0.05em" }}>MESA Nº ___</div>
               </div>
-            );
-          })}
-        </div>
+              <div style={{ marginTop: 6, textAlign: "center" }}>
+                <div style={{ color: themePreview.accent, fontWeight: 900, fontSize: 6 }}>{poster.projectTitle}</div>
+                <div style={{ color: "#ddd", fontSize: 4.5, marginTop: 1 }}>{poster.projectCaption}</div>
+                {(poster.photo1 || poster.photo2) && (
+                  <div style={{ display: "flex", gap: 3, justifyContent: "center", marginTop: 3 }}>
+                    {[poster.photo1, poster.photo2].map((p, i) => (
+                      <div key={i} style={{ width: 30, height: 22, background: "#1a1a1a", border: "0.5px solid #fff", borderRadius: 2, overflow: "hidden" }}>
+                        {p && <img src={p} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
+                      </div>
+                    ))}
+                  </div>
+                )}
+                <div style={{ marginTop: 6, fontWeight: 800, fontSize: 6 }}>{poster.footerLine}</div>
+              </div>
+            </div>
+            <div style={{ height: 6, background: themePreview.accent, borderTop: "1.5px solid #F4C430" }} />
+          </div>
+        ) : (
+          <div
+            className="mx-auto max-w-[260px] rounded-2xl p-5 text-center"
+            style={{ background: tpl.bg, color: tpl.color, border: tpl.border }}
+          >
+            {tpl.topLabel && <div className="text-[10px] tracking-[0.3em] font-black opacity-80">{tpl.topLabel}</div>}
+            <div className="text-[11px] tracking-[0.35em] font-black uppercase mt-1" style={{ color: tpl.accent }}>{brand}</div>
+            <div className="text-[10px] tracking-[0.25em] mt-3 opacity-70 font-bold">MESA</div>
+            <div className="text-5xl font-black leading-none">1</div>
+            <div className="bg-white p-2 rounded-lg inline-block mt-3">
+              {previewUrl && <QRCode value={previewUrl} size={110} level="M" />}
+            </div>
+            <div className="text-[10px] mt-2 opacity-85 font-semibold px-2">{tpl.hint}</div>
+          </div>
+        )}
+      </div>
+
+      {/* Conteúdo de impressão (oculto) */}
+      <div ref={printRef} className="hidden">
+        {isPoster ? tables.map(renderPosterPage) : <div className="grid">{tables.map(renderCard)}</div>}
       </div>
 
       <p className="text-[11px] text-muted-foreground text-center">
-        🖨 Serão impressas <strong>{count}</strong> placas no modelo{" "}
-        <strong>{tpl.label}</strong> — 2 por folha A4, prontas para recortar.
+        🖨 {count} placa{count > 1 ? "s" : ""} — modelo <strong>{tpl.label}</strong>
+        {isPoster ? " (1 por folha A4)" : " (2 por folha A4, prontas para recortar)"}.
       </p>
     </section>
   );
