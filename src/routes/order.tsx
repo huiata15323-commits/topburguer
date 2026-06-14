@@ -172,33 +172,33 @@ function OrderPage() {
   return (
     <main className="min-h-screen bg-background pb-32 lg:pb-0">
       <header className="sticky top-0 z-20 bg-gradient-night text-white shadow-lg">
-        <div className="mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-gradient-ember grid place-items-center font-black shadow-ember">{branding.emoji}</div>
-            <div>
-              <div className="font-black leading-none">{branding.name}</div>
-              <div className="text-[10px] text-amber-warm uppercase tracking-widest">
+        <div className="mx-auto max-w-6xl px-3 sm:px-4 py-3 sm:py-4 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:gap-4">
+          <Link to="/" className="flex min-w-0 items-center gap-2">
+            <div className="w-9 h-9 shrink-0 rounded-xl bg-gradient-ember grid place-items-center font-black shadow-ember">{branding.emoji}</div>
+            <div className="min-w-0">
+              <div className="font-black leading-none truncate">{branding.name}</div>
+              <div className="text-[10px] text-amber-warm uppercase tracking-widest truncate">
                 {mesa ? `Mesa ${mesa} · Faça seu pedido` : "Faça seu pedido"}
               </div>
             </div>
           </Link>
-          <div className="flex items-center gap-3 text-xs">
+          <div className="flex items-center gap-2 text-xs shrink-0 flex-wrap justify-end">
             {mesa && (
               <Link
                 to="/mesa"
                 search={{ n: mesa }}
-                className="px-2.5 py-1 rounded-full bg-amber-warm text-charcoal font-black text-[11px] hover:scale-105 transition"
+                className="px-2.5 py-1 rounded-full bg-amber-warm text-charcoal font-black text-[10px] sm:text-[11px] hover:scale-105 transition"
                 title="Ver comanda completa da mesa"
               >
-                🪑 {t("order.table")} {mesa} · comanda
+                🪑 {t("order.table")} {mesa}<span className="hidden sm:inline"> · comanda</span>
               </Link>
             )}
-            <LanguageToggle />
-            <Link to="/status" className="text-white/70 hover:text-amber-warm hidden sm:inline">Status</Link>
+            <LanguageToggle compact />
+            <Link to="/status" className="text-white/70 hover:text-amber-warm hidden md:inline">Status</Link>
           </div>
         </div>
         {/* Category tabs */}
-        <div className="mx-auto max-w-6xl px-4 pb-3 flex gap-2 overflow-x-auto">
+        <div className="mx-auto max-w-6xl px-3 sm:px-4 pb-3 flex gap-2 overflow-x-auto">
           {CATEGORIES.map((c) => (
             <button
               key={c.key}
@@ -206,7 +206,7 @@ function OrderPage() {
                 setActiveCat(c.key);
                 document.getElementById(`cat-${c.key}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
               }}
-              className={`shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+              className={`shrink-0 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-all ${
                 activeCat === c.key
                   ? "bg-amber-warm text-charcoal shadow-tv-glow"
                   : "bg-white/5 text-white/70 hover:bg-white/10"
@@ -219,7 +219,7 @@ function OrderPage() {
       </header>
 
       {/* Estimativa de tempo de espera */}
-      <div className="mx-auto max-w-6xl px-4 pt-4 space-y-3">
+      <div className="mx-auto max-w-6xl px-3 sm:px-4 pt-4 space-y-3">
         <div className="rounded-2xl border border-amber-warm/30 bg-gradient-to-r from-amber-warm/10 via-ember/5 to-transparent px-4 py-3 flex items-center gap-3">
           <span className="text-2xl">⏱️</span>
           <div className="flex-1 text-sm">
@@ -270,15 +270,15 @@ function OrderPage() {
       </div>
 
 
-      <div className="mx-auto max-w-6xl px-4 py-6 grid gap-6 lg:grid-cols-[1fr_380px]">
+      <div className="mx-auto max-w-6xl px-3 sm:px-4 py-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_400px]">
 
-        <section className="space-y-10">
+        <section className="space-y-10 min-w-0">
           {CATEGORIES.map((cat) => (
             <div key={cat.key} id={`cat-${cat.key}`} className="scroll-mt-32">
-              <h2 className="text-xl font-black mb-4 flex items-center gap-2">
+              <h2 className="text-lg sm:text-xl font-black mb-4 flex items-center gap-2">
                 <span className="text-2xl">{cat.emoji}</span> {t(cat.tKey)}
               </h2>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 grid-cols-2 xl:grid-cols-3">
                 {menu.filter((m) => m.category === cat.key).map((m, i) => {
                   const entry = cart[m.id];
                   const q = entry?.qty || 0;
@@ -325,13 +325,13 @@ function OrderPage() {
                           </motion.div>
                         )}
                       </div>
-                      <div className="p-4 flex-1 flex flex-col">
-                        <h3 className="font-bold text-card-foreground">{m.name}</h3>
+                      <div className="p-3 sm:p-4 flex-1 flex flex-col">
+                        <h3 className="font-bold text-card-foreground text-sm sm:text-base leading-tight">{m.name}</h3>
                         {m.description && (
-                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{m.description}</p>
+                          <p className="text-[11px] sm:text-xs text-muted-foreground mt-1 line-clamp-2">{m.description}</p>
                         )}
-                        <div className="mt-3 flex items-end justify-between gap-2">
-                          <p className="text-ember font-black text-lg">R$ {m.price.toFixed(2)}</p>
+                        <div className="mt-3 flex items-end justify-between gap-2 flex-wrap">
+                          <p className="text-ember font-black text-base sm:text-lg">R$ {m.price.toFixed(2)}</p>
                           <div className="flex items-center gap-1.5">
                             <AnimatePresence>
                               {q > 0 && !soldOut && (
@@ -412,7 +412,7 @@ function OrderPage() {
           <motion.div
             initial={{ y: 100 }} animate={{ y: 0 }} exit={{ y: 100 }}
             transition={{ type: "spring", damping: 24, stiffness: 280 }}
-            className="lg:hidden fixed bottom-4 left-4 right-4 z-30"
+            className="lg:hidden fixed bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 z-30 max-w-2xl sm:mx-auto"
           >
             <details className="rounded-2xl bg-card border border-border shadow-2xl overflow-hidden">
               <summary className="list-none cursor-pointer p-4 flex items-center justify-between gap-3">
