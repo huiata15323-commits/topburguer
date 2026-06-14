@@ -12,7 +12,7 @@ import { useBranding } from "@/lib/branding";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Fast Order — Top Burguer" },
+      { title: "Top Burguer" },
       { name: "description", content: "Sistema inteligente de pedidos da Top Burguer: cliente, status e cozinha conectados em tempo real." },
     ],
   }),
@@ -72,7 +72,7 @@ function Landing() {
               initial="hidden" animate="show" variants={fadeUp} custom={2}
               className="mt-6 text-lg md:text-xl text-white/70 max-w-xl text-balance"
             >
-              Fast Order conecta o cliente, o painel de status e a cozinha
+              O Top Burguer conecta o cliente, o painel de status e a cozinha
               numa única experiência. Pediu, fritou, entregou.
             </motion.p>
 
@@ -247,7 +247,7 @@ function Landing() {
               Junto com o professor <strong className="text-amber-warm">Huiatã Ribeiro</strong>, formamos uma equipe que, aula após aula, foi virando muito mais do que uma turma — virou uma <strong>identidade de família</strong>. Do ano passado até agora, foram momentos intensos de aprendizagem para a vida: erros, acertos, risadas, descobertas e a certeza de que, juntos, a gente vai longe. 💛
             </p>
             <p className="mt-3 text-white/70 leading-relaxed">
-              Este Fast Order é parte desse caminho — código, sonho e gratidão impressos em cada tela. As turmas <strong>2º Ano A e B</strong> assinam, com orgulho, este projeto.
+              Este projeto é parte desse caminho — código, sonho e gratidão impressos em cada tela. As turmas <strong>2º Ano A e B</strong> assinam, com orgulho, este projeto.
             </p>
             <div className="mt-6 grid grid-cols-2 gap-4">
               {[
@@ -267,7 +267,7 @@ function Landing() {
       </section>
 
       <footer className="relative z-10 border-t border-white/5 py-6 text-center text-xs text-white/40">
-        <div>Top Burguer · Fast Order — feito pra hamburgueria que voa.</div>
+        <div>Top Burguer — feito pra hamburgueria que voa.</div>
         <div className="mt-1 text-white/25">Criado pelos alunos do Curso Técnico em Desenvolvimento de Sistemas — SENAI, CEPI Elberto Alves · 2º Ano A e B</div>
       </footer>
     </main>

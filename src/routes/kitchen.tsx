@@ -8,7 +8,7 @@ import { StaffGate } from "@/components/StaffGate";
 export const Route = createFileRoute("/kitchen")({
   head: () => ({
     meta: [
-      { title: "Cozinha — Fast Order" },
+      { title: "Cozinha — Top Burguer" },
       { name: "description", content: "Painel de cozinha em tempo real da Top Burguer." },
     ],
   }),
