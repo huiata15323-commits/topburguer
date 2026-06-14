@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { usePromos } from "@/lib/promos";
+import { useServerFn } from "@tanstack/react-start";
+import { generateDishImage } from "@/lib/ai-image.functions";
 
 export function PromosAdmin() {
   const { cfg, addCoupon, removeCoupon, setHappyHour, isHappyHourNow } = usePromos();
