@@ -140,6 +140,14 @@ export function BrandingAdmin() {
               </button>
             )}
           </div>
+          <button
+            type="button"
+            onClick={generateLogoAI}
+            disabled={genLogo || !branding.name.trim()}
+            className="w-full mt-1 text-[10px] font-black uppercase tracking-wider px-2 py-1.5 rounded-lg bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white shadow-sm hover:scale-[1.02] active:scale-95 transition disabled:opacity-50"
+          >
+            {genLogo ? "🧠 Gerando…" : "✨ Gerar logo com IA"}
+          </button>
           <input ref={fileInput} type="file" accept="image/*" onChange={onLogoFile} className="hidden" />
           {showPicker && !branding.logoUrl && (
             <div className="absolute z-20 mt-2 left-0 right-0 sm:w-72 rounded-2xl border-2 border-ember/40 bg-card shadow-2xl p-3">
