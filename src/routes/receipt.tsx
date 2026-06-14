@@ -26,6 +26,7 @@ const STATUS_LABEL = {
 function ReceiptPage() {
   const { n } = useSearch({ from: "/receipt" });
   const { orders } = useOrders();
+  const { branding } = useBranding();
   const order: Order | undefined = useMemo(
     () => (n ? orders.find((o) => o.number === n) : undefined),
     [orders, n]
