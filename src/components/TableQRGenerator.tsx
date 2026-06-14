@@ -250,6 +250,7 @@ function themeColors(): { accent: string; dark: string; cream: string } {
 export function TableQRGenerator() {
   const [count, setCount] = useState<number>(6);
   const [origin, setOrigin] = useState<string>("");
+  const [baseUrl, setBaseUrl] = useState<string>("");
   const [templateId, setTemplateId] = useState<TemplateId>("student");
   const [poster, setPoster] = useState<Poster>(POSTER_DEFAULT);
   const { branding } = useBranding();
@@ -259,9 +260,12 @@ export function TableQRGenerator() {
 
   useEffect(() => {
     setCount(readCount());
-    setOrigin(window.location.origin);
+    const o = window.location.origin;
+    setOrigin(o);
     setTemplateId(readTemplate());
     setPoster(readPoster());
+    const saved = localStorage.getItem(BASEURL_KEY) || "";
+    setBaseUrl(saved || suggestPublicBase(o));
   }, []);
 
   const tables = useMemo(() => Array.from({ length: count }, (_, i) => i + 1), [count]);
