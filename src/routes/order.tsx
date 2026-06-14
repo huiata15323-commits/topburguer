@@ -139,6 +139,24 @@ function OrderPage() {
       // Atualiza estoque (itens sem controle são ignorados internamente)
       decrementStock(items.map((i) => ({ menuId: i.menuId, quantity: i.quantity })));
       toast.success(`Pedido #${order.number} enviado! 🔥`);
+      // 🎉 Confetti de batata frita / brasa
+      try {
+        const confetti = (await import("canvas-confetti")).default;
+        const fire = (particleRatio: number, opts: import("canvas-confetti").Options) =>
+          confetti({
+            origin: { y: 0.7 },
+            scalar: 1.2,
+            ticks: 200,
+            ...opts,
+            particleCount: Math.floor(220 * particleRatio),
+          });
+        fire(0.25, { spread: 26, startVelocity: 55, colors: ["#ff6b1a", "#ffb800", "#ff3b00"] });
+        fire(0.2, { spread: 60, colors: ["#ffd34d", "#ff8a3d", "#ffffff"] });
+        fire(0.35, { spread: 100, decay: 0.91, scalar: 0.9, colors: ["#ff6b1a", "#ffb800"] });
+        fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.4, colors: ["#ffd34d"] });
+        fire(0.1, { spread: 120, startVelocity: 45, colors: ["#ff3b00", "#ffffff"] });
+      } catch {}
+
       setCart({});
       setCustomer("");
       setPhone("");
