@@ -33,8 +33,24 @@ export function BrandingAdmin() {
   const { branding, save } = useBranding();
   const [showPicker, setShowPicker] = useState(false);
   const [showDomain, setShowDomain] = useState(false);
+  const [genLogo, setGenLogo] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const importInput = useRef<HTMLInputElement>(null);
+  const callGen = useServerFn(generateDishImage);
+
+  async function generateLogoAI() {
+    if (!branding.name.trim()) { toast.error("Defina o nome da loja primeiro"); return; }
+    setGenLogo(true);
+    const tid = toast.loading("🎨 IA criando seu logo…");
+    try {
+      const r = await callGen({ data: { dishName: branding.name, kind: "logo", style: "minimal" } });
+      if (r.error === "rate_limit") toast.error("⏳ Aguarde 1min", { id: tid });
+      else if (r.error === "no_credits") toast.error("💳 Sem créditos", { id: tid });
+      else if (r.error || !r.dataUrl) toast.error("Falhou — tente de novo", { id: tid });
+      else { save({ logoUrl: r.dataUrl }); toast.success("✨ Logo aplicado!", { id: tid }); }
+    } finally { setGenLogo(false); }
+  }
+
 
   // Agrupa temas por segmento para UI mais clara
   const bySegment = THEME_PRESETS.reduce<Record<string, typeof THEME_PRESETS>>((acc, p) => {
