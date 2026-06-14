@@ -15,6 +15,7 @@ import { Route as ReceiptRouteImport } from './routes/receipt'
 import { Route as PainelRouteImport } from './routes/painel'
 import { Route as OrderRouteImport } from './routes/order'
 import { Route as MesaRouteImport } from './routes/mesa'
+import { Route as MRouteImport } from './routes/m'
 import { Route as KitchenRouteImport } from './routes/kitchen'
 import { Route as FinanceRouteImport } from './routes/finance'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -51,6 +52,11 @@ const MesaRoute = MesaRouteImport.update({
   path: '/mesa',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MRoute = MRouteImport.update({
+  id: '/m',
+  path: '/m',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const KitchenRoute = KitchenRouteImport.update({
   id: '/kitchen',
   path: '/kitchen',
@@ -83,6 +89,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/finance': typeof FinanceRoute
   '/kitchen': typeof KitchenRoute
+  '/m': typeof MRoute
   '/mesa': typeof MesaRoute
   '/order': typeof OrderRoute
   '/painel': typeof PainelRoute
@@ -96,6 +103,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/finance': typeof FinanceRoute
   '/kitchen': typeof KitchenRoute
+  '/m': typeof MRoute
   '/mesa': typeof MesaRoute
   '/order': typeof OrderRoute
   '/painel': typeof PainelRoute
@@ -110,6 +118,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/finance': typeof FinanceRoute
   '/kitchen': typeof KitchenRoute
+  '/m': typeof MRoute
   '/mesa': typeof MesaRoute
   '/order': typeof OrderRoute
   '/painel': typeof PainelRoute
@@ -125,6 +134,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/finance'
     | '/kitchen'
+    | '/m'
     | '/mesa'
     | '/order'
     | '/painel'
@@ -138,6 +148,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/finance'
     | '/kitchen'
+    | '/m'
     | '/mesa'
     | '/order'
     | '/painel'
@@ -151,6 +162,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/finance'
     | '/kitchen'
+    | '/m'
     | '/mesa'
     | '/order'
     | '/painel'
@@ -165,6 +177,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   FinanceRoute: typeof FinanceRoute
   KitchenRoute: typeof KitchenRoute
+  MRoute: typeof MRoute
   MesaRoute: typeof MesaRoute
   OrderRoute: typeof OrderRoute
   PainelRoute: typeof PainelRoute
@@ -217,6 +230,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MesaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/m': {
+      id: '/m'
+      path: '/m'
+      fullPath: '/m'
+      preLoaderRoute: typeof MRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/kitchen': {
       id: '/kitchen'
       path: '/kitchen'
@@ -261,6 +281,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   FinanceRoute: FinanceRoute,
   KitchenRoute: KitchenRoute,
+  MRoute: MRoute,
   MesaRoute: MesaRoute,
   OrderRoute: OrderRoute,
   PainelRoute: PainelRoute,
