@@ -720,9 +720,43 @@ function FeaturedReady({ featured, big, onReannounce, onDelivered }: { featured?
                 🪑 MESA {featured.tableNumber}
               </motion.div>
             )}
-            <div className="mt-4 text-sm sm:text-base text-white/50 font-medium uppercase tracking-widest">
-              {featured.items.reduce((s, i) => s + i.quantity, 0)} itens · pronto há {elapsedLabel(featured.doneAt ?? featured.createdAt)}
+            {/* Cronômetro de espera color-coded */}
+            {featured.doneAt && (
+              <motion.div
+                animate={waitTone.pulse ? { scale: [1, 1.05, 1] } : {}}
+                transition={{ duration: 1, repeat: waitTone.pulse ? Infinity : 0 }}
+                className={`mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full border-2 backdrop-blur-md ${waitTone.bg} ${waitTone.border} ${waitTone.glow}`}
+              >
+                <span className="text-lg">⏱</span>
+                <span className={`text-base sm:text-lg font-black tabular-nums ${waitTone.text}`}>
+                  Esperando há {elapsedLabel(featured.doneAt)}
+                </span>
+              </motion.div>
+            )}
+            <div className="mt-3 text-sm sm:text-base text-white/50 font-medium uppercase tracking-widest">
+              {featured.items.reduce((s, i) => s + i.quantity, 0)} itens
             </div>
+            {/* Botões de ação — Chamar de novo / Entregue */}
+            {(onReannounce || onDelivered) && (
+              <div className="mt-5 flex items-center justify-center gap-3 flex-wrap">
+                {onReannounce && (
+                  <button
+                    onClick={() => onReannounce(featured)}
+                    className="px-5 py-2.5 rounded-2xl bg-amber-warm/20 hover:bg-amber-warm/30 border-2 border-amber-warm/50 text-amber-warm font-black text-sm uppercase tracking-wider transition active:scale-95"
+                  >
+                    🔔 Chamar de novo
+                  </button>
+                )}
+                {onDelivered && (
+                  <button
+                    onClick={() => onDelivered(featured.id)}
+                    className="px-5 py-2.5 rounded-2xl bg-emerald-500/20 hover:bg-emerald-500/30 border-2 border-emerald-400/50 text-emerald-200 font-black text-sm uppercase tracking-wider transition active:scale-95"
+                  >
+                    ✓ Entregue
+                  </button>
+                )}
+              </div>
+            )}
           </motion.div>
         ) : (
           <motion.div
