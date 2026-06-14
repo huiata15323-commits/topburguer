@@ -423,8 +423,7 @@ export function TableQRGenerator() {
             <div className="label">APONTE A CÂMERA</div>
             <div className="sub">{tpl.hint}</div>
             <div className="qr-holder">
-              {url && <QRCode value={url} size={400} level="H" />}
-              <div className="qr-badge">{initials}</div>
+              {url && <QRCode value={url} size={400} level="M" />}
             </div>
             <div className="mesa-line">MESA Nº <span className="num">{n}</span></div>
           </div>
@@ -446,7 +445,7 @@ export function TableQRGenerator() {
   };
 
   const renderCard = (n: number) => {
-    const url = effectiveBaseUrl ? `${effectiveBaseUrl}/order?mesa=${n}` : "";
+    const url = effectiveBaseUrl ? `${effectiveBaseUrl}/mesa?n=${n}` : "";
     return (
       <div key={n} className="card">
         {tpl.decor && <span className="decor tl">{tpl.decor}</span>}
@@ -460,7 +459,7 @@ export function TableQRGenerator() {
           <div className="num">{n}</div>
         </div>
         <div className="qr-wrap">
-          <div className="qr-box">{url && <QRCode value={url} size={160} level="M" />}</div>
+          <div className="qr-box">{url && <QRCode value={url} size={160} level="L" />}</div>
         </div>
         <div className="hint">{tpl.hint}</div>
       </div>
@@ -468,7 +467,7 @@ export function TableQRGenerator() {
   };
 
   // Preview do pôster (escala reduzida)
-  const previewUrl = effectiveBaseUrl ? `${effectiveBaseUrl}/order?mesa=1` : "";
+  const previewUrl = effectiveBaseUrl ? `${effectiveBaseUrl}/mesa?n=1` : "";
   const themePreview = poster.useThemeColors ? themeColors() : { accent: tpl.accent, dark: tpl.bg, cream: "#FBEFD8" };
 
   return (
