@@ -148,9 +148,14 @@ function StatusPage() {
                     <div className="text-6xl font-black">#{order.number}</div>
                     <div className="text-white/60">{order.customer}</div>
                     {order.tableNumber && (
-                      <span className="px-3 py-1 rounded-full bg-amber-warm text-charcoal text-sm font-black">
-                        🪑 MESA {order.tableNumber}
-                      </span>
+                      <Link
+                        to="/mesa"
+                        search={{ n: order.tableNumber }}
+                        className="px-3 py-1 rounded-full bg-amber-warm text-charcoal text-sm font-black hover:scale-105 transition"
+                        title="Abrir comanda da mesa"
+                      >
+                        🪑 MESA {order.tableNumber} →
+                      </Link>
                     )}
                   </div>
                   <div className="mt-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-sm">
