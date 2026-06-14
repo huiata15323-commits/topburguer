@@ -45,11 +45,46 @@ function elapsedLabel(ms: number) {
   return `${Math.floor(s / 60)}m`;
 }
 
+// Hook: pedidos marcados como "entregues" — escondidos do painel mas preservados
+// no DB para relatórios. Persiste no localStorage com expiração de 8h.
+function useDeliveredHidden() {
+  const [hidden, setHidden] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = JSON.parse(localStorage.getItem("painel.delivered") ?? "{}") as Record<string, number>;
+      const now = Date.now();
+      const fresh = Object.entries(raw).filter(([, t]) => now - t < 8 * 3600_000);
+      const map = Object.fromEntries(fresh);
+      localStorage.setItem("painel.delivered", JSON.stringify(map));
+      setHidden(new Set(Object.keys(map)));
+    } catch {}
+  }, []);
+  const hide = useCallback((id: string) => {
+    setHidden((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      try {
+        const raw = JSON.parse(localStorage.getItem("painel.delivered") ?? "{}") as Record<string, number>;
+        raw[id] = Date.now();
+        localStorage.setItem("painel.delivered", JSON.stringify(raw));
+      } catch {}
+      return next;
+    });
+  }, []);
+  return { hidden, hide };
+}
+
 function PainelPage() {
   const { view } = useSearch({ from: "/painel" });
   const navigate = useNavigate({ from: "/painel" });
-  const { orders, clearWaiterCall } = useOrders();
+  const { orders: allOrders, clearWaiterCall } = useOrders();
   const { items: menu } = useMenu();
+  const { hidden: deliveredHidden, hide: markDelivered } = useDeliveredHidden();
+  const orders = useMemo(
+    () => allOrders.filter((o) => !(o.status === "done" && deliveredHidden.has(o.id))),
+    [allOrders, deliveredHidden]
+  );
   const lastReadyIds = useRef<Set<string>>(new Set());
   const lastWaiterIds = useRef<Set<string>>(new Set());
   const [, force] = useState(0);
@@ -62,6 +97,22 @@ function PainelPage() {
   // Fila de pedidos a exibir em tela cheia (takeover cinematográfico)
   const [spotlightQueue, setSpotlightQueue] = useState<Order[]>([]);
   const currentSpotlight = spotlightQueue[0];
+
+  const reannounce = useCallback((o: Order) => {
+    setSpotlightQueue((q) => [...q, o]);
+    if (voiceOn) announceReady(o.number, o.tableNumber, o.customer);
+    toast.success(`🔔 Chamando #${o.number} novamente`);
+  }, [voiceOn]);
+
+  // Tempo médio de preparo (últimos 10 done)
+  const avgPrepMin = useMemo(() => {
+    const recent = allOrders
+      .filter((o) => o.status === "done" && o.doneAt)
+      .slice(0, 10);
+    if (recent.length === 0) return null;
+    const total = recent.reduce((s, o) => s + Math.max(0, (o.doneAt ?? 0) - o.createdAt), 0);
+    return Math.max(1, Math.round(total / recent.length / 60000));
+  }, [allOrders]);
 
   // Avança a fila do spotlight automaticamente (5.5s cada)
   useEffect(() => {
