@@ -461,7 +461,7 @@ function PainelPage() {
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="grid grid-rows-[1fr_auto] gap-4 h-full"
             >
-              <FeaturedReady featured={featured} big />
+              <FeaturedReady featured={featured} big onReannounce={reannounce} onDelivered={markDelivered} />
               {ready.length > 1 && (
                 <div className="rounded-3xl bg-white/[0.03] border border-emerald-500/20 p-4">
                   <div className="text-[11px] uppercase tracking-[0.3em] text-emerald-400 font-black mb-3">Também prontos</div>
