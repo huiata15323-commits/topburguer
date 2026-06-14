@@ -90,6 +90,23 @@ function AdminPage() {
     }
   };
 
+  const [regenId, setRegenId] = useState<string | null>(null);
+  const regenerateForItem = async (m: EditableMenuItem) => {
+    setRegenId(m.id);
+    const tid = toast.loading(`🎨 Regerando foto de ${m.name}…`);
+    try {
+      const r = await callGenImage({
+        data: { dishName: m.name, description: m.description || undefined, kind: "dish", style: form.aiStyle },
+      });
+      if (r.error === "rate_limit") toast.error("⏳ Aguarde 1min", { id: tid });
+      else if (r.error === "no_credits") toast.error("💳 Sem créditos de IA", { id: tid });
+      else if (r.error || !r.dataUrl) toast.error("Falhou. Tente novamente.", { id: tid });
+      else { updateItem(m.id, { image: r.dataUrl }); toast.success("✨ Nova foto!", { id: tid }); }
+    } finally {
+      setRegenId(null);
+    }
+  };
+
   const startEdit = (m: EditableMenuItem) => {
     setForm({
       id: m.id,
