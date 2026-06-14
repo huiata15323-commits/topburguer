@@ -387,6 +387,14 @@ function AdminPage() {
                               ✏️ Editar
                             </button>
                             <button
+                              onClick={() => regenerateForItem(m)}
+                              disabled={regenId === m.id}
+                              className="px-2 py-1.5 text-xs rounded-lg bg-gradient-to-r from-violet-500/15 to-fuchsia-500/15 text-fuchsia-700 dark:text-fuchsia-300 hover:from-violet-500/25 hover:to-fuchsia-500/25 disabled:opacity-50"
+                              title="Regerar foto com IA usando o estilo selecionado no formulário"
+                            >
+                              {regenId === m.id ? "🧠" : "✨"}
+                            </button>
+                            <button
                               onClick={() => toggleSoldOut(m.id)}
                               className={`flex-1 py-1.5 text-xs rounded-lg font-semibold ${
                                 m.soldOut
