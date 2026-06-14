@@ -1,5 +1,6 @@
 // Estado compartilhado de pedidos via Lovable Cloud.
-// Realtime foi removido (broadcast vazava PII); usamos polling leve (4s).
+// Usa Realtime (postgres_changes) com fallback de polling lento (30s)
+// só para garantir reconexão se a subscription cair.
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getStaffPin } from "@/components/StaffGate";
