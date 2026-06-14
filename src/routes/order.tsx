@@ -412,7 +412,7 @@ function OrderPage() {
           <motion.div
             initial={{ y: 100 }} animate={{ y: 0 }} exit={{ y: 100 }}
             transition={{ type: "spring", damping: 24, stiffness: 280 }}
-            className="lg:hidden fixed bottom-4 left-4 right-4 z-30"
+            className="lg:hidden fixed bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 z-30 max-w-2xl sm:mx-auto"
           >
             <details className="rounded-2xl bg-card border border-border shadow-2xl overflow-hidden">
               <summary className="list-none cursor-pointer p-4 flex items-center justify-between gap-3">
