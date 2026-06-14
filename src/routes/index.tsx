@@ -1,4 +1,4 @@
-// Landing comercial — vende o Top Burguer System para outras hamburguerias.
+// Landing institucional — apresenta o Top Burguer System ao colégio.
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useBranding } from "@/lib/branding";
@@ -6,42 +6,21 @@ import { useBranding } from "@/lib/branding";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Top Burguer System — Sistema de pedidos para sua hamburgueria" },
+      { title: "Top Burguer System — Projeto SENAI / CEPI Elberto Alves" },
       {
         name: "description",
         content:
-          "Cardápio digital, QR de mesa, KDS para a cozinha, painel com voz e IA. Tudo num só lugar — sem mensalidade abusiva.",
+          "Sistema completo de pedidos para hamburgueria: cardápio QR, KDS na cozinha, painel com voz e IA. Projeto dos alunos do Curso Técnico em Desenvolvimento de Sistemas.",
       },
-      { property: "og:title", content: "Top Burguer System — Para sua hamburgueria" },
+      { property: "og:title", content: "Top Burguer System — Projeto Escolar" },
       {
         property: "og:description",
-        content: "Garçom IA por voz, fotos geradas por IA, painel de chamadas, modo offline-ready.",
+        content: "Garçom IA por voz, fotos geradas por IA, painel de chamadas. Feito pelos alunos do SENAI / CEPI Elberto Alves.",
       },
     ],
   }),
   component: Landing,
 });
-
-const PLANS = [
-  {
-    key: "starter", name: "Starter", price: "R$ 49", period: "/mês",
-    tagline: "Pra começar com cardápio digital",
-    features: ["Cardápio QR por mesa", "Pedidos via celular", "Pagamento PIX/Cartão", "Recibo digital", "Até 1 unidade"],
-    highlight: false,
-  },
-  {
-    key: "pro", name: "Pro", price: "R$ 149", period: "/mês",
-    tagline: "Para quem quer girar a cozinha",
-    features: ["Tudo do Starter, mais:", "KDS com voz", "Painel de chamadas", "Resumo do dia por IA", "Financeiro + PDF", "Heatmap de mesas", "Fidelidade"],
-    highlight: true,
-  },
-  {
-    key: "premium", name: "Premium", price: "R$ 299", period: "/mês",
-    tagline: "Para redes e operações sérias",
-    features: ["Tudo do Pro, mais:", "🎙️ Garçom IA por voz", "📸 Fotos por IA", "Multi-loja / franquia", "Integração iFood (em breve)", "White label", "Suporte prioritário"],
-    highlight: false,
-  },
-];
 
 const DIFFERENCES = [
   { emoji: "🎙️", title: "Garçom IA por voz", desc: 'Cliente fala "dois X-Bacon e uma coca" — o pedido monta sozinho.' },
@@ -69,8 +48,8 @@ function Landing() {
           <span className="font-black tracking-tight truncate text-sm sm:text-base">Top Burguer System</span>
         </Link>
         <div className="flex items-center gap-2 text-xs shrink-0">
-          <Link to="/app" className="hidden sm:inline px-3 py-1.5 rounded-full border border-white/15 hover:bg-white/10 transition">Acessar painel</Link>
-          <Link to="/order" className="px-3 py-1.5 rounded-full bg-amber-warm/15 border border-amber-warm/40 text-amber-warm font-bold hover:bg-amber-warm/25 transition">Demo grátis →</Link>
+          <Link to="/app" className="hidden sm:inline px-3 py-1.5 rounded-full border border-white/15 hover:bg-white/10 transition">Painel</Link>
+          <Link to="/order" className="px-3 py-1.5 rounded-full bg-amber-warm/15 border border-amber-warm/40 text-amber-warm font-bold hover:bg-amber-warm/25 transition">Demonstração →</Link>
         </div>
       </nav>
 
@@ -80,16 +59,17 @@ function Landing() {
           className="inline-flex items-center gap-2 rounded-full border border-amber-warm/30 bg-amber-warm/10 px-3 py-1.5 text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-amber-warm"
         >
           <span className="w-1.5 h-1.5 rounded-full bg-amber-warm animate-live" />
-          Para hamburguerias que querem girar mais
+          Projeto SENAI · CEPI Elberto Alves
         </motion.div>
 
         <motion.h1
           initial="hidden" animate="show" variants={fade} custom={1}
           className="mt-5 font-black text-4xl sm:text-6xl md:text-7xl tracking-tight text-balance leading-[0.95]"
         >
-          O sistema que faz sua{" "}
-          <span className="bg-gradient-to-r from-amber-warm to-ember bg-clip-text text-transparent">cozinha voar</span>.
+          Um sistema completo pra{" "}
+          <span className="bg-gradient-to-r from-amber-warm to-ember bg-clip-text text-transparent">hamburgueria</span>.
         </motion.h1>
+
 
         <motion.p
           initial="hidden" animate="show" variants={fade} custom={2}
@@ -135,76 +115,73 @@ function Landing() {
         </div>
       </section>
 
-      <section id="planos" className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 py-12 sm:py-16">
+      {/* Acessos rápidos da demo */}
+      <section className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 py-12 sm:py-16">
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-center mb-2 text-balance">
-          Planos que <span className="text-amber-warm">cabem no caixa</span>
+          Demonstração <span className="text-amber-warm">ao vivo</span>
         </h2>
-        <p className="text-center text-sm text-white/60 mb-10">Sem fidelidade. Cancele quando quiser.</p>
+        <p className="text-center text-sm text-white/60 mb-10 max-w-xl mx-auto">
+          Explore cada parte do sistema. Tudo conectado em tempo real — pediu, foi pra cozinha.
+        </p>
 
-        <div className="grid gap-4 sm:gap-5 md:grid-cols-3">
-          {PLANS.map((p, i) => (
-            <motion.div
-              key={p.key}
-              initial="hidden" whileInView="show" viewport={{ once: true }}
-              variants={fade} custom={i}
-              className={`relative rounded-2xl sm:rounded-3xl p-5 sm:p-6 ${
-                p.highlight
-                  ? "bg-gradient-to-br from-ember/20 via-amber-warm/10 to-ember/5 border-2 border-amber-warm shadow-ember md:scale-[1.02]"
-                  : "bg-white/[0.03] border border-white/10"
+        <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            { to: "/order" as const,   emoji: "📱", title: "Cliente pede",     desc: "Cardápio digital pelo celular.", accent: true },
+            { to: "/kitchen" as const, emoji: "🔥", title: "Cozinha recebe",   desc: "KDS com timer e voz." },
+            { to: "/painel" as const,  emoji: "📺", title: "Painel chama",     desc: "Anuncia pedidos prontos em voz alta." },
+            { to: "/admin" as const,   emoji: "⚙️", title: "Admin do menu",   desc: "Cardápio + fotos por IA." },
+            { to: "/dashboard" as const, emoji: "📊", title: "Dashboard",      desc: "Vendas, heatmap, picos." },
+            { to: "/app" as const,     emoji: "🏠", title: "Hub completo",    desc: "Todas as telas do projeto." },
+          ].map((t) => (
+            <Link
+              key={t.to}
+              to={t.to}
+              className={`group block rounded-2xl sm:rounded-3xl p-5 border transition-all active:scale-[0.98] ${
+                t.accent
+                  ? "border-amber-warm/40 bg-gradient-to-br from-amber-warm/15 to-ember/10 hover:border-amber-warm/70 shadow-ember/30 shadow-lg"
+                  : "border-white/10 bg-white/[0.04] hover:bg-white/[0.08] hover:border-white/20"
               }`}
             >
-              {p.highlight && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-amber-warm text-charcoal text-[10px] font-black uppercase tracking-widest shadow-md whitespace-nowrap">
-                  ⭐ Mais escolhido
-                </div>
-              )}
-              <div className="text-xs sm:text-sm font-bold text-amber-warm uppercase tracking-wider">{p.name}</div>
-              <div className="mt-2 flex items-baseline gap-1">
-                <span className="text-4xl sm:text-5xl font-black">{p.price}</span>
-                <span className="text-white/50 text-sm">{p.period}</span>
+              <div className="text-3xl sm:text-4xl">{t.emoji}</div>
+              <div className="mt-2 font-black text-base sm:text-lg">{t.title}</div>
+              <div className="mt-1 text-xs sm:text-sm text-white/60">{t.desc}</div>
+              <div className={`mt-3 text-xs font-bold ${t.accent ? "text-amber-warm" : "text-white/70"} group-hover:translate-x-1 transition-transform`}>
+                Abrir →
               </div>
-              <p className="mt-2 text-sm text-white/65">{p.tagline}</p>
-
-              <ul className="mt-5 space-y-2 text-sm">
-                {p.features.map((f) => (
-                  <li key={f} className="flex gap-2">
-                    <span className="text-amber-warm shrink-0">✓</span>
-                    <span className="text-white/85">{f}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <Link
-                to="/order"
-                className={`mt-6 block text-center py-3 rounded-2xl font-bold transition-all ${
-                  p.highlight
-                    ? "bg-gradient-ember text-ember-foreground shadow-ember hover:scale-[1.02]"
-                    : "border border-white/20 bg-white/5 hover:bg-white/10"
-                }`}
-              >
-                Testar grátis
-              </Link>
-            </motion.div>
+            </Link>
           ))}
         </div>
-
-        <p className="text-center text-xs text-white/40 mt-8 px-4">
-          Implantação personalizada: R$ 500 – R$ 1.500 (cardápio inicial, logo, treinamento).
-        </p>
       </section>
+
+      {/* Sobre o projeto escolar */}
+      <section className="relative z-10 mx-auto max-w-3xl px-4 sm:px-6 py-12 sm:py-16">
+        <div className="rounded-3xl border border-amber-warm/20 bg-gradient-to-br from-amber-warm/10 via-white/[0.03] to-ember/5 p-6 sm:p-10 text-center">
+          <div className="text-[10px] uppercase tracking-widest text-amber-warm font-bold">Projeto Escolar</div>
+          <h3 className="mt-2 text-2xl sm:text-3xl font-black text-balance">
+            Feito pelos alunos do <span className="text-amber-warm">SENAI / CEPI Elberto Alves</span>
+          </h3>
+          <p className="mt-4 text-sm sm:text-base text-white/70 leading-relaxed">
+            Turmas <strong>2º Ano A e B</strong> do Curso Técnico em Desenvolvimento de Sistemas,
+            sob orientação do professor <strong className="text-amber-warm">Huiatã Ribeiro</strong>.
+            Sem laboratório, sem computadores em sala — só vontade de aprender e fazer acontecer. 💛
+          </p>
+        </div>
+      </section>
+
 
       <section className="relative z-10 mx-auto max-w-3xl px-4 sm:px-6 py-16 sm:py-20 text-center">
         <h2 className="text-2xl sm:text-3xl md:text-5xl font-black mb-4 text-balance">
-          Pronto pra ver sua hamburgueria <span className="text-amber-warm">no nível</span>?
+          Quer ver o sistema <span className="text-amber-warm">funcionando</span>?
         </h2>
-        <p className="text-white/65 mb-6 sm:mb-8 text-sm sm:text-base">Sem cartão. Sem instalação. Em 5 minutos tá rodando.</p>
+        <p className="text-white/65 mb-6 sm:mb-8 text-sm sm:text-base">Toque abaixo e experimente fazer um pedido.</p>
         <Link
           to="/order"
           className="inline-flex items-center gap-2 rounded-2xl bg-gradient-ember px-6 sm:px-8 py-4 sm:py-5 font-bold text-base sm:text-lg shadow-ember hover:scale-[1.02] transition-transform"
         >
-          Começar agora 🔥
+          Iniciar demonstração 🔥
         </Link>
       </section>
+
 
       <footer className="relative z-10 border-t border-white/10 mt-8 py-8 px-4 text-center text-xs text-white/40">
         © Top Burguer System • Feito com IA pelos alunos do CEPI Elberto Alves
