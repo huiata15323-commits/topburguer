@@ -325,13 +325,13 @@ function OrderPage() {
                           </motion.div>
                         )}
                       </div>
-                      <div className="p-4 flex-1 flex flex-col">
-                        <h3 className="font-bold text-card-foreground">{m.name}</h3>
+                      <div className="p-3 sm:p-4 flex-1 flex flex-col">
+                        <h3 className="font-bold text-card-foreground text-sm sm:text-base leading-tight">{m.name}</h3>
                         {m.description && (
-                          <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{m.description}</p>
+                          <p className="text-[11px] sm:text-xs text-muted-foreground mt-1 line-clamp-2">{m.description}</p>
                         )}
-                        <div className="mt-3 flex items-end justify-between gap-2">
-                          <p className="text-ember font-black text-lg">R$ {m.price.toFixed(2)}</p>
+                        <div className="mt-3 flex items-end justify-between gap-2 flex-wrap">
+                          <p className="text-ember font-black text-base sm:text-lg">R$ {m.price.toFixed(2)}</p>
                           <div className="flex items-center gap-1.5">
                             <AnimatePresence>
                               {q > 0 && !soldOut && (
