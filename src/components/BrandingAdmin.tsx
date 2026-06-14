@@ -2,6 +2,8 @@
 import { useRef, useState } from "react";
 import { useBranding, THEME_PRESETS, exportBrandingBundle, importBrandingBundle } from "@/lib/branding";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
+import { generateDishImage } from "@/lib/ai-image.functions";
 
 const PREVIEW: Record<string, string[]> = {
   classic:   ["#1a0e08", "#e85d3a", "#f4b860"],
