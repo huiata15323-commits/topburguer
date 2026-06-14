@@ -165,11 +165,12 @@ function PainelPage() {
           o.stop(ctx.currentTime + i * 0.16 + 0.18);
         });
       } catch {}
-      // Anúncio por voz logo após o sino
+      // Anúncio por voz + takeover na tela
+      const newOrders = newOnes
+        .map((id) => orders.find((o) => o.id === id))
+        .filter((o): o is Order => !!o);
+      setSpotlightQueue((q) => [...q, ...newOrders]);
       if (voiceOn) {
-        const newOrders = newOnes
-          .map((id) => orders.find((o) => o.id === id))
-          .filter((o): o is Order => !!o);
         newOrders.forEach((o, i) => {
           setTimeout(() => announceReady(o.number, o.tableNumber, o.customer), 700 + i * 2200);
         });
