@@ -99,6 +99,7 @@ function AdminPage() {
       emoji: m.emoji,
       description: m.description ?? "",
       image: m.image,
+      aiStyle: form.aiStyle,
     });
     setEditing(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
