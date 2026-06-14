@@ -44,7 +44,23 @@ function KitchenPage() {
   const [tvMode, setTvMode] = useState(false);
   const [autoBrightness, setAutoBrightness] = useState(true);
   const [brightness, setBrightness] = useState(1);
+  const [showAggregate, setShowAggregate] = useState(false);
   const containerRef = useRef<HTMLElement>(null);
+
+  // Agregado de produção: soma todas as quantidades por item dos pedidos ativos
+  const aggregate = useMemo(() => {
+    const map = new Map<string, { name: string; image: string; emoji: string; qty: number }>();
+    orders
+      .filter((o) => o.status === "pending" || o.status === "preparing")
+      .forEach((o) => {
+        o.items.forEach((i) => {
+          const cur = map.get(i.menuId);
+          if (cur) cur.qty += i.quantity;
+          else map.set(i.menuId, { name: i.name, image: i.image, emoji: i.emoji, qty: i.quantity });
+        });
+      });
+    return [...map.values()].sort((a, b) => b.qty - a.qty);
+  }, [orders]);
 
   // Optimized tick: only update when there are active orders (saves CPU/GPU on TVs)
   useEffect(() => {
