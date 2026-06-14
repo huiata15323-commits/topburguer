@@ -16,6 +16,8 @@ export function generateReportPDF(opts: {
   range: ReportRange;
 }) {
   const { orders, expenses, range } = opts;
+  const brand = getBranding();
+  const brandName = (brand.name || "Loja").toUpperCase();
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const W = doc.internal.pageSize.getWidth();
 
@@ -25,7 +27,7 @@ export function generateReportPDF(opts: {
   doc.setTextColor(255, 168, 38);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(22);
-  doc.text("TOP BURGUER", 40, 38);
+  doc.text(brandName, 40, 38);
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(11);
   doc.setFont("helvetica", "normal");
