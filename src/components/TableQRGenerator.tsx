@@ -7,6 +7,25 @@ import { toast } from "sonner";
 const STORAGE_KEY = "fast-order:tables";
 const TEMPLATE_KEY = "fast-order:qr-template";
 const POSTER_KEY = "fast-order:qr-poster";
+const BASEURL_KEY = "fast-order:qr-baseurl";
+
+// Detecta um URL público estável (publicado) para os QR codes.
+// Evita usar o domínio de preview do editor, que exige login e expira.
+function suggestPublicBase(origin: string): string {
+  if (!origin) return "";
+  try {
+    const u = new URL(origin);
+    const h = u.hostname;
+    // Domínios de preview do Lovable não são acessíveis ao público.
+    if (h.includes("id-preview--") || h.endsWith(".sandbox.lovable.dev") || h === "localhost" || h.startsWith("127.")) {
+      // Tenta extrair o ID do projeto do hostname de preview: id-preview--<id>.lovable.app
+      const m = h.match(/id-preview--([a-z0-9-]+)\.lovable\.app/i);
+      if (m) return `https://${m[1]}.lovable.app`;
+      return "https://topburguer.lovable.app";
+    }
+    return origin;
+  } catch { return origin; }
+}
 
 type TemplateId =
   | "classic"
@@ -231,6 +250,7 @@ function themeColors(): { accent: string; dark: string; cream: string } {
 export function TableQRGenerator() {
   const [count, setCount] = useState<number>(6);
   const [origin, setOrigin] = useState<string>("");
+  const [baseUrl, setBaseUrl] = useState<string>("");
   const [templateId, setTemplateId] = useState<TemplateId>("student");
   const [poster, setPoster] = useState<Poster>(POSTER_DEFAULT);
   const { branding } = useBranding();
@@ -240,9 +260,12 @@ export function TableQRGenerator() {
 
   useEffect(() => {
     setCount(readCount());
-    setOrigin(window.location.origin);
+    const o = window.location.origin;
+    setOrigin(o);
     setTemplateId(readTemplate());
     setPoster(readPoster());
+    const saved = localStorage.getItem(BASEURL_KEY) || "";
+    setBaseUrl(saved || suggestPublicBase(o));
   }, []);
 
   const tables = useMemo(() => Array.from({ length: count }, (_, i) => i + 1), [count]);
@@ -361,7 +384,7 @@ export function TableQRGenerator() {
 
   // ===== Render do conteúdo de impressão (oculto) =====
   const renderPosterPage = (n: number) => {
-    const url = origin ? `${origin}/order?mesa=${n}` : "";
+    const url = baseUrl ? `${baseUrl}/order?mesa=${n}` : "";
     return (
       <div key={n} className="page">
         <div className="stripe" />
@@ -395,7 +418,7 @@ export function TableQRGenerator() {
   };
 
   const renderCard = (n: number) => {
-    const url = origin ? `${origin}/order?mesa=${n}` : "";
+    const url = baseUrl ? `${baseUrl}/order?mesa=${n}` : "";
     return (
       <div key={n} className="card">
         {tpl.decor && <span className="decor tl">{tpl.decor}</span>}
@@ -417,7 +440,7 @@ export function TableQRGenerator() {
   };
 
   // Preview do pôster (escala reduzida)
-  const previewUrl = origin ? `${origin}/order?mesa=1` : "";
+  const previewUrl = baseUrl ? `${baseUrl}/order?mesa=1` : "";
   const themePreview = poster.useThemeColors ? themeColors() : { accent: tpl.accent, dark: tpl.bg, cream: "#FBEFD8" };
 
   return (
@@ -446,6 +469,50 @@ export function TableQRGenerator() {
           </button>
         </div>
       </div>
+
+      {/* URL pública usada pelos QR Codes */}
+      <div className="mb-5 rounded-2xl border-2 border-amber-warm/40 bg-amber-warm/10 p-3">
+        <div className="flex items-center justify-between gap-2 mb-1.5 flex-wrap">
+          <label className="text-[11px] uppercase tracking-widest font-black text-muted-foreground">
+            🔗 URL pública dos QR Codes
+          </label>
+          <div className="flex gap-1">
+            <button
+              type="button"
+              onClick={() => {
+                const v = suggestPublicBase(origin);
+                setBaseUrl(v);
+                localStorage.setItem(BASEURL_KEY, v);
+                toast.success("URL pública restaurada");
+              }}
+              className="text-[10px] px-2 py-1 rounded-md bg-background border border-border hover:border-ember font-bold"
+            >Usar publicada</button>
+            {baseUrl && (
+              <a
+                href={`${baseUrl}/order?mesa=1`}
+                target="_blank" rel="noreferrer"
+                className="text-[10px] px-2 py-1 rounded-md bg-background border border-border hover:border-ember font-bold"
+              >Testar</a>
+            )}
+          </div>
+        </div>
+        <input
+          value={baseUrl}
+          onChange={(e) => {
+            const v = e.target.value.trim().replace(/\/+$/, "");
+            setBaseUrl(v);
+            localStorage.setItem(BASEURL_KEY, v);
+          }}
+          placeholder="https://seusite.lovable.app"
+          className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm font-mono"
+        />
+        <p className="text-[10px] text-muted-foreground mt-1.5 leading-snug">
+          Os clientes vão escanear o QR e abrir <code className="font-mono">{baseUrl || "(URL)"}/order?mesa=N</code>.
+          Use o domínio <strong>publicado</strong> (ou seu domínio próprio) — nunca o link de preview do editor, que exige login.
+        </p>
+      </div>
+
+
 
       {/* Seletor de modelo */}
       <div className="mb-5">
