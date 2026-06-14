@@ -3,6 +3,10 @@ import { motion } from "framer-motion";
 import topBacon from "@/assets/menu/top-bacon.jpg";
 import topCheddar from "@/assets/menu/top-cheddar.jpg";
 import topClassic from "@/assets/menu/top-classic.jpg";
+import turma2a from "@/assets/turma-2a.jpg.asset.json";
+import turma2b from "@/assets/turma-2b.jpg.asset.json";
+import qrMesa from "@/assets/qr-mesa.png.asset.json";
+import qrPrintPdf from "@/assets/qr-print.pdf.asset.json";
 import { useBranding } from "@/lib/branding";
 
 export const Route = createFileRoute("/")({
