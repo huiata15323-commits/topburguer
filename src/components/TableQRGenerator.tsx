@@ -412,7 +412,7 @@ export function TableQRGenerator() {
 
   // ===== Render do conteúdo de impressão (oculto) =====
   const renderPosterPage = (n: number) => {
-    const url = effectiveBaseUrl ? `${effectiveBaseUrl}/order?mesa=${n}` : "";
+    const url = effectiveBaseUrl ? `${effectiveBaseUrl}/m?n=${n}` : "";
     return (
       <div key={n} className="page">
         <div className="stripe" />
@@ -516,7 +516,7 @@ export function TableQRGenerator() {
             >Usar publicada</button>
             {baseUrl && (
               <a
-                href={`${effectiveBaseUrl}/order?mesa=1`}
+                href={`${effectiveBaseUrl}/m?n=1`}
                 target="_blank" rel="noreferrer"
                 className="text-[10px] px-2 py-1 rounded-md bg-background border border-border hover:border-ember font-bold"
               >Testar</a>
@@ -539,7 +539,7 @@ export function TableQRGenerator() {
           className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm font-mono"
         />
         <p className="text-[10px] text-muted-foreground mt-1.5 leading-snug">
-          Os clientes vão escanear o QR e abrir <code className="font-mono">{effectiveBaseUrl || "(URL)"}/order?mesa=N</code>.
+          Os clientes vão escanear o QR e abrir <code className="font-mono">{effectiveBaseUrl || "(URL)"}/m?n=N</code>.
           Use o domínio <strong>publicado</strong> (ou seu domínio próprio) — nunca o link de preview do editor, que exige login.
         </p>
       </div>
