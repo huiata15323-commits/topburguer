@@ -8,6 +8,7 @@ import { MENU as SEED } from "@/lib/menu";
 import { TableQRGenerator } from "@/components/TableQRGenerator";
 import { EndOfDayCard } from "@/components/EndOfDayCard";
 import { StaffGate } from "@/components/StaffGate";
+import { RoleGate } from "@/components/RoleGate";
 import { PromosAdmin } from "@/components/PromosAdmin";
 import { TableHeatmap } from "@/components/TableHeatmap";
 import { BrandingAdmin } from "@/components/BrandingAdmin";
@@ -19,12 +20,15 @@ export const Route = createFileRoute("/admin")({
     meta: [
       { title: "Admin — Cardápio" },
       { name: "description", content: "Painel administrativo do cardápio da Top Burguer." },
+      { name: "robots", content: "noindex,nofollow" },
     ],
   }),
   component: () => (
-    <StaffGate allow={["admin"]} title="Administração">
-      <AdminPage />
-    </StaffGate>
+    <RoleGate roles={["admin"]}>
+      <StaffGate allow={["admin"]} title="Administração">
+        <AdminPage />
+      </StaffGate>
+    </RoleGate>
   ),
 });
 
