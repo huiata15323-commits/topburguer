@@ -74,6 +74,9 @@
 
   /* Amber accent */
   --amber-warm: oklch(0.82 0.17 75);
+  /* Gold artesanal — 3º acento premium */
+  --gold: oklch(0.78 0.14 88);
+
 
   --secondary: oklch(0.96 0.01 60);
   --secondary-foreground: oklch(0.18 0.02 40);
