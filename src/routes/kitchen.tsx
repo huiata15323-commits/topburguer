@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useOrders, type Order, type OrderStatus } from "@/lib/orders-store";
 import { buildReadyMessage, waLink, formatPhoneBR } from "@/lib/whatsapp";
 import { StaffGate } from "@/components/StaffGate";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/kitchen")({
   head: () => ({
