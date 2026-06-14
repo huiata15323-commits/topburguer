@@ -45,11 +45,46 @@ function elapsedLabel(ms: number) {
   return `${Math.floor(s / 60)}m`;
 }
 
+// Hook: pedidos marcados como "entregues" — escondidos do painel mas preservados
+// no DB para relatórios. Persiste no localStorage com expiração de 8h.
+function useDeliveredHidden() {
+  const [hidden, setHidden] = useState<Set<string>>(new Set());
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = JSON.parse(localStorage.getItem("painel.delivered") ?? "{}") as Record<string, number>;
+      const now = Date.now();
+      const fresh = Object.entries(raw).filter(([, t]) => now - t < 8 * 3600_000);
+      const map = Object.fromEntries(fresh);
+      localStorage.setItem("painel.delivered", JSON.stringify(map));
+      setHidden(new Set(Object.keys(map)));
+    } catch {}
+  }, []);
+  const hide = useCallback((id: string) => {
+    setHidden((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      try {
+        const raw = JSON.parse(localStorage.getItem("painel.delivered") ?? "{}") as Record<string, number>;
+        raw[id] = Date.now();
+        localStorage.setItem("painel.delivered", JSON.stringify(raw));
+      } catch {}
+      return next;
+    });
+  }, []);
+  return { hidden, hide };
+}
+
 function PainelPage() {
   const { view } = useSearch({ from: "/painel" });
   const navigate = useNavigate({ from: "/painel" });
-  const { orders, clearWaiterCall } = useOrders();
+  const { orders: allOrders, clearWaiterCall } = useOrders();
   const { items: menu } = useMenu();
+  const { hidden: deliveredHidden, hide: markDelivered } = useDeliveredHidden();
+  const orders = useMemo(
+    () => allOrders.filter((o) => !(o.status === "done" && deliveredHidden.has(o.id))),
+    [allOrders, deliveredHidden]
+  );
   const lastReadyIds = useRef<Set<string>>(new Set());
   const lastWaiterIds = useRef<Set<string>>(new Set());
   const [, force] = useState(0);
@@ -62,6 +97,22 @@ function PainelPage() {
   // Fila de pedidos a exibir em tela cheia (takeover cinematográfico)
   const [spotlightQueue, setSpotlightQueue] = useState<Order[]>([]);
   const currentSpotlight = spotlightQueue[0];
+
+  const reannounce = useCallback((o: Order) => {
+    setSpotlightQueue((q) => [...q, o]);
+    if (voiceOn) announceReady(o.number, o.tableNumber, o.customer);
+    toast.success(`🔔 Chamando #${o.number} novamente`);
+  }, [voiceOn]);
+
+  // Tempo médio de preparo (últimos 10 done)
+  const avgPrepMin = useMemo(() => {
+    const recent = allOrders
+      .filter((o) => o.status === "done" && o.doneAt)
+      .slice(0, 10);
+    if (recent.length === 0) return null;
+    const total = recent.reduce((s, o) => s + Math.max(0, (o.doneAt ?? 0) - o.createdAt), 0);
+    return Math.max(1, Math.round(total / recent.length / 60000));
+  }, [allOrders]);
 
   // Avança a fila do spotlight automaticamente (5.5s cada)
   useEffect(() => {
@@ -295,6 +346,26 @@ function PainelPage() {
           >
             {voiceOn ? "🔊" : "🔇"}
           </button>
+          <div className="hidden md:flex items-center gap-3 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10">
+            <div className="text-center">
+              <div className="text-[9px] uppercase tracking-widest text-white/40 font-bold">Prontos</div>
+              <div className="text-lg font-black text-emerald-400 tabular-nums leading-none">{ready.length}</div>
+            </div>
+            <div className="w-px h-7 bg-white/10" />
+            <div className="text-center">
+              <div className="text-[9px] uppercase tracking-widest text-white/40 font-bold">Preparo</div>
+              <div className="text-lg font-black text-amber-warm tabular-nums leading-none">{preparing.length}</div>
+            </div>
+            {avgPrepMin != null && (
+              <>
+                <div className="w-px h-7 bg-white/10" />
+                <div className="text-center">
+                  <div className="text-[9px] uppercase tracking-widest text-white/40 font-bold">Médio</div>
+                  <div className="text-lg font-black text-white/90 tabular-nums leading-none">{avgPrepMin}m</div>
+                </div>
+              </>
+            )}
+          </div>
           <div className="text-right">
             <div className="text-2xl sm:text-3xl font-black tabular-nums">{new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</div>
             <div className="text-[10px] uppercase tracking-widest text-white/40 hidden sm:block">
@@ -376,7 +447,7 @@ function PainelPage() {
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="grid lg:grid-cols-[1.5fr_1fr] gap-4 sm:gap-6 h-full"
             >
-              <FeaturedReady featured={featured} />
+              <FeaturedReady featured={featured} onReannounce={reannounce} onDelivered={markDelivered} />
               <aside className="grid grid-rows-2 gap-4 sm:gap-6 min-h-0">
                 <Column title="Também prontos" tone="emerald" orders={ready.slice(1, 7)} emptyMsg="—" />
                 <Column title="Em preparo" tone="amber" orders={preparing.slice(0, 6)} emptyMsg="Sem pedidos em preparo" showTimer />
@@ -390,7 +461,7 @@ function PainelPage() {
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="grid grid-rows-[1fr_auto] gap-4 h-full"
             >
-              <FeaturedReady featured={featured} big />
+              <FeaturedReady featured={featured} big onReannounce={reannounce} onDelivered={markDelivered} />
               {ready.length > 1 && (
                 <div className="rounded-3xl bg-white/[0.03] border border-emerald-500/20 p-4">
                   <div className="text-[11px] uppercase tracking-[0.3em] text-emerald-400 font-black mb-3">Também prontos</div>
@@ -586,7 +657,13 @@ function CategoryStrip({
   );
 }
 
-function FeaturedReady({ featured, big }: { featured?: Order; big?: boolean }) {
+function FeaturedReady({ featured, big, onReannounce, onDelivered }: { featured?: Order; big?: boolean; onReannounce?: (o: Order) => void; onDelivered?: (id: string) => void }) {
+  const waitSec = featured?.doneAt ? Math.floor((Date.now() - featured.doneAt) / 1000) : 0;
+  const waitMin = Math.floor(waitSec / 60);
+  const waitTone =
+    waitMin >= 5 ? { bg: "bg-red-500/30", border: "border-red-400/60", text: "text-red-100", glow: "shadow-[0_0_40px_rgba(239,68,68,0.4)]", pulse: true } :
+    waitMin >= 2 ? { bg: "bg-amber-warm/30", border: "border-amber-warm/60", text: "text-amber-100", glow: "shadow-[0_0_30px_rgba(245,166,35,0.3)]", pulse: false } :
+                   { bg: "bg-emerald-500/25", border: "border-emerald-400/50", text: "text-emerald-100", glow: "", pulse: false };
   return (
     <section className="rounded-3xl bg-gradient-to-br from-emerald-600/25 via-emerald-500/10 to-transparent border border-emerald-500/30 grid place-items-center p-6 sm:p-8 relative overflow-hidden min-h-0 shadow-[inset_0_0_120px_rgba(16,185,129,0.15)]">
       <div className="absolute inset-0 bg-grain opacity-50" />
@@ -643,9 +720,43 @@ function FeaturedReady({ featured, big }: { featured?: Order; big?: boolean }) {
                 🪑 MESA {featured.tableNumber}
               </motion.div>
             )}
-            <div className="mt-4 text-sm sm:text-base text-white/50 font-medium uppercase tracking-widest">
-              {featured.items.reduce((s, i) => s + i.quantity, 0)} itens · pronto há {elapsedLabel(featured.doneAt ?? featured.createdAt)}
+            {/* Cronômetro de espera color-coded */}
+            {featured.doneAt && (
+              <motion.div
+                animate={waitTone.pulse ? { scale: [1, 1.05, 1] } : {}}
+                transition={{ duration: 1, repeat: waitTone.pulse ? Infinity : 0 }}
+                className={`mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full border-2 backdrop-blur-md ${waitTone.bg} ${waitTone.border} ${waitTone.glow}`}
+              >
+                <span className="text-lg">⏱</span>
+                <span className={`text-base sm:text-lg font-black tabular-nums ${waitTone.text}`}>
+                  Esperando há {elapsedLabel(featured.doneAt)}
+                </span>
+              </motion.div>
+            )}
+            <div className="mt-3 text-sm sm:text-base text-white/50 font-medium uppercase tracking-widest">
+              {featured.items.reduce((s, i) => s + i.quantity, 0)} itens
             </div>
+            {/* Botões de ação — Chamar de novo / Entregue */}
+            {(onReannounce || onDelivered) && (
+              <div className="mt-5 flex items-center justify-center gap-3 flex-wrap">
+                {onReannounce && (
+                  <button
+                    onClick={() => onReannounce(featured)}
+                    className="px-5 py-2.5 rounded-2xl bg-amber-warm/20 hover:bg-amber-warm/30 border-2 border-amber-warm/50 text-amber-warm font-black text-sm uppercase tracking-wider transition active:scale-95"
+                  >
+                    🔔 Chamar de novo
+                  </button>
+                )}
+                {onDelivered && (
+                  <button
+                    onClick={() => onDelivered(featured.id)}
+                    className="px-5 py-2.5 rounded-2xl bg-emerald-500/20 hover:bg-emerald-500/30 border-2 border-emerald-400/50 text-emerald-200 font-black text-sm uppercase tracking-wider transition active:scale-95"
+                  >
+                    ✓ Entregue
+                  </button>
+                )}
+              </div>
+            )}
           </motion.div>
         ) : (
           <motion.div

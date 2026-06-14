@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useOrders, type Order, type OrderStatus } from "@/lib/orders-store";
 import { buildReadyMessage, waLink, formatPhoneBR } from "@/lib/whatsapp";
 import { StaffGate } from "@/components/StaffGate";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/kitchen")({
   head: () => ({
@@ -43,7 +44,23 @@ function KitchenPage() {
   const [tvMode, setTvMode] = useState(false);
   const [autoBrightness, setAutoBrightness] = useState(true);
   const [brightness, setBrightness] = useState(1);
+  const [showAggregate, setShowAggregate] = useState(false);
   const containerRef = useRef<HTMLElement>(null);
+
+  // Agregado de produção: soma todas as quantidades por item dos pedidos ativos
+  const aggregate = useMemo(() => {
+    const map = new Map<string, { name: string; image: string; emoji: string; qty: number }>();
+    orders
+      .filter((o) => o.status === "pending" || o.status === "preparing")
+      .forEach((o) => {
+        o.items.forEach((i) => {
+          const cur = map.get(i.menuId);
+          if (cur) cur.qty += i.quantity;
+          else map.set(i.menuId, { name: i.name, image: i.image, emoji: i.emoji, qty: i.quantity });
+        });
+      });
+    return [...map.values()].sort((a, b) => b.qty - a.qty);
+  }, [orders]);
 
   // Optimized tick: only update when there are active orders (saves CPU/GPU on TVs)
   useEffect(() => {
@@ -215,6 +232,13 @@ function KitchenPage() {
               {autoBrightness ? "☀ Auto" : "☼ Manual"} <span className="opacity-60 ml-1">{Math.round(brightness * 100)}%</span>
             </button>
             <button
+              onClick={() => setShowAggregate((v) => !v)}
+              title="Total agregado de itens em produção"
+              className={`px-3 py-2 text-xs rounded-lg transition ${showAggregate ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40" : "bg-white/10 hover:bg-white/20"}`}
+            >
+              📊 {showAggregate ? "Ocultar agregado" : "Ver agregado"}
+            </button>
+            <button
               onClick={toggleTv}
               className="px-3 py-2 text-xs rounded-lg bg-gradient-ember text-charcoal font-bold transition hover:brightness-110"
             >
@@ -223,6 +247,38 @@ function KitchenPage() {
           </div>
         </div>
       </header>
+
+      <AnimatePresence>
+        {showAggregate && aggregate.length > 0 && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="border-b border-emerald-500/30 bg-gradient-to-r from-emerald-600/15 via-emerald-500/5 to-transparent overflow-hidden"
+          >
+            <div className="px-6 py-4">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-2xl">📊</span>
+                <div>
+                  <div className="text-[10px] uppercase tracking-[0.3em] text-emerald-300 font-black">Produção agregada</div>
+                  <div className="text-xs text-white/60">Total de itens a preparar em todos os pedidos ativos</div>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                {aggregate.map((a) => (
+                  <div key={a.name} className="rounded-xl bg-black/40 border border-emerald-500/20 p-3 flex items-center gap-3">
+                    <div className="text-4xl font-black text-emerald-400 tabular-nums leading-none shrink-0">{a.qty}×</div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm font-bold truncate">{a.name}</div>
+                      <div className="text-base">{a.emoji}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className={tvMode ? "p-4" : "p-6"}>
         {list.length === 0 ? (
@@ -378,6 +434,22 @@ function OrderCard({ order, onStatus, onNotified }: { order: Order; onStatus: (s
         >
           🖨
         </a>
+        {order.status !== "done" && (
+          <button
+            onClick={() => {
+              const reason = window.prompt(`Cancelar pedido #${order.number}? Informe o motivo (opcional):`, "");
+              if (reason === null) return;
+              const ok = window.confirm(`Confirmar cancelamento do pedido #${order.number}?${reason ? `\n\nMotivo: ${reason}` : ""}`);
+              if (!ok) return;
+              onStatus("done");
+              toast.warning(`❌ Pedido #${order.number} cancelado${reason ? ` — ${reason}` : ""}`);
+            }}
+            className="px-3 py-2 rounded-lg bg-red-500/15 hover:bg-red-500/30 border border-red-500/30 text-red-300 text-xs font-bold transition"
+            title="Cancelar pedido"
+          >
+            ✕
+          </button>
+        )}
       </div>
 
 
