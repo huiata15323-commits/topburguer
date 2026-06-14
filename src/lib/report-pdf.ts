@@ -207,13 +207,14 @@ export function generateReportPDF(opts: {
     doc.setFontSize(8);
     doc.setTextColor(150, 150, 150);
     doc.text(
-      `Top Burguer — página ${i}/${pages}`,
+      `${brand.whiteLabel ? brandName : brandName + " — Relatório"} — página ${i}/${pages}`,
       W / 2,
       doc.internal.pageSize.getHeight() - 18,
       { align: "center" }
     );
   }
 
-  const filename = `topburguer-relatorio-${range.label.toLowerCase().replace(/\s+/g, "-")}-${new Date().toISOString().slice(0, 10)}.pdf`;
+  const slug = (brand.name || "loja").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const filename = `${slug}-relatorio-${range.label.toLowerCase().replace(/\s+/g, "-")}-${new Date().toISOString().slice(0, 10)}.pdf`;
   doc.save(filename);
 }
