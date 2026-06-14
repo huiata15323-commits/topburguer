@@ -517,7 +517,7 @@ export function TableQRGenerator() {
             >Usar publicada</button>
             {baseUrl && (
               <a
-                href={`${baseUrl}/order?mesa=1`}
+                href={`${effectiveBaseUrl}/order?mesa=1`}
                 target="_blank" rel="noreferrer"
                 className="text-[10px] px-2 py-1 rounded-md bg-background border border-border hover:border-ember font-bold"
               >Testar</a>
@@ -531,11 +531,16 @@ export function TableQRGenerator() {
             setBaseUrl(v);
             localStorage.setItem(BASEURL_KEY, v);
           }}
+          onBlur={() => {
+            const safe = sanitizeBaseUrl(baseUrl, origin);
+            setBaseUrl(safe);
+            localStorage.setItem(BASEURL_KEY, safe);
+          }}
           placeholder="https://seusite.lovable.app"
           className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm font-mono"
         />
         <p className="text-[10px] text-muted-foreground mt-1.5 leading-snug">
-          Os clientes vão escanear o QR e abrir <code className="font-mono">{baseUrl || "(URL)"}/order?mesa=N</code>.
+          Os clientes vão escanear o QR e abrir <code className="font-mono">{effectiveBaseUrl || "(URL)"}/order?mesa=N</code>.
           Use o domínio <strong>publicado</strong> (ou seu domínio próprio) — nunca o link de preview do editor, que exige login.
         </p>
       </div>
