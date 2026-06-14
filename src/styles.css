@@ -323,4 +323,85 @@
     will-change: transform, opacity;
     filter: drop-shadow(0 0 12px oklch(0.68 0.22 35 / 0.4));
   }
+
+  /* ========== NOVO: efeitos premium ========== */
+
+  /* Texto outline editorial */
+  .text-outline {
+    -webkit-text-stroke: 2px var(--amber-warm);
+    color: transparent;
+  }
+  .text-outline-thin { -webkit-text-stroke: 1px currentColor; color: transparent; }
+
+  /* Glow colorido (brasa) — sombra premium */
+  .shadow-glow-ember {
+    box-shadow:
+      0 10px 40px -10px color-mix(in oklab, var(--ember) 60%, transparent),
+      0 0 0 1px color-mix(in oklab, var(--amber-warm) 25%, transparent);
+  }
+  .shadow-glow-gold {
+    box-shadow: 0 10px 50px -10px color-mix(in oklab, var(--gold) 65%, transparent);
+  }
+
+  /* Tilt 3D card — spotlight no hover */
+  .card-tilt {
+    transform-style: preserve-3d;
+    transition: transform 0.5s cubic-bezier(.22,1,.36,1), box-shadow 0.3s ease;
+    position: relative;
+  }
+  .card-tilt:hover {
+    transform: perspective(900px) rotateX(4deg) rotateY(-6deg) translateY(-4px);
+    box-shadow:
+      0 30px 60px -20px color-mix(in oklab, var(--ember) 50%, transparent),
+      0 0 0 1px color-mix(in oklab, var(--amber-warm) 30%, transparent);
+  }
+  .card-tilt::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(600px circle at var(--mx, 50%) var(--my, 50%), oklch(1 0 0 / 0.12), transparent 40%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    border-radius: inherit;
+  }
+  .card-tilt:hover::after { opacity: 1; }
+
+  /* Meteor / falling spark */
+  @keyframes meteor {
+    0%   { transform: translate(0,0) rotate(215deg); opacity: 0; }
+    10%  { opacity: 1; }
+    100% { transform: translate(-600px, 600px) rotate(215deg); opacity: 0; }
+  }
+  .meteor {
+    position: absolute;
+    top: -10%;
+    width: 2px; height: 2px;
+    border-radius: 9999px;
+    background: var(--amber-warm);
+    box-shadow: 0 0 8px 2px var(--amber-warm);
+    animation: meteor linear infinite;
+  }
+  .meteor::before {
+    content: "";
+    position: absolute;
+    top: 50%; transform: translateY(-50%);
+    width: 60px; height: 1px;
+    background: linear-gradient(90deg, var(--amber-warm), transparent);
+  }
+
+  /* Splash brasa — splash ao abrir */
+  @keyframes ember-pulse {
+    0%, 100% { transform: scale(1); filter: brightness(1); }
+    50%      { transform: scale(1.08); filter: brightness(1.3); }
+  }
+  .animate-ember-pulse { animation: ember-pulse 2.2s ease-in-out infinite; }
+
+  /* Display gigante editorial */
+  .text-display {
+    font-family: "Bricolage Grotesque", "Inter", sans-serif;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 0.88;
+  }
 }
+
