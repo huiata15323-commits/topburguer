@@ -170,16 +170,17 @@ function Landing() {
 
       <section className="relative z-10 mx-auto max-w-3xl px-4 sm:px-6 py-16 sm:py-20 text-center">
         <h2 className="text-2xl sm:text-3xl md:text-5xl font-black mb-4 text-balance">
-          Pronto pra ver sua hamburgueria <span className="text-amber-warm">no nível</span>?
+          Quer ver o sistema <span className="text-amber-warm">funcionando</span>?
         </h2>
-        <p className="text-white/65 mb-6 sm:mb-8 text-sm sm:text-base">Sem cartão. Sem instalação. Em 5 minutos tá rodando.</p>
+        <p className="text-white/65 mb-6 sm:mb-8 text-sm sm:text-base">Toque abaixo e experimente fazer um pedido.</p>
         <Link
           to="/order"
           className="inline-flex items-center gap-2 rounded-2xl bg-gradient-ember px-6 sm:px-8 py-4 sm:py-5 font-bold text-base sm:text-lg shadow-ember hover:scale-[1.02] transition-transform"
         >
-          Começar agora 🔥
+          Iniciar demonstração 🔥
         </Link>
       </section>
+
 
       <footer className="relative z-10 border-t border-white/10 mt-8 py-8 px-4 text-center text-xs text-white/40">
         © Top Burguer System • Feito com IA pelos alunos do CEPI Elberto Alves
