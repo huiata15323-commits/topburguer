@@ -657,7 +657,13 @@ function CategoryStrip({
   );
 }
 
-function FeaturedReady({ featured, big }: { featured?: Order; big?: boolean }) {
+function FeaturedReady({ featured, big, onReannounce, onDelivered }: { featured?: Order; big?: boolean; onReannounce?: (o: Order) => void; onDelivered?: (id: string) => void }) {
+  const waitSec = featured?.doneAt ? Math.floor((Date.now() - featured.doneAt) / 1000) : 0;
+  const waitMin = Math.floor(waitSec / 60);
+  const waitTone =
+    waitMin >= 5 ? { bg: "bg-red-500/30", border: "border-red-400/60", text: "text-red-100", glow: "shadow-[0_0_40px_rgba(239,68,68,0.4)]", pulse: true } :
+    waitMin >= 2 ? { bg: "bg-amber-warm/30", border: "border-amber-warm/60", text: "text-amber-100", glow: "shadow-[0_0_30px_rgba(245,166,35,0.3)]", pulse: false } :
+                   { bg: "bg-emerald-500/25", border: "border-emerald-400/50", text: "text-emerald-100", glow: "", pulse: false };
   return (
     <section className="rounded-3xl bg-gradient-to-br from-emerald-600/25 via-emerald-500/10 to-transparent border border-emerald-500/30 grid place-items-center p-6 sm:p-8 relative overflow-hidden min-h-0 shadow-[inset_0_0_120px_rgba(16,185,129,0.15)]">
       <div className="absolute inset-0 bg-grain opacity-50" />
