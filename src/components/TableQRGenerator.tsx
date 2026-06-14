@@ -7,6 +7,25 @@ import { toast } from "sonner";
 const STORAGE_KEY = "fast-order:tables";
 const TEMPLATE_KEY = "fast-order:qr-template";
 const POSTER_KEY = "fast-order:qr-poster";
+const BASEURL_KEY = "fast-order:qr-baseurl";
+
+// Detecta um URL público estável (publicado) para os QR codes.
+// Evita usar o domínio de preview do editor, que exige login e expira.
+function suggestPublicBase(origin: string): string {
+  if (!origin) return "";
+  try {
+    const u = new URL(origin);
+    const h = u.hostname;
+    // Domínios de preview do Lovable não são acessíveis ao público.
+    if (h.includes("id-preview--") || h.endsWith(".sandbox.lovable.dev") || h === "localhost" || h.startsWith("127.")) {
+      // Tenta extrair o ID do projeto do hostname de preview: id-preview--<id>.lovable.app
+      const m = h.match(/id-preview--([a-z0-9-]+)\.lovable\.app/i);
+      if (m) return `https://${m[1]}.lovable.app`;
+      return "https://topburguer.lovable.app";
+    }
+    return origin;
+  } catch { return origin; }
+}
 
 type TemplateId =
   | "classic"
