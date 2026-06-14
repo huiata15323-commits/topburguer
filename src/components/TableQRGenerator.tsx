@@ -107,11 +107,7 @@ export function TableQRGenerator() {
         </div>
       </div>
 
-      {origin && (
-        <p className="text-[10px] text-muted-foreground mt-3 font-mono break-all">
-          URL base: {origin}/order?mesa=N
-        </p>
-      )}
     </section>
+
   );
 }
