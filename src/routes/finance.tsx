@@ -6,18 +6,22 @@ import { useOrders } from "@/lib/orders-store";
 import { useExpenses, CATEGORY_LABEL, type ExpenseCategory } from "@/lib/expenses-store";
 import { generateReportPDF } from "@/lib/report-pdf";
 import { StaffGate } from "@/components/StaffGate";
+import { RoleGate } from "@/components/RoleGate";
 
 export const Route = createFileRoute("/finance")({
   head: () => ({
     meta: [
       { title: "Financeiro — Top Burguer" },
       { name: "description", content: "Controle de despesas, lucro e relatórios financeiros." },
+      { name: "robots", content: "noindex,nofollow" },
     ],
   }),
   component: () => (
-    <StaffGate allow={["admin", "caixa"]} title="Financeiro / Caixa">
-      <FinancePage />
-    </StaffGate>
+    <RoleGate roles={["admin", "cashier"]}>
+      <StaffGate allow={["admin", "caixa"]} title="Financeiro / Caixa">
+        <FinancePage />
+      </StaffGate>
+    </RoleGate>
   ),
 });
 
