@@ -31,6 +31,22 @@ function Landing() {
       {/* Decorative grain layer */}
       <div className="absolute inset-0 bg-grain pointer-events-none" />
 
+      {/* Meteoros — faíscas caindo no hero */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {Array.from({ length: 14 }).map((_, i) => (
+          <span
+            key={i}
+            className="meteor"
+            style={{
+              left: `${(i * 7.3) % 100}%`,
+              animationDelay: `${(i * 0.7) % 8}s`,
+              animationDuration: `${4 + ((i * 1.3) % 6)}s`,
+            }}
+          />
+        ))}
+      </div>
+
+
       {/* Top bar */}
       <nav className="relative z-10 mx-auto max-w-7xl px-6 py-5 flex items-center justify-between">
         <div className="flex items-center gap-2">
