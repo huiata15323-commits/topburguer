@@ -2,6 +2,8 @@
 import { useRef, useState } from "react";
 import { useBranding, THEME_PRESETS, exportBrandingBundle, importBrandingBundle } from "@/lib/branding";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
+import { generateDishImage } from "@/lib/ai-image.functions";
 
 const PREVIEW: Record<string, string[]> = {
   classic:   ["#1a0e08", "#e85d3a", "#f4b860"],
@@ -31,8 +33,24 @@ export function BrandingAdmin() {
   const { branding, save } = useBranding();
   const [showPicker, setShowPicker] = useState(false);
   const [showDomain, setShowDomain] = useState(false);
+  const [genLogo, setGenLogo] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const importInput = useRef<HTMLInputElement>(null);
+  const callGen = useServerFn(generateDishImage);
+
+  async function generateLogoAI() {
+    if (!branding.name.trim()) { toast.error("Defina o nome da loja primeiro"); return; }
+    setGenLogo(true);
+    const tid = toast.loading("🎨 IA criando seu logo…");
+    try {
+      const r = await callGen({ data: { dishName: branding.name, kind: "logo", style: "minimal" } });
+      if (r.error === "rate_limit") toast.error("⏳ Aguarde 1min", { id: tid });
+      else if (r.error === "no_credits") toast.error("💳 Sem créditos", { id: tid });
+      else if (r.error || !r.dataUrl) toast.error("Falhou — tente de novo", { id: tid });
+      else { save({ logoUrl: r.dataUrl }); toast.success("✨ Logo aplicado!", { id: tid }); }
+    } finally { setGenLogo(false); }
+  }
+
 
   // Agrupa temas por segmento para UI mais clara
   const bySegment = THEME_PRESETS.reduce<Record<string, typeof THEME_PRESETS>>((acc, p) => {
@@ -122,6 +140,14 @@ export function BrandingAdmin() {
               </button>
             )}
           </div>
+          <button
+            type="button"
+            onClick={generateLogoAI}
+            disabled={genLogo || !branding.name.trim()}
+            className="w-full mt-1 text-[10px] font-black uppercase tracking-wider px-2 py-1.5 rounded-lg bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white shadow-sm hover:scale-[1.02] active:scale-95 transition disabled:opacity-50"
+          >
+            {genLogo ? "🧠 Gerando…" : "✨ Gerar logo com IA"}
+          </button>
           <input ref={fileInput} type="file" accept="image/*" onChange={onLogoFile} className="hidden" />
           {showPicker && !branding.logoUrl && (
             <div className="absolute z-20 mt-2 left-0 right-0 sm:w-72 rounded-2xl border-2 border-ember/40 bg-card shadow-2xl p-3">

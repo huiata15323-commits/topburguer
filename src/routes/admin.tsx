@@ -28,6 +28,7 @@ export const Route = createFileRoute("/admin")({
   ),
 });
 
+type AiStyle = "premium" | "rustic" | "minimal" | "neon" | "american" | "cartoon";
 type FormState = {
   id?: string;
   name: string;
@@ -36,9 +37,19 @@ type FormState = {
   emoji: string;
   description: string;
   image: string;
+  aiStyle: AiStyle;
 };
 
-const EMPTY: FormState = { name: "", price: "", category: "burger", emoji: "🍔", description: "", image: "" };
+const EMPTY: FormState = { name: "", price: "", category: "burger", emoji: "🍔", description: "", image: "", aiStyle: "premium" };
+
+const AI_STYLES: { key: AiStyle; label: string; emoji: string }[] = [
+  { key: "premium", label: "Premium", emoji: "🔥" },
+  { key: "rustic", label: "Rústico", emoji: "🪵" },
+  { key: "minimal", label: "Minimal", emoji: "⚪" },
+  { key: "neon", label: "Neon", emoji: "💜" },
+  { key: "american", label: "Diner US", emoji: "🇺🇸" },
+  { key: "cartoon", label: "Cartoon", emoji: "🎨" },
+];
 
 const CATS: { key: EditableMenuItem["category"]; label: string; emoji: string }[] = [
   { key: "burger", label: "Hambúrgueres", emoji: "🍔" },
@@ -65,7 +76,7 @@ function AdminPage() {
     const tid = toast.loading("🎨 IA gerando foto do prato…");
     try {
       const r = await callGenImage({
-        data: { dishName: form.name.trim(), description: form.description.trim() || undefined },
+        data: { dishName: form.name.trim(), description: form.description.trim() || undefined, kind: "dish", style: form.aiStyle },
       });
       if (r.error === "rate_limit") toast.error("⏳ Muitas gerações — aguarde 1min", { id: tid });
       else if (r.error === "no_credits") toast.error("💳 Sem créditos de IA", { id: tid });
@@ -79,6 +90,23 @@ function AdminPage() {
     }
   };
 
+  const [regenId, setRegenId] = useState<string | null>(null);
+  const regenerateForItem = async (m: EditableMenuItem) => {
+    setRegenId(m.id);
+    const tid = toast.loading(`🎨 Regerando foto de ${m.name}…`);
+    try {
+      const r = await callGenImage({
+        data: { dishName: m.name, description: m.description || undefined, kind: "dish", style: form.aiStyle },
+      });
+      if (r.error === "rate_limit") toast.error("⏳ Aguarde 1min", { id: tid });
+      else if (r.error === "no_credits") toast.error("💳 Sem créditos de IA", { id: tid });
+      else if (r.error || !r.dataUrl) toast.error("Falhou. Tente novamente.", { id: tid });
+      else { updateItem(m.id, { image: r.dataUrl }); toast.success("✨ Nova foto!", { id: tid }); }
+    } finally {
+      setRegenId(null);
+    }
+  };
+
   const startEdit = (m: EditableMenuItem) => {
     setForm({
       id: m.id,
@@ -88,6 +116,7 @@ function AdminPage() {
       emoji: m.emoji,
       description: m.description ?? "",
       image: m.image,
+      aiStyle: form.aiStyle,
     });
     setEditing(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -222,6 +251,25 @@ function AdminPage() {
                   {generatingImg ? "🧠 Gerando…" : "✨ Gerar com IA"}
                 </button>
               </div>
+              <div className="mb-2">
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">Estilo visual da IA</div>
+                <div className="flex flex-wrap gap-1">
+                  {AI_STYLES.map((s) => (
+                    <button
+                      key={s.key}
+                      type="button"
+                      onClick={() => setForm({ ...form, aiStyle: s.key })}
+                      className={`text-[10px] font-bold px-2 py-1 rounded-lg border transition ${
+                        form.aiStyle === s.key
+                          ? "border-fuchsia-500 bg-fuchsia-500/20 text-fuchsia-700 dark:text-fuchsia-300"
+                          : "border-border bg-background hover:border-fuchsia-400/40"
+                      }`}
+                    >
+                      {s.emoji} {s.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
               <input
                 value={form.image.startsWith("data:") ? "" : form.image}
                 onChange={(e) => setForm({ ...form, image: e.target.value })}
@@ -337,6 +385,14 @@ function AdminPage() {
                               className="flex-1 py-1.5 text-xs rounded-lg bg-muted hover:bg-secondary font-semibold"
                             >
                               ✏️ Editar
+                            </button>
+                            <button
+                              onClick={() => regenerateForItem(m)}
+                              disabled={regenId === m.id}
+                              className="px-2 py-1.5 text-xs rounded-lg bg-gradient-to-r from-violet-500/15 to-fuchsia-500/15 text-fuchsia-700 dark:text-fuchsia-300 hover:from-violet-500/25 hover:to-fuchsia-500/25 disabled:opacity-50"
+                              title="Regerar foto com IA usando o estilo selecionado no formulário"
+                            >
+                              {regenId === m.id ? "🧠" : "✨"}
                             </button>
                             <button
                               onClick={() => toggleSoldOut(m.id)}

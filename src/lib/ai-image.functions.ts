@@ -1,11 +1,22 @@
-// Gera foto de prato via IA. Retorna data URL (base64 PNG) que o admin
-// salva no campo image do item do cardápio.
+// Gera imagens via IA (pratos, logos, banners promocionais).
+// Retorna data URL (base64 PNG) que o admin salva onde quiser.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
 const Input = z.object({
-  dishName: z.string().min(2).max(80),
+  dishName: z.string().min(1).max(80),
   description: z.string().max(200).optional(),
+  kind: z.enum(["dish", "logo", "promo"]).default("dish"),
+  style: z
+    .enum([
+      "premium",
+      "rustic",
+      "minimal",
+      "neon",
+      "american",
+      "cartoon",
+    ])
+    .default("premium"),
 });
 
 const rl = new Map<string, { count: number; resetAt: number }>();
@@ -17,7 +28,27 @@ function rateLimit(ip: string) {
     return true;
   }
   cur.count++;
-  return cur.count <= 4;
+  return cur.count <= 6;
+}
+
+const STYLE_HINTS: Record<string, string> = {
+  premium:  "fundo escuro de madeira queimada, iluminação cinematográfica quente, ângulo 45°, estilo menu premium",
+  rustic:   "tábua de madeira rústica, luz natural suave, vapor leve, vibe artesanal de boteco",
+  minimal:  "fundo branco limpo, sombra suave, composição minimalista estilo Apple, vista superior",
+  neon:     "ambiente noturno urbano, luzes neon rosa e ciano, reflexos vibrantes, estilo cyberpunk",
+  american: "estilo diner americano anos 50, fundo vermelho com xadrez, cores saturadas, vibe vintage",
+  cartoon:  "ilustração cartoon vibrante, traços fortes, cores planas saturadas, estilo mascote de fast-food",
+};
+
+function buildPrompt(kind: string, style: string, name: string, desc?: string) {
+  const styleHint = STYLE_HINTS[style] ?? STYLE_HINTS.premium;
+  if (kind === "logo") {
+    return `Logo profissional de marca de restaurante chamada "${name}", design icônico, vetorial limpo, alta legibilidade, ${styleHint}. Apenas o símbolo/ícone centralizado em fundo neutro, sem texto adicional, sem marca d'água.`;
+  }
+  if (kind === "promo") {
+    return `Banner promocional vertical de restaurante para "${name}"${desc ? ` — ${desc}` : ""}. ${styleHint}. Composição chamativa, espaço para texto no topo, super apetitoso, alta resolução. Sem texto, sem marca d'água.`;
+  }
+  return `Fotografia profissional de comida, prato: ${name}${desc ? `. Detalhes: ${desc}` : ""}. ${styleHint}. Super apetitoso, alta resolução. Sem texto, sem marca d'água.`;
 }
 
 export const generateDishImage = createServerFn({ method: "POST" })
@@ -32,7 +63,7 @@ export const generateDishImage = createServerFn({ method: "POST" })
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) return { dataUrl: null, error: "no_key" as const };
 
-    const prompt = `Fotografia profissional de comida, estilo menu de hamburgueria premium, fundo escuro de madeira queimada, iluminação cinematográfica quente, ângulo 45°, super apetitoso, alta resolução. Prato: ${data.dishName}${data.description ? `. Detalhes: ${data.description}` : ""}. Sem texto, sem marca d'água.`;
+    const prompt = buildPrompt(data.kind, data.style, data.dishName, data.description);
 
     try {
       const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
