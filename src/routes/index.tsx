@@ -199,20 +199,28 @@ function Landing() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1, duration: 0.5 }}
+              onMouseMove={(e) => {
+                const el = e.currentTarget;
+                const r = el.getBoundingClientRect();
+                el.style.setProperty("--mx", `${e.clientX - r.left}px`);
+                el.style.setProperty("--my", `${e.clientY - r.top}px`);
+              }}
+              className="card-tilt rounded-3xl"
             >
               <Link
                 to={c.to}
-                className="group block h-full rounded-3xl border border-white/10 bg-white/[0.03] p-6 hover:bg-white/[0.06] hover:border-amber-warm/40 transition-all"
+                className="group block h-full rounded-3xl border border-white/10 bg-white/[0.03] p-6 hover:bg-white/[0.06] hover:border-gold/50 transition-colors"
               >
-                <div className="text-4xl">{c.emoji}</div>
-                <div className="mt-4 text-[10px] uppercase tracking-widest text-amber-warm font-bold">{c.tag}</div>
-                <h3 className="mt-1 text-xl font-bold">{c.title}</h3>
+                <div className="text-5xl drop-shadow-[0_0_20px_rgba(255,180,80,0.4)]">{c.emoji}</div>
+                <div className="mt-4 text-[10px] uppercase tracking-[0.3em] text-gold font-black">{c.tag}</div>
+                <h3 className="mt-2 text-2xl font-black tracking-tight">{c.title}</h3>
                 <p className="mt-2 text-sm text-white/60">{c.desc}</p>
-                <div className="mt-4 text-sm font-semibold text-amber-warm group-hover:translate-x-1 transition-transform inline-block">
+                <div className="mt-5 text-sm font-bold text-amber-warm group-hover:translate-x-1 transition-transform inline-block">
                   Abrir →
                 </div>
               </Link>
             </motion.div>
+
           ))}
         </div>
       </section>
