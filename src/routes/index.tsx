@@ -1,4 +1,4 @@
-// Landing comercial — vende o Top Burguer System para outras hamburguerias.
+// Landing institucional — apresenta o Top Burguer System ao colégio.
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { useBranding } from "@/lib/branding";
@@ -6,42 +6,21 @@ import { useBranding } from "@/lib/branding";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Top Burguer System — Sistema de pedidos para sua hamburgueria" },
+      { title: "Top Burguer System — Projeto SENAI / CEPI Elberto Alves" },
       {
         name: "description",
         content:
-          "Cardápio digital, QR de mesa, KDS para a cozinha, painel com voz e IA. Tudo num só lugar — sem mensalidade abusiva.",
+          "Sistema completo de pedidos para hamburgueria: cardápio QR, KDS na cozinha, painel com voz e IA. Projeto dos alunos do Curso Técnico em Desenvolvimento de Sistemas.",
       },
-      { property: "og:title", content: "Top Burguer System — Para sua hamburgueria" },
+      { property: "og:title", content: "Top Burguer System — Projeto Escolar" },
       {
         property: "og:description",
-        content: "Garçom IA por voz, fotos geradas por IA, painel de chamadas, modo offline-ready.",
+        content: "Garçom IA por voz, fotos geradas por IA, painel de chamadas. Feito pelos alunos do SENAI / CEPI Elberto Alves.",
       },
     ],
   }),
   component: Landing,
 });
-
-const PLANS = [
-  {
-    key: "starter", name: "Starter", price: "R$ 49", period: "/mês",
-    tagline: "Pra começar com cardápio digital",
-    features: ["Cardápio QR por mesa", "Pedidos via celular", "Pagamento PIX/Cartão", "Recibo digital", "Até 1 unidade"],
-    highlight: false,
-  },
-  {
-    key: "pro", name: "Pro", price: "R$ 149", period: "/mês",
-    tagline: "Para quem quer girar a cozinha",
-    features: ["Tudo do Starter, mais:", "KDS com voz", "Painel de chamadas", "Resumo do dia por IA", "Financeiro + PDF", "Heatmap de mesas", "Fidelidade"],
-    highlight: true,
-  },
-  {
-    key: "premium", name: "Premium", price: "R$ 299", period: "/mês",
-    tagline: "Para redes e operações sérias",
-    features: ["Tudo do Pro, mais:", "🎙️ Garçom IA por voz", "📸 Fotos por IA", "Multi-loja / franquia", "Integração iFood (em breve)", "White label", "Suporte prioritário"],
-    highlight: false,
-  },
-];
 
 const DIFFERENCES = [
   { emoji: "🎙️", title: "Garçom IA por voz", desc: 'Cliente fala "dois X-Bacon e uma coca" — o pedido monta sozinho.' },
