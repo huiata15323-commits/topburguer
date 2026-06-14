@@ -90,7 +90,7 @@ function ReceiptPage() {
         <div className="p-6">
           <header className="text-center pb-3 border-b border-dashed border-charcoal/40">
             <div className="text-2xl font-black tracking-tight">TOP BURGUER</div>
-            <div className="text-[11px] uppercase tracking-widest opacity-70">Fast Order • Recibo</div>
+            <div className="text-[11px] uppercase tracking-widest opacity-70">Top Burguer • Recibo</div>
             <div className="mt-1 text-[11px] opacity-70">{dateStr} • {timeStr}</div>
           </header>
 

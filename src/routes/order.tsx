@@ -24,7 +24,7 @@ export const Route = createFileRoute("/order")({
   validateSearch: search,
   head: () => ({
     meta: [
-      { title: "Pedido — Fast Order" },
+      { title: "Pedido — Top Burguer" },
       { name: "description", content: "Monte seu pedido na Top Burguer." },
     ],
   }),
