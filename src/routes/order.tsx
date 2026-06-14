@@ -270,15 +270,15 @@ function OrderPage() {
       </div>
 
 
-      <div className="mx-auto max-w-6xl px-4 py-6 grid gap-6 lg:grid-cols-[1fr_380px]">
+      <div className="mx-auto max-w-6xl px-3 sm:px-4 py-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_400px]">
 
-        <section className="space-y-10">
+        <section className="space-y-10 min-w-0">
           {CATEGORIES.map((cat) => (
             <div key={cat.key} id={`cat-${cat.key}`} className="scroll-mt-32">
-              <h2 className="text-xl font-black mb-4 flex items-center gap-2">
+              <h2 className="text-lg sm:text-xl font-black mb-4 flex items-center gap-2">
                 <span className="text-2xl">{cat.emoji}</span> {t(cat.tKey)}
               </h2>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 grid-cols-2 xl:grid-cols-3">
                 {menu.filter((m) => m.category === cat.key).map((m, i) => {
                   const entry = cart[m.id];
                   const q = entry?.qty || 0;
