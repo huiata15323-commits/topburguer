@@ -2,6 +2,7 @@ import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { z } from "zod";
 import { useOrders, type Order } from "@/lib/orders-store";
+import { useBranding } from "@/lib/branding";
 
 const search = z.object({ n: z.coerce.number().int().positive().optional() });
 
