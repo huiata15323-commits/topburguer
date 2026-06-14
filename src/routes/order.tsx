@@ -129,8 +129,9 @@ function OrderPage() {
     setSubmitting(true);
     try {
       const normalized = phone.trim() ? normalizePhoneBR(phone) ?? undefined : undefined;
+      const fallbackName = mesa ? `Mesa ${mesa}` : "Cliente";
       const order = await addOrder({
-        customer: customer.trim().slice(0, 50),
+        customer: (customer.trim() || fallbackName).slice(0, 50),
         phone: normalized,
         tableNumber: mesa,
         items,
