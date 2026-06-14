@@ -245,8 +245,8 @@ function Landing() {
             </p>
             <div className="mt-6 grid grid-cols-2 gap-4">
               {[
-                { src: turma2a.url, label: "2º Ano A — Técnico" },
-                { src: turma2b.url, label: "2º Ano B — Técnico" },
+                { src: turma2b.url, label: "2º Ano A — Técnico" },
+                { src: turma2a.url, label: "2º Ano B — Técnico" },
               ].map((t) => (
                 <figure key={t.label} className="group relative overflow-hidden rounded-2xl border border-white/10">
                   <img src={t.src} alt={`Turma ${t.label}`} className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-700" />
