@@ -159,7 +159,7 @@ export function useOrders() {
 
 
   useEffect(() => {
-    ensurePolling();
+    ensureStreaming();
 
     const fn = (o: Order[]) => setOrders(o);
     listeners.add(fn);
