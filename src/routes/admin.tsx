@@ -100,19 +100,9 @@ function AdminPage() {
 
   return (
     <main className="min-h-screen bg-background">
-      <header className="bg-gradient-night text-white">
-        <div className="mx-auto max-w-6xl px-4 py-5 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 font-bold">
-            <div className="w-8 h-8 rounded-lg bg-gradient-ember grid place-items-center text-sm">T</div>
-            Top Burguer · Admin
-          </Link>
-          <div className="flex gap-3 text-xs">
-            <Link to="/order" className="text-amber-warm hover:underline">Pedido</Link>
-            <Link to="/kitchen" className="text-amber-warm hover:underline">Cozinha</Link>
-            <Link to="/dashboard" className="text-amber-warm hover:underline">Dashboard</Link>
-          </div>
-        </div>
-      </header>
+      <div className="mx-auto max-w-6xl px-4 pt-6">
+        <AdminHeroHeader title="Painel Administrativo" subtitle="Cardápio, identidade e operações" />
+      </div>
 
       <div className="mx-auto max-w-6xl px-4 py-8 space-y-8">
         <BrandingAdmin />
@@ -120,6 +110,7 @@ function AdminPage() {
         <PromosAdmin />
         <TableHeatmap />
         <TableQRGenerator />
+
 
 
 
