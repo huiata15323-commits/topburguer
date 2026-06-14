@@ -195,6 +195,74 @@ function Landing() {
         </div>
       </section>
 
+      {/* Sobre / Conhecendo os autores */}
+      <section id="sobre" className="relative z-10 mx-auto max-w-7xl px-6 pb-24">
+        <div className="grid lg:grid-cols-[1fr_1.2fr] gap-10 items-start">
+          {/* QR Code card */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="rounded-3xl border border-amber-warm/30 bg-gradient-to-br from-amber-warm/10 via-white/[0.03] to-ember/10 p-8 shadow-ember"
+          >
+            <div className="text-[10px] uppercase tracking-widest text-amber-warm font-bold">QR Code das mesas</div>
+            <h3 className="mt-2 text-2xl font-black">Imprima e cole nas mesas</h3>
+            <p className="mt-2 text-sm text-white/60">
+              Cliente aponta a câmera, abre a comanda direto no celular — sem fila, sem app.
+            </p>
+            <div className="mt-6 flex flex-col sm:flex-row items-center gap-6">
+              <div className="rounded-2xl bg-cream p-3 shadow-lg">
+                <img src={qrMesa.url} alt="QR Code da mesa Top Burguer" className="w-40 h-40 block" />
+              </div>
+              <div className="flex-1 space-y-3 text-center sm:text-left">
+                <div className="text-xs text-white/50">Aponta para</div>
+                <div className="font-mono text-sm text-amber-warm break-all">topburguer.lovable.app/mesa</div>
+                <a
+                  href={qrPrintPdf.url}
+                  target="_blank"
+                  rel="noopener"
+                  className="inline-flex items-center gap-2 rounded-full bg-gradient-ember px-5 py-2.5 text-sm font-bold shadow-ember hover:scale-105 transition-transform"
+                >
+                  📄 Baixar PDF para imprimir
+                </a>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Conhecendo os autores */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="rounded-3xl border border-white/10 bg-white/[0.03] p-8"
+          >
+            <div className="text-[10px] uppercase tracking-widest text-amber-warm font-bold">Sobre o projeto</div>
+            <h3 className="mt-2 text-2xl md:text-3xl font-black">Conhecendo os autores</h3>
+            <p className="mt-3 text-white/70 leading-relaxed">
+              Este sistema foi desenvolvido pelos alunos do <strong className="text-amber-warm">Curso Técnico em Desenvolvimento de Sistemas</strong> — turmas do <strong>2º Ano A e B</strong>, como projeto integrador unindo tecnologia, design e a paixão por uma boa hamburgueria. 🍔
+            </p>
+            <div className="mt-6 grid grid-cols-2 gap-4">
+              {[
+                { src: turma2a.url, label: "2º Ano A — Técnico" },
+                { src: turma2b.url, label: "2º Ano B — Técnico" },
+              ].map((t) => (
+                <figure key={t.label} className="group relative overflow-hidden rounded-2xl border border-white/10">
+                  <img src={t.src} alt={`Turma ${t.label}`} className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-700" />
+                  <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-3 text-xs font-bold text-white">
+                    {t.label}
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+            <div className="mt-5 text-xs text-white/40 italic">
+              "Do toque à chapa em segundos." — feito com café, código e fritas.
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       <footer className="relative z-10 border-t border-white/5 py-6 text-center text-xs text-white/40">
         <div>Top Burguer · Fast Order — feito pra hamburgueria que voa.</div>
         <div className="mt-1 text-white/25">Criado pelos alunos do Curso Técnico em Desenvolvimento de Sistemas — SENAI, CEPI Elberto Alves · 2º Ano A e B</div>
