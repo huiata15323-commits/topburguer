@@ -447,7 +447,7 @@ function PainelPage() {
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               className="grid lg:grid-cols-[1.5fr_1fr] gap-4 sm:gap-6 h-full"
             >
-              <FeaturedReady featured={featured} />
+              <FeaturedReady featured={featured} onReannounce={reannounce} onDelivered={markDelivered} />
               <aside className="grid grid-rows-2 gap-4 sm:gap-6 min-h-0">
                 <Column title="Também prontos" tone="emerald" orders={ready.slice(1, 7)} emptyMsg="—" />
                 <Column title="Em preparo" tone="amber" orders={preparing.slice(0, 6)} emptyMsg="Sem pedidos em preparo" showTimer />
