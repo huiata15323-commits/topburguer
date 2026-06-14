@@ -175,6 +175,42 @@ export function PromosAdmin() {
           </div>
         </div>
       </div>
+
+      {/* Gerador de banner promocional com IA */}
+      <div className="rounded-2xl border border-fuchsia-400/30 bg-background/60 p-4">
+        <div className="font-bold flex items-center gap-2 mb-1">
+          <span className="text-lg">🖼️</span> Banner promocional com IA
+        </div>
+        <p className="text-[11px] text-muted-foreground mb-3">
+          Descreva a promo e a IA cria um banner pronto pra postar (Instagram, WhatsApp…).
+        </p>
+        <div className="flex gap-2 mb-3">
+          <input
+            value={bannerPrompt}
+            onChange={(e) => setBannerPrompt(e.target.value.slice(0, 140))}
+            placeholder="Ex: combo X-Bacon + batata + refri por R$35"
+            className="flex-1 px-3 py-2 rounded-xl border border-border bg-background text-sm"
+          />
+          <button
+            onClick={generateBanner}
+            disabled={genBanner || !bannerPrompt.trim()}
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white font-bold text-sm shadow-sm disabled:opacity-50"
+          >
+            {genBanner ? "🧠…" : "✨ Gerar"}
+          </button>
+        </div>
+        {bannerImg && (
+          <div className="space-y-2">
+            <img src={bannerImg} alt="Banner gerado" className="w-full rounded-xl border-2 border-fuchsia-400/40" />
+            <button
+              onClick={downloadBanner}
+              className="w-full py-2 rounded-xl border-2 border-fuchsia-400/40 bg-fuchsia-500/10 hover:bg-fuchsia-500/20 font-bold text-sm"
+            >
+              ⬇ Baixar PNG
+            </button>
+          </div>
+        )}
+      </div>
     </section>
   );
 }
