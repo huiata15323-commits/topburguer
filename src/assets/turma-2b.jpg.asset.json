@@ -1,11 +1,11 @@
 {
   "version": 1,
-  "asset_id": "7bb2e949-1d99-4e99-8f8a-be6433334cc2",
+  "asset_id": "912f3240-ffe3-43ba-9f21-845138fa7cdf",
   "project_id": "e71c1bcd-35ca-41e6-a505-76c7cee0a064",
-  "url": "/__l5e/assets-v1/7bb2e949-1d99-4e99-8f8a-be6433334cc2/turma-2b.jpg",
-  "r2_key": "a/v1/e71c1bcd-35ca-41e6-a505-76c7cee0a064/7bb2e949-1d99-4e99-8f8a-be6433334cc2/turma-2b.jpg",
-  "original_filename": "turma-2b.jpg",
-  "size": 4325056,
-  "content_type": "image/jpeg",
-  "created_at": "2026-06-14T17:13:50Z"
+  "url": "/__l5e/assets-v1/912f3240-ffe3-43ba-9f21-845138fa7cdf/turma-2b-clean.jpg",
+  "r2_key": "a/v1/e71c1bcd-35ca-41e6-a505-76c7cee0a064/912f3240-ffe3-43ba-9f21-845138fa7cdf/turma-2b-clean.jpg",
+  "original_filename": "turma-2b-clean.jpg",
+  "size": 2037694,
+  "content_type": "image/png",
+  "created_at": "2026-06-14T17:20:26Z"
 }
