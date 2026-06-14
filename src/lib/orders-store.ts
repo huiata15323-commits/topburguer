@@ -308,14 +308,17 @@ export function estimateWaitMinutes(orders: Order[]): number {
   return Math.max(3, positions * avgPerOrder);
 }
 
-// Para o polling quando a aba é fechada
+// Para realtime e polling quando a aba é fechada
 if (typeof window !== "undefined") {
   window.addEventListener("beforeunload", () => {
     if (pollTimer) {
       clearInterval(pollTimer);
       pollTimer = null;
-      initialized = false;
     }
+    if (realtimeChannel) {
+      void supabase.removeChannel(realtimeChannel);
+      realtimeChannel = null;
+    }
+    initialized = false;
   });
-
 }
