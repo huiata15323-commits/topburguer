@@ -1,6 +1,6 @@
 // Comanda eletrônica da mesa: agrega todos os pedidos do dia para uma mesa
 // e oferece dividir a conta entre N pessoas (com gorjeta opcional).
-import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { createFileRoute, Link, Navigate, useNavigate, useSearch } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { z } from "zod";
@@ -60,6 +60,8 @@ function MesaPage() {
     for (const o of tabOrders) c[o.status]++;
     return c;
   }, [tabOrders]);
+
+  if (!n) return <Navigate to="/order" replace />;
 
   return (
     <main className="min-h-screen bg-background">

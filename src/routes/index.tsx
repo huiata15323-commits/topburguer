@@ -1,13 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import QRCode from "react-qr-code";
 import topBacon from "@/assets/menu/top-bacon.jpg";
 import topCheddar from "@/assets/menu/top-cheddar.jpg";
 import topClassic from "@/assets/menu/top-classic.jpg";
 import turma2a from "@/assets/turma-2a.jpg.asset.json";
 import turma2b from "@/assets/turma-2b.jpg.asset.json";
-import qrMesa from "@/assets/qr-mesa.png.asset.json";
-import qrPrintPdf from "@/assets/qr-print.pdf.asset.json";
 import { useBranding } from "@/lib/branding";
+
+const PUBLIC_MENU_QR_SAMPLE = "https://topburguer.lovable.app/order?mesa=1";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -243,19 +244,17 @@ function Landing() {
             </p>
             <div className="mt-6 flex flex-col sm:flex-row items-center gap-6">
               <div className="rounded-2xl bg-cream p-3 shadow-lg">
-                <img src={qrMesa.url} alt="QR Code da mesa Top Burguer" className="w-40 h-40 block" />
+                <QRCode value={PUBLIC_MENU_QR_SAMPLE} size={160} level="M" />
               </div>
               <div className="flex-1 space-y-3 text-center sm:text-left">
                 <div className="text-xs uppercase tracking-widest text-amber-warm font-bold">Top Burguer</div>
-                <div className="text-sm text-white/70">Aponte a câmera, abra a comanda e peça da sua mesa em segundos.</div>
-                <a
-                  href={qrPrintPdf.url}
-                  target="_blank"
-                  rel="noopener"
+                <div className="text-sm text-white/70">Aponte a câmera, abra o cardápio e peça direto da mesa.</div>
+                <Link
+                  to="/admin"
                   className="inline-flex items-center gap-2 rounded-full bg-gradient-ember px-5 py-2.5 text-sm font-bold shadow-ember hover:scale-105 transition-transform"
                 >
-                  📄 Baixar PDF para imprimir
-                </a>
+                  📄 Gerar QR atualizado
+                </Link>
               </div>
             </div>
           </motion.div>

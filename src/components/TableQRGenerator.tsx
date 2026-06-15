@@ -9,6 +9,7 @@ const TEMPLATE_KEY = "fast-order:qr-template";
 const POSTER_KEY = "fast-order:qr-poster";
 const BASEURL_KEY = "fast-order:qr-baseurl";
 const PUBLISHED_QR_BASE = "https://topburguer.lovable.app";
+const buildTableMenuUrl = (tableNumber: number) => `${PUBLISHED_QR_BASE}/order?mesa=${tableNumber}`;
 
 function isPreviewLikeUrl(value: string): boolean {
   if (!value) return false;
@@ -45,9 +46,9 @@ function suggestPublicBase(origin: string): string {
 
 
 function sanitizeBaseUrl(value: string, origin: string): string {
-  const trimmed = value.trim().replace(/\/+$/, "");
-  if (!trimmed || isPreviewLikeUrl(trimmed)) return suggestPublicBase(origin);
-  return trimmed;
+  // QR de cliente não pode depender de preview, cache local ou edição manual.
+  // Trava sempre no domínio publicado para evitar tela de login no celular.
+  return suggestPublicBase(origin || value);
 }
 
 type TemplateId =
@@ -410,7 +411,7 @@ export function TableQRGenerator() {
 
   // ===== Render do conteúdo de impressão (oculto) =====
   const renderPosterPage = (n: number) => {
-    const url = effectiveBaseUrl ? `${effectiveBaseUrl}/m?n=${n}` : "";
+    const url = buildTableMenuUrl(n);
     return (
       <div key={n} className="page">
         <div className="stripe" />
@@ -443,7 +444,7 @@ export function TableQRGenerator() {
   };
 
   const renderCard = (n: number) => {
-    const url = effectiveBaseUrl ? `${effectiveBaseUrl}/m?n=${n}` : "";
+    const url = buildTableMenuUrl(n);
     return (
       <div key={n} className="card">
         {tpl.decor && <span className="decor tl">{tpl.decor}</span>}
@@ -465,7 +466,7 @@ export function TableQRGenerator() {
   };
 
   // Preview do pôster (escala reduzida)
-  const previewUrl = effectiveBaseUrl ? `${effectiveBaseUrl}/m?n=1` : "";
+  const previewUrl = buildTableMenuUrl(1);
   const themePreview = poster.useThemeColors ? themeColors() : { accent: tpl.accent, dark: tpl.bg, cream: "#FBEFD8" };
 
   return (
@@ -514,7 +515,7 @@ export function TableQRGenerator() {
             >Usar publicada</button>
             {baseUrl && (
               <a
-                href={`${effectiveBaseUrl}/m?n=1`}
+                href={buildTableMenuUrl(1)}
                 target="_blank" rel="noreferrer"
                 className="text-[10px] px-2 py-1 rounded-md bg-background border border-border hover:border-ember font-bold"
               >Testar</a>
@@ -522,23 +523,14 @@ export function TableQRGenerator() {
           </div>
         </div>
         <input
-          value={baseUrl}
-          onChange={(e) => {
-            const v = e.target.value.trim().replace(/\/+$/, "");
-            setBaseUrl(v);
-            localStorage.setItem(BASEURL_KEY, v);
-          }}
-          onBlur={() => {
-            const safe = sanitizeBaseUrl(baseUrl, origin);
-            setBaseUrl(safe);
-            localStorage.setItem(BASEURL_KEY, safe);
-          }}
+          value={effectiveBaseUrl}
+          readOnly
           placeholder="https://seusite.lovable.app"
-          className="w-full px-3 py-2 rounded-lg border border-border bg-background text-sm font-mono"
+          className="w-full px-3 py-2 rounded-lg border border-border bg-muted text-sm font-mono"
         />
         <p className="text-[10px] text-muted-foreground mt-1.5 leading-snug">
-          Os clientes vão escanear o QR e abrir <code className="font-mono">{effectiveBaseUrl || "(URL)"}/m?n=N</code>.
-          Use o domínio <strong>publicado</strong> (ou seu domínio próprio) — nunca o link de preview do editor, que exige login.
+          Os clientes vão escanear o QR e abrir <code className="font-mono">{PUBLISHED_QR_BASE}/order?mesa=N</code>.
+          O link foi travado no domínio publicado para não cair no preview que pede login.
         </p>
       </div>
 
