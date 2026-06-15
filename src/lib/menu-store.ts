@@ -119,7 +119,16 @@ export function useMenu() {
   }, []);
 
   const updateItem = useCallback(async (id: string, patch: Partial<EditableMenuItem>) => {
-    const dbPatch: Record<string, unknown> = {};
+    const dbPatch: {
+      name?: string;
+      price?: number;
+      category?: EditableMenuItem["category"];
+      emoji?: string;
+      image?: string;
+      description?: string | null;
+      sold_out?: boolean;
+      stock?: number | null;
+    } = {};
     if (patch.name !== undefined) dbPatch.name = patch.name;
     if (patch.price !== undefined) dbPatch.price = patch.price;
     if (patch.category !== undefined) dbPatch.category = patch.category;
