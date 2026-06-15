@@ -31,20 +31,16 @@ function isPreviewLikeUrl(value: string): boolean {
 // Detecta um URL público estável (publicado) para os QR codes.
 // Evita usar o domínio de preview do editor, que exige login e expira.
 function suggestPublicBase(origin: string): string {
-  if (!origin) return "";
+  if (!origin) return PUBLISHED_QR_BASE;
   try {
-    const u = new URL(origin);
-    const h = u.hostname;
     // Domínios de preview do editor e hosts locais não são acessíveis ao público.
-    if (isPreviewLikeUrl(origin)) {
-      // Tenta extrair o ID do projeto do hostname de preview: id-preview--<id>.lovable.app
-      const m = h.match(/id-preview--([a-z0-9-]+)\.lovable\.app/i);
-      if (m) return `https://${m[1]}.lovable.app`;
-      return PUBLISHED_QR_BASE;
-    }
+    // Sempre usamos o domínio publicado real (topburguer.lovable.app), porque
+    // o slug `id-preview--<id>` não bate com o slug publicado do projeto.
+    if (isPreviewLikeUrl(origin)) return PUBLISHED_QR_BASE;
     return origin;
-  } catch { return origin; }
+  } catch { return PUBLISHED_QR_BASE; }
 }
+
 
 function sanitizeBaseUrl(value: string, origin: string): string {
   const trimmed = value.trim().replace(/\/+$/, "");
