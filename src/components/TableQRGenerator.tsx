@@ -9,6 +9,7 @@ const TEMPLATE_KEY = "fast-order:qr-template";
 const POSTER_KEY = "fast-order:qr-poster";
 const BASEURL_KEY = "fast-order:qr-baseurl";
 const PUBLISHED_QR_BASE = "https://topburguer.lovable.app";
+const buildTableMenuUrl = (tableNumber: number) => `${PUBLISHED_QR_BASE}/order?mesa=${tableNumber}`;
 
 function isPreviewLikeUrl(value: string): boolean {
   if (!value) return false;
@@ -45,9 +46,9 @@ function suggestPublicBase(origin: string): string {
 
 
 function sanitizeBaseUrl(value: string, origin: string): string {
-  const trimmed = value.trim().replace(/\/+$/, "");
-  if (!trimmed || isPreviewLikeUrl(trimmed)) return suggestPublicBase(origin);
-  return trimmed;
+  // QR de cliente não pode depender de preview, cache local ou edição manual.
+  // Trava sempre no domínio publicado para evitar tela de login no celular.
+  return suggestPublicBase(origin || value);
 }
 
 type TemplateId =
@@ -410,7 +411,7 @@ export function TableQRGenerator() {
 
   // ===== Render do conteúdo de impressão (oculto) =====
   const renderPosterPage = (n: number) => {
-    const url = effectiveBaseUrl ? `${effectiveBaseUrl}/m?n=${n}` : "";
+    const url = buildTableMenuUrl(n);
     return (
       <div key={n} className="page">
         <div className="stripe" />
@@ -443,7 +444,7 @@ export function TableQRGenerator() {
   };
 
   const renderCard = (n: number) => {
-    const url = effectiveBaseUrl ? `${effectiveBaseUrl}/m?n=${n}` : "";
+    const url = buildTableMenuUrl(n);
     return (
       <div key={n} className="card">
         {tpl.decor && <span className="decor tl">{tpl.decor}</span>}
@@ -465,7 +466,7 @@ export function TableQRGenerator() {
   };
 
   // Preview do pôster (escala reduzida)
-  const previewUrl = effectiveBaseUrl ? `${effectiveBaseUrl}/m?n=1` : "";
+  const previewUrl = buildTableMenuUrl(1);
   const themePreview = poster.useThemeColors ? themeColors() : { accent: tpl.accent, dark: tpl.bg, cream: "#FBEFD8" };
 
   return (
