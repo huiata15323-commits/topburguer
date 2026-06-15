@@ -16,8 +16,11 @@ function isPreviewLikeUrl(value: string): boolean {
     const host = new URL(value).hostname.toLowerCase();
     return (
       host.includes("id-preview--") ||
+      host.startsWith("preview--") ||
+      host.includes("--preview") ||
       host.endsWith(".sandbox.lovable.dev") ||
       host.endsWith(".lovableproject.com") ||
+      host.endsWith(".lovable.dev") ||
       host === "localhost" ||
       host.startsWith("127.") ||
       host.startsWith("192.168.") ||
@@ -35,9 +38,8 @@ function suggestPublicBase(origin: string): string {
   try {
     // Domínios de preview do editor e hosts locais não são acessíveis ao público.
     // Sempre usamos o domínio publicado real (topburguer.lovable.app), porque
-    // o slug `id-preview--<id>` não bate com o slug publicado do projeto.
-    if (isPreviewLikeUrl(origin)) return PUBLISHED_QR_BASE;
-    return origin;
+    // o slug de preview não bate com o slug publicado do projeto.
+    return PUBLISHED_QR_BASE;
   } catch { return PUBLISHED_QR_BASE; }
 }
 
