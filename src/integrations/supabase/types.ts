@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      menu_items: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          emoji: string
+          id: string
+          image: string
+          name: string
+          price: number
+          sold_out: boolean
+          sort_order: number
+          stock: number | null
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          emoji?: string
+          id: string
+          image?: string
+          name: string
+          price?: number
+          sold_out?: boolean
+          sort_order?: number
+          stock?: number | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          emoji?: string
+          id?: string
+          image?: string
+          name?: string
+          price?: number
+          sold_out?: boolean
+          sort_order?: number
+          stock?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           created_at: string
@@ -101,6 +146,7 @@ export type Database = {
         Args: never
         Returns: Database["public"]["Enums"]["app_role"]
       }
+      decrement_menu_stock: { Args: { p_items: Json }; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
