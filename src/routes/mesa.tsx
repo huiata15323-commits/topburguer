@@ -38,8 +38,6 @@ function MesaPage() {
   const [tipPct, setTipPct] = useState(10);
   const [splitOpen, setSplitOpen] = useState(false);
 
-  if (!n) return <Navigate to="/order" replace />;
-
   const tabOrders = useMemo<Order[]>(() => {
     if (!n) return [];
     const since = startOfToday();
@@ -62,6 +60,8 @@ function MesaPage() {
     for (const o of tabOrders) c[o.status]++;
     return c;
   }, [tabOrders]);
+
+  if (!n) return <Navigate to="/order" replace />;
 
   return (
     <main className="min-h-screen bg-background">
