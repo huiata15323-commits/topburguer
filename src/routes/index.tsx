@@ -8,7 +8,7 @@ import turma2a from "@/assets/turma-2a.jpg.asset.json";
 import turma2b from "@/assets/turma-2b.jpg.asset.json";
 import { useBranding } from "@/lib/branding";
 
-const PUBLIC_MENU_QR_SAMPLE = "https://topburguer.lovable.app/order?mesa=1";
+const DRIVE_ACERVO_URL = "https://drive.google.com/drive/folders/1Wv8JwaqaLX1Awhp_HPAC_hjb1Pz1YBPu?usp=drive_link";
 
 export const Route = createFileRoute("/")({
   head: () => ({
