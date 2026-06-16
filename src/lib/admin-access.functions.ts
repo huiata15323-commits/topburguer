@@ -36,7 +36,10 @@ export const ensureApprovedAdminRole = createServerFn({ method: "POST" })
 
     const { error } = await supabaseAdmin
       .from("user_roles")
-      .upsert({ user_id: context.userId, role: "admin" }, { onConflict: "user_id,role" });
+      .upsert(
+        { user_id: context.userId, role: "admin" },
+        { onConflict: "user_id,role" },
+      );
 
     if (error) {
       throw new Error("Não foi possível liberar o administrador: " + error.message);
