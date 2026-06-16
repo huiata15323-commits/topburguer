@@ -8,7 +8,7 @@ import turma2a from "@/assets/turma-2a.jpg.asset.json";
 import turma2b from "@/assets/turma-2b.jpg.asset.json";
 import { useBranding } from "@/lib/branding";
 
-const PUBLIC_MENU_QR_SAMPLE = "https://topburguer.lovable.app/order?mesa=1";
+const DRIVE_ACERVO_URL = "https://drive.google.com/drive/folders/1Wv8JwaqaLX1Awhp_HPAC_hjb1Pz1YBPu?usp=drive_link";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -237,24 +237,26 @@ function Landing() {
             transition={{ duration: 0.6 }}
             className="rounded-3xl border border-amber-warm/30 bg-gradient-to-br from-amber-warm/10 via-white/[0.03] to-ember/10 p-8 shadow-ember"
           >
-            <div className="text-[10px] uppercase tracking-widest text-amber-warm font-bold">QR Code das mesas</div>
-            <h3 className="mt-2 text-2xl font-black">Imprima e cole nas mesas</h3>
+            <div className="text-[10px] uppercase tracking-widest text-amber-warm font-bold">Acervo da turma</div>
+            <h3 className="mt-2 text-2xl font-black">Nossa jornada na nuvem</h3>
             <p className="mt-2 text-sm text-white/60">
-              Cliente aponta a câmera, abre a comanda direto no celular — sem fila, sem app.
+              Aponte a câmera e acesse a pasta com todas as aulas, projetos, momentos e visitas técnicas do Curso Técnico em Desenvolvimento de Sistemas — 2025/2026.
             </p>
             <div className="mt-6 flex flex-col sm:flex-row items-center gap-6">
               <div className="rounded-2xl bg-cream p-3 shadow-lg">
-                <QRCode value={PUBLIC_MENU_QR_SAMPLE} size={160} level="M" />
+                <QRCode value={DRIVE_ACERVO_URL} size={160} level="M" />
               </div>
               <div className="flex-1 space-y-3 text-center sm:text-left">
-                <div className="text-xs uppercase tracking-widest text-amber-warm font-bold">Top Burguer</div>
-                <div className="text-sm text-white/70">Aponte a câmera, abra o cardápio e peça direto da mesa.</div>
-                <Link
-                  to="/admin"
+                <div className="text-xs uppercase tracking-widest text-amber-warm font-bold">2º Ano A & B · SENAI</div>
+                <div className="text-sm text-white/70">Aulas, projetos, visitas técnicas e os momentos que marcaram a turma — tudo num só lugar.</div>
+                <a
+                  href={DRIVE_ACERVO_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-full bg-gradient-ember px-5 py-2.5 text-sm font-bold shadow-ember hover:scale-105 transition-transform"
                 >
-                  📄 Gerar QR atualizado
-                </Link>
+                  ☁️ Abrir acervo no Drive
+                </a>
               </div>
             </div>
           </motion.div>
@@ -293,6 +295,102 @@ function Landing() {
             </div>
           </motion.div>
         </div>
+      </section>
+
+      {/* Momentos — emocional e marcante */}
+      <section id="momentos" className="relative z-10 mx-auto max-w-7xl px-6 pb-24">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7 }}
+          className="relative overflow-hidden rounded-[2.5rem] border border-amber-warm/20 bg-gradient-to-br from-ember/20 via-black/40 to-amber-warm/10 p-10 md:p-14"
+        >
+          <div className="absolute -top-20 -right-20 w-80 h-80 bg-gradient-ember blur-3xl opacity-30 rounded-full pointer-events-none" />
+          <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-amber-warm/20 blur-3xl rounded-full pointer-events-none" />
+
+          <div className="relative">
+            <div className="inline-flex items-center gap-2 rounded-full border border-amber-warm/40 bg-amber-warm/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-amber-warm">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber-warm animate-live" />
+              Momentos
+            </div>
+            <h2 className="mt-5 text-display text-balance text-[clamp(2.5rem,6vw,5rem)] leading-[0.95]">
+              <span className="block">CADA AULA,</span>
+              <span className="block bg-gradient-to-br from-amber-warm via-gold to-ember bg-clip-text text-transparent">
+                UMA MEMÓRIA.
+              </span>
+            </h2>
+            <p className="mt-6 max-w-2xl text-lg text-white/75 leading-relaxed">
+              Sem laboratório, sem computador na sala — mas com o que ninguém pode tirar da gente:
+              <strong className="text-amber-warm"> vontade, união e código pulsando no coração.</strong>
+              Aqui estão os momentos que viraram história da nossa turma.
+            </p>
+
+            <div className="mt-10 grid md:grid-cols-3 gap-5">
+              {[
+                {
+                  emoji: "🎓",
+                  tag: "Sala de aula",
+                  title: "Onde tudo começou",
+                  desc: "Quadro, caderno e o brilho nos olhos. Foi assim que aprendemos a programar antes de tocar num teclado.",
+                },
+                {
+                  emoji: "🚀",
+                  tag: "Visitas técnicas",
+                  title: "O mundo lá fora",
+                  desc: "Saímos da escola, entramos em empresas, vimos de perto o futuro que estamos construindo.",
+                },
+                {
+                  emoji: "💛",
+                  tag: "Família 2A & 2B",
+                  title: "Mais que uma turma",
+                  desc: "Risos, choros, abraços e madrugadas de código. A gente virou família — e família a gente não esquece.",
+                },
+              ].map((m, i) => (
+                <motion.div
+                  key={m.title}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.12, duration: 0.5 }}
+                  className="group rounded-2xl border border-white/10 bg-black/30 backdrop-blur p-6 hover:border-amber-warm/40 hover:bg-black/50 transition"
+                >
+                  <div className="text-4xl drop-shadow-[0_0_20px_rgba(255,180,80,0.4)]">{m.emoji}</div>
+                  <div className="mt-4 text-[10px] uppercase tracking-[0.3em] text-gold font-black">{m.tag}</div>
+                  <h3 className="mt-2 text-xl font-black tracking-tight">{m.title}</h3>
+                  <p className="mt-2 text-sm text-white/65 leading-relaxed">{m.desc}</p>
+                </motion.div>
+              ))}
+            </div>
+
+            <motion.blockquote
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4, duration: 0.8 }}
+              className="mt-12 border-l-4 border-amber-warm pl-6 max-w-3xl"
+            >
+              <p className="text-xl md:text-2xl font-bold italic text-white/90 leading-snug">
+                "Não tínhamos os melhores recursos. Tínhamos algo maior: <span className="text-amber-warm">uns aos outros</span>."
+              </p>
+              <footer className="mt-3 text-xs uppercase tracking-widest text-white/50">
+                — Turmas 2A & 2B · Curso Técnico em Desenvolvimento de Sistemas · 2025–2026
+              </footer>
+            </motion.blockquote>
+
+            <div className="mt-10 flex flex-wrap gap-3">
+              <a
+                href={DRIVE_ACERVO_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-2 rounded-2xl bg-gradient-ember px-6 py-4 font-bold shadow-ember hover:scale-[1.02] active:scale-[0.98] transition-transform"
+              >
+                ☁️ Ver todos os momentos no Drive
+                <span className="transition-transform group-hover:translate-x-1">→</span>
+              </a>
+            </div>
+          </div>
+        </motion.div>
       </section>
 
       <footer className="relative z-10 border-t border-white/5 py-6 text-center text-xs text-white/40">
