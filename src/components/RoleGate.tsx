@@ -1,13 +1,26 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { useAuth, useUserRoles, type AppRole } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import { ensureApprovedAdminRole } from "@/lib/admin-access.functions";
 
 type Props = {
   roles: AppRole[];
   children: ReactNode;
 };
+
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  if (error && typeof error === "object") {
+    const err = error as { message?: unknown; error_description?: unknown; details?: unknown };
+    const message = err.message ?? err.error_description ?? err.details;
+    if (typeof message === "string") return message;
+  }
+  return "Erro inesperado. Tente sair e entrar novamente.";
+}
 
 /**
  * Gate de UI: exige usuário logado E pelo menos um dos papéis.
@@ -18,21 +31,34 @@ export function RoleGate({ roles, children }: Props) {
   const { roles: userRoles, loading: rolesLoading, hasAnyRole } = useUserRoles(user?.id);
   const navigate = useNavigate();
   const [claiming, setClaiming] = useState(false);
+  const [autoGrantTried, setAutoGrantTried] = useState(false);
+  const grantApprovedAdmin = useServerFn(ensureApprovedAdminRole);
+
+  useEffect(() => {
+    if (!user || authLoading || rolesLoading || autoGrantTried) return;
+    if (!roles.includes("admin") || userRoles.includes("admin")) return;
+
+    setAutoGrantTried(true);
+    setClaiming(true);
+    grantApprovedAdmin({ data: {} })
+      .then(() => {
+        toast.success("Acesso de administrador liberado. Recarregando…");
+        setTimeout(() => window.location.reload(), 600);
+      })
+      .catch((error) => {
+        console.error("[admin access] grant failed", error);
+        setClaiming(false);
+      });
+  }, [authLoading, autoGrantTried, grantApprovedAdmin, roles, rolesLoading, user, userRoles]);
 
   const claimAdmin = async () => {
     setClaiming(true);
     try {
-      const { error } = await supabase.rpc("claim_first_admin");
-      if (error) throw error;
-      toast.success("Você agora é admin! Recarregando…");
+      await grantApprovedAdmin({ data: {} });
+      toast.success("Acesso de administrador liberado. Recarregando…");
       setTimeout(() => window.location.reload(), 600);
     } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      if (msg.includes("admin already exists")) {
-        toast.error("Já existe um admin. Peça para ele te liberar.");
-      } else {
-        toast.error("Não foi possível: " + msg);
-      }
+      toast.error("Não foi possível: " + getErrorMessage(e));
       setClaiming(false);
     }
   };
@@ -80,16 +106,16 @@ export function RoleGate({ roles, children }: Props) {
           </p>
           {roles.includes("admin") && (
             <div className="rounded-xl border border-amber-warm/40 bg-amber-warm/10 p-3 text-xs text-left">
-              <div className="font-bold text-amber-warm mb-1">🚀 Primeira vez aqui?</div>
+              <div className="font-bold text-amber-warm mb-1">🚀 Administrador geral</div>
               <p className="text-muted-foreground mb-2">
-                Se ninguém ainda é admin, você pode reivindicar este papel agora (uma única vez).
+                Se seu email estiver liberado pela equipe, ative seu acesso de administrador aqui.
               </p>
               <button
                 onClick={claimAdmin}
                 disabled={claiming}
                 className="w-full py-2 rounded-lg bg-gradient-ember text-ember-foreground font-bold text-xs disabled:opacity-50"
               >
-                {claiming ? "Promovendo…" : "Sou o primeiro admin, me promova"}
+                {claiming ? "Liberando…" : "Liberar meu acesso de administrador"}
               </button>
             </div>
           )}
