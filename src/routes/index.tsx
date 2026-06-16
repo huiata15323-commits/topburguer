@@ -237,24 +237,26 @@ function Landing() {
             transition={{ duration: 0.6 }}
             className="rounded-3xl border border-amber-warm/30 bg-gradient-to-br from-amber-warm/10 via-white/[0.03] to-ember/10 p-8 shadow-ember"
           >
-            <div className="text-[10px] uppercase tracking-widest text-amber-warm font-bold">QR Code das mesas</div>
-            <h3 className="mt-2 text-2xl font-black">Imprima e cole nas mesas</h3>
+            <div className="text-[10px] uppercase tracking-widest text-amber-warm font-bold">Acervo da turma</div>
+            <h3 className="mt-2 text-2xl font-black">Nossa jornada na nuvem</h3>
             <p className="mt-2 text-sm text-white/60">
-              Cliente aponta a câmera, abre a comanda direto no celular — sem fila, sem app.
+              Aponte a câmera e acesse a pasta com todas as aulas, projetos, momentos e visitas técnicas do Curso Técnico em Desenvolvimento de Sistemas — 2025/2026.
             </p>
             <div className="mt-6 flex flex-col sm:flex-row items-center gap-6">
               <div className="rounded-2xl bg-cream p-3 shadow-lg">
-                <QRCode value={PUBLIC_MENU_QR_SAMPLE} size={160} level="M" />
+                <QRCode value={DRIVE_ACERVO_URL} size={160} level="M" />
               </div>
               <div className="flex-1 space-y-3 text-center sm:text-left">
-                <div className="text-xs uppercase tracking-widest text-amber-warm font-bold">Top Burguer</div>
-                <div className="text-sm text-white/70">Aponte a câmera, abra o cardápio e peça direto da mesa.</div>
-                <Link
-                  to="/admin"
+                <div className="text-xs uppercase tracking-widest text-amber-warm font-bold">2º Ano A & B · SENAI</div>
+                <div className="text-sm text-white/70">Aulas, projetos, visitas técnicas e os momentos que marcaram a turma — tudo num só lugar.</div>
+                <a
+                  href={DRIVE_ACERVO_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-full bg-gradient-ember px-5 py-2.5 text-sm font-bold shadow-ember hover:scale-105 transition-transform"
                 >
-                  📄 Gerar QR atualizado
-                </Link>
+                  ☁️ Abrir acervo no Drive
+                </a>
               </div>
             </div>
           </motion.div>
