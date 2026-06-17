@@ -13,7 +13,9 @@ export function useAuth() {
 
   useEffect(() => {
     // CRITICAL: listener FIRST, then getSession (avoids race)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, s) => {
       setSession(s);
       setUser(s?.user ?? null);
     });

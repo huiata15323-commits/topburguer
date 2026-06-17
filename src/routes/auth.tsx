@@ -74,9 +74,7 @@ function AuthPage() {
           </div>
         </Link>
 
-        <h1 className="text-2xl font-black mb-1">
-          {mode === "signin" ? "Entrar" : "Criar conta"}
-        </h1>
+        <h1 className="text-2xl font-black mb-1">{mode === "signin" ? "Entrar" : "Criar conta"}</h1>
         <p className="text-sm text-muted-foreground mb-5">
           {mode === "signin"
             ? "Acesse o painel, financeiro ou cozinha."
@@ -124,7 +122,10 @@ function AuthPage() {
           {mode === "signin" ? "Não tem conta? Criar uma" : "Já tem conta? Entrar"}
         </button>
 
-        <Link to="/" className="block text-center text-xs text-muted-foreground mt-6 hover:text-amber-warm">
+        <Link
+          to="/"
+          className="block text-center text-xs text-muted-foreground mt-6 hover:text-amber-warm"
+        >
           ← Voltar para o cardápio
         </Link>
       </div>
