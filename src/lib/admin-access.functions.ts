@@ -44,3 +44,19 @@ export const ensureApprovedAdminRole = createServerFn({ method: "POST" })
 
     return { ok: true as const, email };
   });
+
+export const getMyRoles = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", context.userId);
+
+    if (error) {
+      throw new Error("Não foi possível carregar suas permissões: " + error.message);
+    }
+
+    return { roles: (data ?? []).map((item) => item.role) };
+  });

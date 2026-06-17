@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import type { Session, User } from "@supabase/supabase-js";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
+import { getMyRoles } from "@/lib/admin-access.functions";
 
 export type AppRole = "admin" | "kitchen" | "cashier";
 
@@ -11,7 +13,9 @@ export function useAuth() {
 
   useEffect(() => {
     // CRITICAL: listener FIRST, then getSession (avoids race)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, s) => {
       setSession(s);
       setUser(s?.user ?? null);
     });
@@ -31,6 +35,7 @@ export function useAuth() {
 export function useUserRoles(userId: string | null | undefined) {
   const [roles, setRoles] = useState<AppRole[]>([]);
   const [loading, setLoading] = useState(true);
+  const loadMyRoles = useServerFn(getMyRoles);
 
   useEffect(() => {
     if (!userId) {
@@ -40,24 +45,22 @@ export function useUserRoles(userId: string | null | undefined) {
     }
     let active = true;
     setLoading(true);
-    supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", userId)
-      .then(({ data, error }) => {
+    loadMyRoles()
+      .then(({ roles: data }) => {
         if (!active) return;
-        if (error) {
-          console.error("[roles] load failed", error);
-          setRoles([]);
-        } else {
-          setRoles((data ?? []).map((r) => r.role as AppRole));
-        }
+        setRoles((data ?? []).map((role) => role as AppRole));
+        setLoading(false);
+      })
+      .catch((error) => {
+        if (!active) return;
+        console.error("[roles] load failed", error);
+        setRoles([]);
         setLoading(false);
       });
     return () => {
       active = false;
     };
-  }, [userId]);
+  }, [loadMyRoles, userId]);
 
   return {
     roles,

@@ -34,7 +34,7 @@ function rowToItem(r: DbRow): EditableMenuItem {
     price: typeof r.price === "string" ? parseFloat(r.price) : r.price,
     category: r.category,
     emoji: r.emoji,
-    image: r.image && r.image.length > 0 ? r.image : SEED_IMAGE_BY_ID.get(r.id) ?? "",
+    image: r.image && r.image.length > 0 ? r.image : (SEED_IMAGE_BY_ID.get(r.id) ?? ""),
     description: r.description ?? undefined,
     soldOut: r.sold_out,
     stock: r.stock ?? undefined,
@@ -152,7 +152,7 @@ export function useMenu() {
       if (!cur) return;
       await updateItem(id, { soldOut: !cur.soldOut });
     },
-    [updateItem]
+    [updateItem],
   );
 
   const setStock = useCallback(
@@ -161,21 +161,13 @@ export function useMenu() {
       if (stock !== undefined) patch.soldOut = stock <= 0;
       await updateItem(id, patch);
     },
-    [updateItem]
+    [updateItem],
   );
 
-  /** Decrementa estoque de forma atômica via RPC (anti-oversell). */
-  const decrementStock = useCallback(
-    async (sold: { menuId: string; quantity: number }[]) => {
-      const payload = sold
-        .filter((s) => s.quantity > 0)
-        .map((s) => ({ menu_id: s.menuId, quantity: s.quantity }));
-      if (payload.length === 0) return;
-      const { error } = await supabase.rpc("decrement_menu_stock", { p_items: payload });
-      if (error) console.error("[menu] decrementStock failed", error);
-    },
-    []
-  );
+  /** Estoque é baixado automaticamente pelo backend quando o pedido é criado. */
+  const decrementStock = useCallback(async (sold: { menuId: string; quantity: number }[]) => {
+    void sold;
+  }, []);
 
   /** Restaura cardápio padrão: apaga tudo e re-insere o SEED. (admin) */
   const resetToDefaults = useCallback(async () => {

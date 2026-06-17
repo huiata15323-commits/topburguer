@@ -15,8 +15,13 @@ function getErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message;
   if (typeof error === "string") return error;
   if (error && typeof error === "object") {
-    const err = error as { message?: unknown; error_description?: unknown; details?: unknown };
-    const message = err.message ?? err.error_description ?? err.details;
+    const err = error as {
+      message?: unknown;
+      error_description?: unknown;
+      details?: unknown;
+      error?: unknown;
+    };
+    const message = err.message ?? err.error_description ?? err.details ?? err.error;
     if (typeof message === "string") return message;
   }
   return "Erro inesperado. Tente sair e entrar novamente.";
