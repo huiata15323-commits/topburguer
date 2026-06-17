@@ -164,15 +164,10 @@ export function useMenu() {
     [updateItem]
   );
 
-  /** Decrementa estoque de forma atômica via RPC (anti-oversell). */
+  /** Estoque é baixado automaticamente pelo backend quando o pedido é criado. */
   const decrementStock = useCallback(
     async (sold: { menuId: string; quantity: number }[]) => {
-      const payload = sold
-        .filter((s) => s.quantity > 0)
-        .map((s) => ({ menu_id: s.menuId, quantity: s.quantity }));
-      if (payload.length === 0) return;
-      const { error } = await supabase.rpc("decrement_menu_stock", { p_items: payload });
-      if (error) console.error("[menu] decrementStock failed", error);
+      void sold;
     },
     []
   );
