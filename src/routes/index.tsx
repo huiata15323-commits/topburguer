@@ -4,8 +4,8 @@ import QRCode from "react-qr-code";
 import topBacon from "@/assets/menu/top-bacon.jpg";
 import topCheddar from "@/assets/menu/top-cheddar.jpg";
 import topClassic from "@/assets/menu/top-classic.jpg";
-import turma2a from "@/assets/turma-2a.jpg.asset.json";
-import turma2b from "@/assets/turma-2b.jpg.asset.json";
+import turmaFull from "@/assets/turma-2a-full.jpg.asset.json";
+import visitaTecnica from "@/assets/visita-tecnica-clean.jpg.asset.json";
 import { useBranding } from "@/lib/branding";
 
 const DRIVE_ACERVO_URL = "https://drive.google.com/drive/folders/1Wv8JwaqaLX1Awhp_HPAC_hjb1Pz1YBPu?usp=drive_link";
@@ -280,13 +280,17 @@ function Landing() {
             <p className="mt-3 text-white/70 leading-relaxed">
               Este projeto é parte desse caminho — código, sonho e gratidão impressos em cada tela. As turmas <strong>2º Ano A e B</strong> assinam, com orgulho, este projeto.
             </p>
-            <div className="mt-6 grid grid-cols-2 gap-4">
+            <div className="mt-6 grid grid-cols-1 gap-4">
               {[
-                { src: turma2b.url, label: "2º Ano A — Técnico" },
-                { src: turma2a.url, label: "2º Ano B — Técnico" },
+                { src: turmaFull.url, label: "Turma completa — 2º Ano A & B" },
+                { src: visitaTecnica.url, label: "Visita técnica — SENAI Everest Digital" },
               ].map((t) => (
-                <figure key={t.label} className="group relative overflow-hidden rounded-2xl border border-white/10">
-                  <img src={t.src} alt={`Turma ${t.label}`} className="w-full aspect-square object-cover group-hover:scale-105 transition-transform duration-700" />
+                <figure key={t.label} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/40">
+                  <img
+                    src={t.src}
+                    alt={t.label}
+                    className="w-full h-auto object-contain group-hover:scale-[1.02] transition-transform duration-700"
+                  />
                   <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-3 text-xs font-bold text-white">
                     {t.label}
                   </figcaption>
@@ -297,7 +301,7 @@ function Landing() {
         </div>
       </section>
 
-      {/* Momentos — emocional e marcante */}
+      {/* Momentos — memorial aberto para depoimentos */}
       <section id="momentos" className="relative z-10 mx-auto max-w-7xl px-6 pb-24">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -312,7 +316,7 @@ function Landing() {
           <div className="relative">
             <div className="inline-flex items-center gap-2 rounded-full border border-amber-warm/40 bg-amber-warm/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-amber-warm">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-warm animate-live" />
-              Momentos
+              Memorial · Momentos
             </div>
             <h2 className="mt-5 text-display text-balance text-[clamp(2.5rem,6vw,5rem)] leading-[0.95]">
               <span className="block">CADA AULA,</span>
@@ -321,44 +325,31 @@ function Landing() {
               </span>
             </h2>
             <p className="mt-6 max-w-2xl text-lg text-white/75 leading-relaxed">
-              Sem laboratório, sem computador na sala — mas com o que ninguém pode tirar da gente:
-              <strong className="text-amber-warm"> vontade, união e código pulsando no coração.</strong>
-              Aqui estão os momentos que viraram história da nossa turma.
+              Este é o nosso <strong className="text-amber-warm">memorial vivo</strong> — um espaço reservado para guardar
+              os depoimentos dos alunos do 2º Ano A & B. Em breve, cada voz da turma terá seu lugar aqui.
             </p>
 
+            {/* Cards de depoimento — placeholders aguardando preenchimento */}
             <div className="mt-10 grid md:grid-cols-3 gap-5">
-              {[
-                {
-                  emoji: "🎓",
-                  tag: "Sala de aula",
-                  title: "Onde tudo começou",
-                  desc: "Quadro, caderno e o brilho nos olhos. Foi assim que aprendemos a programar antes de tocar num teclado.",
-                },
-                {
-                  emoji: "🚀",
-                  tag: "Visitas técnicas",
-                  title: "O mundo lá fora",
-                  desc: "Saímos da escola, entramos em empresas, vimos de perto o futuro que estamos construindo.",
-                },
-                {
-                  emoji: "💛",
-                  tag: "Família 2A & 2B",
-                  title: "Mais que uma turma",
-                  desc: "Risos, choros, abraços e madrugadas de código. A gente virou família — e família a gente não esquece.",
-                },
-              ].map((m, i) => (
+              {[1, 2, 3, 4, 5, 6].map((i) => (
                 <motion.div
-                  key={m.title}
+                  key={i}
                   initial={{ opacity: 0, y: 24 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: i * 0.12, duration: 0.5 }}
-                  className="group rounded-2xl border border-white/10 bg-black/30 backdrop-blur p-6 hover:border-amber-warm/40 hover:bg-black/50 transition"
+                  transition={{ delay: i * 0.08, duration: 0.5 }}
+                  className="group rounded-2xl border border-dashed border-white/15 bg-black/30 backdrop-blur p-6 hover:border-amber-warm/40 hover:bg-black/50 transition min-h-[200px] flex flex-col"
                 >
-                  <div className="text-4xl drop-shadow-[0_0_20px_rgba(255,180,80,0.4)]">{m.emoji}</div>
-                  <div className="mt-4 text-[10px] uppercase tracking-[0.3em] text-gold font-black">{m.tag}</div>
-                  <h3 className="mt-2 text-xl font-black tracking-tight">{m.title}</h3>
-                  <p className="mt-2 text-sm text-white/65 leading-relaxed">{m.desc}</p>
+                  <div className="text-3xl text-amber-warm/60">“ ”</div>
+                  <div className="mt-3 text-[10px] uppercase tracking-[0.3em] text-gold/70 font-black">
+                    Depoimento #{String(i).padStart(2, "0")}
+                  </div>
+                  <p className="mt-3 text-sm text-white/40 italic leading-relaxed flex-1">
+                    Espaço reservado para o depoimento de um aluno da turma.
+                  </p>
+                  <div className="mt-4 pt-3 border-t border-white/10 text-xs text-white/30">
+                    — Aluno(a) · 2º Ano · SENAI
+                  </div>
                 </motion.div>
               ))}
             </div>
@@ -371,7 +362,7 @@ function Landing() {
               className="mt-12 border-l-4 border-amber-warm pl-6 max-w-3xl"
             >
               <p className="text-xl md:text-2xl font-bold italic text-white/90 leading-snug">
-                "Não tínhamos os melhores recursos. Tínhamos algo maior: <span className="text-amber-warm">uns aos outros</span>."
+                "Cada aula virou memória. Cada memória, parte de quem a gente é hoje."
               </p>
               <footer className="mt-3 text-xs uppercase tracking-widest text-white/50">
                 — Turmas 2A & 2B · Curso Técnico em Desenvolvimento de Sistemas · 2025–2026
