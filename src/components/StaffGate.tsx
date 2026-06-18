@@ -4,7 +4,6 @@ import { ShieldCheck, LogOut, Lock } from "lucide-react";
 
 export type StaffRole = "admin" | "cozinha" | "caixa";
 
-// PINs de demonstração (este é um sistema simulado, não use em produção real)
 const PINS: Record<string, StaffRole> = {
   "9999": "admin",
   "1234": "cozinha",
@@ -138,11 +137,6 @@ export function StaffGate({ allow, title = "Área restrita", children }: Props) 
         >
           Entrar
         </button>
-
-        <div className="text-[10px] text-muted-foreground border-t border-border pt-3 space-y-0.5">
-          <p className="font-medium">PINs demo:</p>
-          <p>Admin: <span className="font-mono">9999</span> · Cozinha: <span className="font-mono">1234</span> · Caixa: <span className="font-mono">4321</span></p>
-        </div>
 
         <Link to="/" className="block text-center text-xs text-muted-foreground hover:text-foreground">
           ← Voltar para o cardápio

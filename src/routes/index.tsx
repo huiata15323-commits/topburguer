@@ -56,10 +56,6 @@ function Landing() {
         </div>
         <div className="flex items-center gap-3 text-xs">
           <Link to="/sobre" className="text-amber-warm/90 hover:text-amber-warm font-bold transition">💼 Para sua hamburgueria</Link>
-          <Link to="/admin" className="hidden sm:inline text-white/60 hover:text-amber-warm transition">⚙️ Admin</Link>
-          <Link to="/painel" className="hidden sm:inline text-white/60 hover:text-amber-warm transition">📺 Painel</Link>
-          <Link to="/dashboard" className="hidden sm:inline text-white/60 hover:text-amber-warm transition">📊 Dashboard</Link>
-          <Link to="/finance" className="hidden sm:inline text-white/60 hover:text-amber-warm transition">💰 Financeiro</Link>
           <div className="hidden md:flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-live" />
             <span className="text-white/60 uppercase tracking-widest">Sistema online</span>
@@ -116,10 +112,10 @@ function Landing() {
                 Acompanhar pedido
               </Link>
               <Link
-                to="/kitchen"
+                to="/status"
                 className="inline-flex items-center gap-2 rounded-2xl border border-amber-warm/30 bg-amber-warm/10 px-6 py-4 font-semibold text-amber-warm hover:bg-amber-warm/20 transition"
               >
-                📺 Painel cozinha
+                Ver status
               </Link>
             </motion.div>
 
@@ -192,7 +188,7 @@ function Landing() {
           {[
             { tag: "01 · Cliente", title: "Faz o pedido", desc: "Cardápio visual, carrinho com observações por item e envio instantâneo.", to: "/order", emoji: "📱" },
             { tag: "02 · Painel", title: "Acompanha em tempo real", desc: "Status do pedido visível no balcão e no celular do cliente.", to: "/status", emoji: "⏱️" },
-            { tag: "03 · Cozinha", title: "Prepara e entrega", desc: "TV otimizada com fila, timer de urgência e som de notificação.", to: "/kitchen", emoji: "🔥" },
+            { tag: "03 · Cliente", title: "Retira ou recebe", desc: "Quando o pedido fica pronto, o cliente acompanha pelo status do próprio pedido.", to: "/status", emoji: "🔥" },
           ].map((c, i) => (
             <motion.div
               key={c.title}

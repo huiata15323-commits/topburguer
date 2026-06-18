@@ -1,6 +1,6 @@
 // Botão "🎙️ Pedir por voz" — escuta o cliente. Tenta parser local rápido
 // e, se falhar, chama IA (Gemini) para entender a fala em linguagem natural.
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { useServerFn } from "@tanstack/react-start";
@@ -13,13 +13,16 @@ type Props = {
 };
 
 export function VoiceOrderButton({ menu, onAdd }: Props) {
+  const [mounted, setMounted] = useState(false);
   const [listening, setListening] = useState(false);
   const [thinking, setThinking] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [stopper, setStopper] = useState<{ stop: () => void } | null>(null);
   const callAI = useServerFn(parseVoiceOrderAI);
 
-  if (!isVoiceSupported()) return null;
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted || !isVoiceSupported()) return null;
 
   const handleFinal = async (text: string) => {
     const available = menu.filter((m) => !m.soldOut);
