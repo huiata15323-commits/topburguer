@@ -312,75 +312,76 @@ function PainelPage() {
       {!tvMode && (
 
   return (
-    <main className="min-h-screen bg-neutral-950 text-white overflow-hidden relative flex flex-col">
-      {/* Top bar */}
-      <header className="border-b border-white/10 px-4 sm:px-8 py-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 sm:flex sm:flex-wrap sm:justify-between">
-        <Link to="/" className="flex min-w-0 items-center gap-3">
-          <div className="w-11 h-11 shrink-0 rounded-2xl bg-gradient-ember grid place-items-center font-black text-lg shadow-ember">T</div>
-          <div className="min-w-0">
-            <div className="font-black text-xl sm:text-2xl tracking-tight truncate">Top Burguer</div>
-            <div className="text-[10px] uppercase tracking-widest text-amber-warm flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-live" /> Painel ao vivo
-            </div>
-          </div>
-        </Link>
+      {!tvMode && (
+        <>
+          {/* Top bar */}
+          <header className="border-b border-white/10 px-4 sm:px-8 py-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 sm:flex sm:flex-wrap sm:justify-between">
+            <Link to="/" className="flex min-w-0 items-center gap-3">
+              <div className="w-11 h-11 shrink-0 rounded-2xl bg-gradient-ember grid place-items-center font-black text-lg shadow-ember">T</div>
+              <div className="min-w-0">
+                <div className="font-black text-xl sm:text-2xl tracking-tight truncate">Top Burguer</div>
+                <div className="text-[10px] uppercase tracking-widest text-amber-warm flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-live" /> Painel ao vivo
+                </div>
+              </div>
+            </Link>
 
-        {/* Filter chips */}
-        <nav className="flex items-center gap-1.5 sm:gap-2 bg-white/5 rounded-xl p-1">
-          <FilterChip active={view === "all"} onClick={() => setView("all")} label="Tudo" count={ready.length + preparing.length} />
-          <FilterChip active={view === "ready"} onClick={() => setView("ready")} label="Prontos" count={ready.length} tone="emerald" />
-          <FilterChip active={view === "preparing"} onClick={() => setView("preparing")} label="Em preparo" count={preparing.length} tone="amber" />
-        </nav>
+            <nav className="flex items-center gap-1.5 sm:gap-2 bg-white/5 rounded-xl p-1">
+              <FilterChip active={view === "all"} onClick={() => setView("all")} label="Tudo" count={ready.length + preparing.length} />
+              <FilterChip active={view === "ready"} onClick={() => setView("ready")} label="Prontos" count={ready.length} tone="emerald" />
+              <FilterChip active={view === "preparing"} onClick={() => setView("preparing")} label="Em preparo" count={preparing.length} tone="amber" />
+            </nav>
 
-        <div className="flex items-center gap-3 shrink-0">
-          <button
-            onClick={() => {
-              const next = !voiceOn;
-              setVoiceOn(next);
-              if (next) speak("Anúncios de voz ativados.");
-            }}
-            title={voiceOn ? "Desativar anúncios de voz" : "Ativar anúncios de voz"}
-            className={`grid place-items-center w-10 h-10 rounded-xl border transition ${
-              voiceOn
-                ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-300"
-                : "bg-white/5 border-white/10 text-white/40"
-            }`}
-          >
-            {voiceOn ? "🔊" : "🔇"}
-          </button>
-          <div className="hidden md:flex items-center gap-3 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10">
-            <div className="text-center">
-              <div className="text-[9px] uppercase tracking-widest text-white/40 font-bold">Prontos</div>
-              <div className="text-lg font-black text-emerald-400 tabular-nums leading-none">{ready.length}</div>
-            </div>
-            <div className="w-px h-7 bg-white/10" />
-            <div className="text-center">
-              <div className="text-[9px] uppercase tracking-widest text-white/40 font-bold">Preparo</div>
-              <div className="text-lg font-black text-amber-warm tabular-nums leading-none">{preparing.length}</div>
-            </div>
-            {avgPrepMin != null && (
-              <>
+            <div className="flex items-center gap-3 shrink-0">
+              <button
+                onClick={() => {
+                  const next = !voiceOn;
+                  setVoiceOn(next);
+                  if (next) speak("Anúncios de voz ativados.");
+                }}
+                title={voiceOn ? "Desativar anúncios de voz" : "Ativar anúncios de voz"}
+                className={`grid place-items-center w-10 h-10 rounded-xl border transition ${
+                  voiceOn
+                    ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-300"
+                    : "bg-white/5 border-white/10 text-white/40"
+                }`}
+              >
+                {voiceOn ? "🔊" : "🔇"}
+              </button>
+              <div className="hidden md:flex items-center gap-3 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10">
+                <div className="text-center">
+                  <div className="text-[9px] uppercase tracking-widest text-white/40 font-bold">Prontos</div>
+                  <div className="text-lg font-black text-emerald-400 tabular-nums leading-none">{ready.length}</div>
+                </div>
                 <div className="w-px h-7 bg-white/10" />
                 <div className="text-center">
-                  <div className="text-[9px] uppercase tracking-widest text-white/40 font-bold">Médio</div>
-                  <div className="text-lg font-black text-white/90 tabular-nums leading-none">{avgPrepMin}m</div>
+                  <div className="text-[9px] uppercase tracking-widest text-white/40 font-bold">Preparo</div>
+                  <div className="text-lg font-black text-amber-warm tabular-nums leading-none">{preparing.length}</div>
                 </div>
-              </>
-            )}
-          </div>
-          <div className="text-right">
-            <div className="text-2xl sm:text-3xl font-black tabular-nums">{now ? now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "--:--"}</div>
-            <div className="text-[10px] uppercase tracking-widest text-white/40 hidden sm:block">
-              {now ? now.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" }) : ""}
+                {avgPrepMin != null && (
+                  <>
+                    <div className="w-px h-7 bg-white/10" />
+                    <div className="text-center">
+                      <div className="text-[9px] uppercase tracking-widest text-white/40 font-bold">Médio</div>
+                      <div className="text-lg font-black text-white/90 tabular-nums leading-none">{avgPrepMin}m</div>
+                    </div>
+                  </>
+                )}
+              </div>
+              <div className="text-right">
+                <div className="text-2xl sm:text-3xl font-black tabular-nums">{now ? now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "--:--"}</div>
+                <div className="text-[10px] uppercase tracking-widest text-white/40 hidden sm:block">
+                  {now ? now.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" }) : ""}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </header>
+          </header>
 
-      {/* Faixa de categorias ao vivo */}
-      <CategoryStrip counts={byCategory} totalActive={preparing.length + pending.length} />
+          <CategoryStrip counts={byCategory} totalActive={preparing.length + pending.length} />
+        </>
+      )}
 
-      {/* Chamados de atendente */}
+      {/* Chamados de atendente (sempre visível) */}
       <AnimatePresence>
         {waiterCalls.length > 0 && (
           <motion.div
@@ -422,8 +423,7 @@ function PainelPage() {
         )}
       </AnimatePresence>
 
-
-      <div className="flex-1 min-h-0 p-4 sm:p-6">
+      <div className={`flex-1 min-h-0 ${tvMode ? "p-3 sm:p-4" : "p-4 sm:p-6"}`}>
         <AnimatePresence mode="wait">
           {view === "all" && (
             <motion.div
@@ -447,7 +447,7 @@ function PainelPage() {
             >
               <FeaturedReady featured={featured} big onReannounce={reannounce} onDelivered={markDelivered} />
               {ready.length > 1 && (
-                <div className="rounded-3xl bg-white/[0.03] border border-emerald-500/20 p-4">
+                <div className="rounded-3xl bg-white/[0.03] border border-emerald-500/20 p-4 backdrop-blur-sm">
                   <div className="text-[11px] uppercase tracking-[0.3em] text-emerald-400 font-black mb-3">Também prontos</div>
                   <BigGrid orders={ready.slice(1, 13)} tone="emerald" />
                 </div>
@@ -467,11 +467,17 @@ function PainelPage() {
         </AnimatePresence>
       </div>
 
-      <div className="px-6 py-2 text-center text-[10px] uppercase tracking-widest text-white/30 border-t border-white/5">
-        Top Burguer · Atualização em tempo real · /painel?view=ready para modo TV
-      </div>
+      {/* Footer: marquee de próximas senhas + ticker promocional + QR */}
+      <TVFooter
+        nextNumbers={nextNumbers}
+        promos={PROMO_MESSAGES}
+        tvMode={tvMode}
+        avgPrepMin={avgPrepMin}
+        clock={now}
+      />
 
       <SpotlightTakeover order={currentSpotlight} />
+      </div>
     </main>
   );
 }
