@@ -2,6 +2,7 @@
 // Retorna data URL (base64 PNG) que o admin salva onde quiser.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const Input = z.object({
   dishName: z.string().min(1).max(80),
