@@ -152,7 +152,14 @@ function DashboardPage() {
               onClick={exportPDF}
               className="px-3 py-2 text-xs rounded-lg bg-ember/20 text-ember border border-ember/40 hover:bg-ember/30 font-bold transition"
             >
-              📄 Relatório PDF
+              📄 PDF
+            </button>
+            <button
+              onClick={exportCSV}
+              className="px-3 py-2 text-xs rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 font-bold transition"
+              title="Exportar pedidos para CSV (Excel)"
+            >
+              📊 CSV
             </button>
             <button
               onClick={resetOrders}
@@ -177,8 +184,25 @@ function DashboardPage() {
             active={statusFilter === "pending"} onClick={() => setStatusFilter("pending")} />
           <KpiCard label="Preparando" value={String(stats.preparing)} sub="em produção" accent="ember"
             active={statusFilter === "preparing"} onClick={() => setStatusFilter("preparing")} />
-          <KpiCard label="Faturamento" value={fmtBRL(stats.revenue)} sub={`Ticket ${fmtBRL(stats.avgTicket)}`} accent="emerald" />
+          <KpiCard
+            label="Faturamento"
+            value={fmtBRL(stats.revenue)}
+            sub={
+              revenueDelta !== null
+                ? `${revenueDelta >= 0 ? "▲" : "▼"} ${Math.abs(revenueDelta).toFixed(1)}% vs período anterior`
+                : `Ticket ${fmtBRL(stats.avgTicket)}`
+            }
+            accent="emerald"
+          />
           <KpiCard label="Lucro" value={fmtBRL(profit)} sub={`Despesas ${fmtBRL(expenseTotal)}`} accent={profit >= 0 ? "violet" : "red"} />
+        </div>
+
+        {/* KPIs secundários */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <KpiCard label="Tempo médio preparo" value={fmtMin(stats.avgPrepMs)} sub={`${stats.done} concluídos`} accent="amber" />
+          <KpiCard label="Itens vendidos" value={String(stats.itemsSold)} sub={`${stats.uniqueItems} produtos diferentes`} accent="ember" />
+          <KpiCard label="Mesas atendidas" value={String(tablesServed)} sub="únicas no período" accent="violet" />
+          <KpiCard label="Taxa de conclusão" value={`${donePct}%`} sub={`${stats.done}/${stats.count} pedidos`} accent={donePct >= 80 ? "emerald" : "amber"} />
         </div>
 
         {/* Trend line chart */}
