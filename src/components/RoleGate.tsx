@@ -43,8 +43,19 @@ export function RoleGate({ roles, children }: Props) {
     if (!user || authLoading || rolesLoading || autoGrantTried) return;
     if (!roles.includes("admin") || userRoles.includes("admin")) return;
 
+    // Evita loop infinito de reload: marca em sessionStorage que já tentamos
+    // a liberação automática para este usuário nesta sessão. Se o grant
+    // não conceder o papel, mostramos o botão de liberação manual em vez
+    // de recarregar a página repetidamente.
+    const flagKey = `topburguer.adminGrantTried.${user.id}`;
+    if (typeof window !== "undefined" && sessionStorage.getItem(flagKey)) {
+      setAutoGrantTried(true);
+      return;
+    }
+
     setAutoGrantTried(true);
     setClaiming(true);
+    if (typeof window !== "undefined") sessionStorage.setItem(flagKey, "1");
     grantApprovedAdmin({ data: {} })
       .then(() => {
         toast.success("Acesso de administrador liberado. Recarregando…");
