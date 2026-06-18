@@ -59,7 +59,7 @@ function Landing() {
           <Link to="/sobre" className="text-amber-warm/90 hover:text-amber-warm font-bold transition">💼 Para sua hamburgueria</Link>
           <Link
             to="/acesso"
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 font-semibold text-white/80 hover:bg-white/10 hover:text-white transition"
+            className="inline-flex items-center gap-1.5 rounded-full bg-amber-warm px-3 py-1.5 font-bold text-zinc-900 shadow-ember hover:brightness-110 transition"
           >
             <Lock className="h-3 w-3" /> Acesso equipe
           </Link>
