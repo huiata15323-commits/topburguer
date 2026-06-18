@@ -7,10 +7,20 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { z } from "zod";
 import { toast } from "sonner";
+import QRCode from "react-qr-code";
 import { useOrders, type Order } from "@/lib/orders-store";
 import { useMenu, type EditableMenuItem } from "@/lib/menu-store";
 import { initVoice, announceReady, announceWaiter, speak } from "@/lib/voice";
 import confetti from "canvas-confetti";
+
+const PROMO_MESSAGES = [
+  "🍔 Combo duplo bacon · R$ 32,90",
+  "🥤 Refil de refrigerante grátis até as 18h",
+  "🍟 Batata cheddar bacon · acompanhe seu burguer",
+  "📱 Faça o pedido pelo QR ao lado — sem fila",
+  "⭐ Avalie seu pedido e ganhe 10% no próximo",
+  "🔥 Top Burguer · cada pedido é arte na chapa",
+];
 
 const search = z.object({
   view: z.enum(["all", "ready", "preparing"]).optional().default("all").catch("all"),
@@ -248,77 +258,126 @@ function PainelPage() {
     navigate({ search: { view: v === "all" ? undefined : v } });
 
   const featured = ready[0];
+  const tvMode = view === "ready";
+
+  // Atalho: F = fullscreen, H = alterna TV puro
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === "f") {
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
+        else document.exitFullscreen?.().catch(() => {});
+      }
+      if (e.key.toLowerCase() === "h") {
+        setView(tvMode ? "all" : "ready");
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tvMode]);
+
+  // Próximas senhas (para marquee)
+  const nextNumbers = useMemo(
+    () => [...preparing, ...pending].slice(0, 8).map((o) => `#${o.number}`).join("  ·  "),
+    [preparing, pending]
+  );
 
   return (
     <main className="min-h-screen bg-neutral-950 text-white overflow-hidden relative flex flex-col">
-      {/* Top bar */}
-      <header className="border-b border-white/10 px-4 sm:px-8 py-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 sm:flex sm:flex-wrap sm:justify-between">
-        <Link to="/" className="flex min-w-0 items-center gap-3">
-          <div className="w-11 h-11 shrink-0 rounded-2xl bg-gradient-ember grid place-items-center font-black text-lg shadow-ember">T</div>
-          <div className="min-w-0">
-            <div className="font-black text-xl sm:text-2xl tracking-tight truncate">Top Burguer</div>
-            <div className="text-[10px] uppercase tracking-widest text-amber-warm flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-live" /> Painel ao vivo
-            </div>
-          </div>
-        </Link>
+      {/* Aurora animada de fundo */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <motion.div
+          className="absolute -top-1/3 -left-1/4 w-[80vw] h-[80vw] rounded-full blur-3xl"
+          style={{ background: "radial-gradient(circle, rgba(16,185,129,0.18), transparent 60%)" }}
+          animate={{ x: [0, 60, -40, 0], y: [0, 40, -30, 0], scale: [1, 1.1, 0.95, 1] }}
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute -bottom-1/3 -right-1/4 w-[80vw] h-[80vw] rounded-full blur-3xl"
+          style={{ background: "radial-gradient(circle, rgba(245,166,35,0.18), transparent 60%)" }}
+          animate={{ x: [0, -80, 50, 0], y: [0, -50, 40, 0], scale: [1, 1.15, 0.9, 1] }}
+          transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute top-1/2 left-1/2 w-[60vw] h-[60vw] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
+          style={{ background: "radial-gradient(circle, rgba(232,93,58,0.10), transparent 60%)" }}
+          animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.2, 1] }}
+          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </div>
 
-        {/* Filter chips */}
-        <nav className="flex items-center gap-1.5 sm:gap-2 bg-white/5 rounded-xl p-1">
-          <FilterChip active={view === "all"} onClick={() => setView("all")} label="Tudo" count={ready.length + preparing.length} />
-          <FilterChip active={view === "ready"} onClick={() => setView("ready")} label="Prontos" count={ready.length} tone="emerald" />
-          <FilterChip active={view === "preparing"} onClick={() => setView("preparing")} label="Em preparo" count={preparing.length} tone="amber" />
-        </nav>
+      {/* conteúdo acima da aurora */}
+      <div className="relative z-10 flex flex-col flex-1 min-h-0">
+      {!tvMode && (
+        <>
+          {/* Top bar */}
+          <header className="border-b border-white/10 px-4 sm:px-8 py-3 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4 sm:flex sm:flex-wrap sm:justify-between">
+            <Link to="/" className="flex min-w-0 items-center gap-3">
+              <div className="w-11 h-11 shrink-0 rounded-2xl bg-gradient-ember grid place-items-center font-black text-lg shadow-ember">T</div>
+              <div className="min-w-0">
+                <div className="font-black text-xl sm:text-2xl tracking-tight truncate">Top Burguer</div>
+                <div className="text-[10px] uppercase tracking-widest text-amber-warm flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-live" /> Painel ao vivo
+                </div>
+              </div>
+            </Link>
 
-        <div className="flex items-center gap-3 shrink-0">
-          <button
-            onClick={() => {
-              const next = !voiceOn;
-              setVoiceOn(next);
-              if (next) speak("Anúncios de voz ativados.");
-            }}
-            title={voiceOn ? "Desativar anúncios de voz" : "Ativar anúncios de voz"}
-            className={`grid place-items-center w-10 h-10 rounded-xl border transition ${
-              voiceOn
-                ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-300"
-                : "bg-white/5 border-white/10 text-white/40"
-            }`}
-          >
-            {voiceOn ? "🔊" : "🔇"}
-          </button>
-          <div className="hidden md:flex items-center gap-3 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10">
-            <div className="text-center">
-              <div className="text-[9px] uppercase tracking-widest text-white/40 font-bold">Prontos</div>
-              <div className="text-lg font-black text-emerald-400 tabular-nums leading-none">{ready.length}</div>
-            </div>
-            <div className="w-px h-7 bg-white/10" />
-            <div className="text-center">
-              <div className="text-[9px] uppercase tracking-widest text-white/40 font-bold">Preparo</div>
-              <div className="text-lg font-black text-amber-warm tabular-nums leading-none">{preparing.length}</div>
-            </div>
-            {avgPrepMin != null && (
-              <>
+            <nav className="flex items-center gap-1.5 sm:gap-2 bg-white/5 rounded-xl p-1">
+              <FilterChip active={view === "all"} onClick={() => setView("all")} label="Tudo" count={ready.length + preparing.length} />
+              <FilterChip active={view === "ready"} onClick={() => setView("ready")} label="Prontos" count={ready.length} tone="emerald" />
+              <FilterChip active={view === "preparing"} onClick={() => setView("preparing")} label="Em preparo" count={preparing.length} tone="amber" />
+            </nav>
+
+            <div className="flex items-center gap-3 shrink-0">
+              <button
+                onClick={() => {
+                  const next = !voiceOn;
+                  setVoiceOn(next);
+                  if (next) speak("Anúncios de voz ativados.");
+                }}
+                title={voiceOn ? "Desativar anúncios de voz" : "Ativar anúncios de voz"}
+                className={`grid place-items-center w-10 h-10 rounded-xl border transition ${
+                  voiceOn
+                    ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-300"
+                    : "bg-white/5 border-white/10 text-white/40"
+                }`}
+              >
+                {voiceOn ? "🔊" : "🔇"}
+              </button>
+              <div className="hidden md:flex items-center gap-3 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10">
+                <div className="text-center">
+                  <div className="text-[9px] uppercase tracking-widest text-white/40 font-bold">Prontos</div>
+                  <div className="text-lg font-black text-emerald-400 tabular-nums leading-none">{ready.length}</div>
+                </div>
                 <div className="w-px h-7 bg-white/10" />
                 <div className="text-center">
-                  <div className="text-[9px] uppercase tracking-widest text-white/40 font-bold">Médio</div>
-                  <div className="text-lg font-black text-white/90 tabular-nums leading-none">{avgPrepMin}m</div>
+                  <div className="text-[9px] uppercase tracking-widest text-white/40 font-bold">Preparo</div>
+                  <div className="text-lg font-black text-amber-warm tabular-nums leading-none">{preparing.length}</div>
                 </div>
-              </>
-            )}
-          </div>
-          <div className="text-right">
-            <div className="text-2xl sm:text-3xl font-black tabular-nums">{now ? now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "--:--"}</div>
-            <div className="text-[10px] uppercase tracking-widest text-white/40 hidden sm:block">
-              {now ? now.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" }) : ""}
+                {avgPrepMin != null && (
+                  <>
+                    <div className="w-px h-7 bg-white/10" />
+                    <div className="text-center">
+                      <div className="text-[9px] uppercase tracking-widest text-white/40 font-bold">Médio</div>
+                      <div className="text-lg font-black text-white/90 tabular-nums leading-none">{avgPrepMin}m</div>
+                    </div>
+                  </>
+                )}
+              </div>
+              <div className="text-right">
+                <div className="text-2xl sm:text-3xl font-black tabular-nums">{now ? now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "--:--"}</div>
+                <div className="text-[10px] uppercase tracking-widest text-white/40 hidden sm:block">
+                  {now ? now.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" }) : ""}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </header>
+          </header>
 
-      {/* Faixa de categorias ao vivo */}
-      <CategoryStrip counts={byCategory} totalActive={preparing.length + pending.length} />
+          <CategoryStrip counts={byCategory} totalActive={preparing.length + pending.length} />
+        </>
+      )}
 
-      {/* Chamados de atendente */}
+      {/* Chamados de atendente (sempre visível) */}
       <AnimatePresence>
         {waiterCalls.length > 0 && (
           <motion.div
@@ -360,8 +419,7 @@ function PainelPage() {
         )}
       </AnimatePresence>
 
-
-      <div className="flex-1 min-h-0 p-4 sm:p-6">
+      <div className={`flex-1 min-h-0 ${tvMode ? "p-3 sm:p-4" : "p-4 sm:p-6"}`}>
         <AnimatePresence mode="wait">
           {view === "all" && (
             <motion.div
@@ -385,7 +443,7 @@ function PainelPage() {
             >
               <FeaturedReady featured={featured} big onReannounce={reannounce} onDelivered={markDelivered} />
               {ready.length > 1 && (
-                <div className="rounded-3xl bg-white/[0.03] border border-emerald-500/20 p-4">
+                <div className="rounded-3xl bg-white/[0.03] border border-emerald-500/20 p-4 backdrop-blur-sm">
                   <div className="text-[11px] uppercase tracking-[0.3em] text-emerald-400 font-black mb-3">Também prontos</div>
                   <BigGrid orders={ready.slice(1, 13)} tone="emerald" />
                 </div>
@@ -405,11 +463,17 @@ function PainelPage() {
         </AnimatePresence>
       </div>
 
-      <div className="px-6 py-2 text-center text-[10px] uppercase tracking-widest text-white/30 border-t border-white/5">
-        Top Burguer · Atualização em tempo real · /painel?view=ready para modo TV
-      </div>
+      {/* Footer: marquee de próximas senhas + ticker promocional + QR */}
+      <TVFooter
+        nextNumbers={nextNumbers}
+        promos={PROMO_MESSAGES}
+        tvMode={tvMode}
+        avgPrepMin={avgPrepMin}
+        clock={now}
+      />
 
       <SpotlightTakeover order={currentSpotlight} />
+      </div>
     </main>
   );
 }
@@ -851,5 +915,90 @@ function PreparingKanban({ orders, menu }: { orders: Order[]; menu: EditableMenu
         })}
       </AnimatePresence>
     </div>
+  );
+}
+
+function TVFooter({
+  nextNumbers,
+  promos,
+  tvMode,
+  avgPrepMin,
+  clock,
+}: {
+  nextNumbers: string;
+  promos: string[];
+  tvMode: boolean;
+  avgPrepMin: number | null;
+  clock: Date | null;
+}) {
+  const orderUrl = typeof window !== "undefined" ? `${window.location.origin}/order` : "/order";
+  const [promoIdx, setPromoIdx] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setPromoIdx((i) => (i + 1) % promos.length), 5000);
+    return () => clearInterval(t);
+  }, [promos.length]);
+
+  return (
+    <footer className="border-t border-white/10 bg-gradient-to-r from-black/80 via-neutral-950/80 to-black/80 backdrop-blur-xl">
+      {nextNumbers && (
+        <div className="relative overflow-hidden border-b border-white/5 bg-amber-warm/[0.04]">
+          <div className="absolute left-0 top-0 bottom-0 z-10 w-24 bg-gradient-to-r from-black to-transparent" />
+          <div className="absolute right-0 top-0 bottom-0 z-10 w-24 bg-gradient-to-l from-black to-transparent" />
+          <div className="flex items-center gap-6 py-2 whitespace-nowrap will-change-transform animate-marquee">
+            {[0, 1].map((dup) => (
+              <div key={dup} className="flex items-center gap-6 shrink-0">
+                <span className="text-[10px] uppercase tracking-[0.4em] text-amber-warm font-black px-4">
+                  ▸ Próximas senhas
+                </span>
+                <span className="text-2xl sm:text-3xl font-black tabular-nums text-white/90 tracking-wider">
+                  {nextNumbers}
+                </span>
+                <span className="text-amber-warm">●</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-[1fr_auto] items-center gap-4 px-4 sm:px-6 py-3">
+        <div className="min-w-0">
+          <div className="text-[9px] uppercase tracking-[0.4em] text-white/40 font-bold mb-1">
+            {tvMode && clock ? clock.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "Top Burguer · ao vivo"}
+            {avgPrepMin != null && <span className="ml-3 text-amber-warm">⏱ {avgPrepMin}m médio</span>}
+          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={promoIdx}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.5 }}
+              className="text-lg sm:text-2xl font-black bg-gradient-to-r from-amber-200 via-amber-warm to-ember bg-clip-text text-transparent truncate"
+            >
+              {promos[promoIdx]}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="hidden sm:block text-right">
+            <div className="text-[9px] uppercase tracking-[0.3em] text-emerald-300 font-black">Sem fila</div>
+            <div className="text-sm font-black text-white">Pedido pelo celular</div>
+            <div className="text-[10px] text-white/40">aponte a câmera ▶</div>
+          </div>
+          <motion.div
+            animate={{ scale: [1, 1.04, 1] }}
+            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+            className="bg-white p-2 rounded-xl shadow-[0_0_30px_rgba(255,180,80,0.35)]"
+          >
+            <QRCode value={orderUrl} size={tvMode ? 88 : 64} level="M" />
+          </motion.div>
+        </div>
+      </div>
+
+      <div className="px-4 py-1 text-center text-[9px] uppercase tracking-[0.4em] text-white/25 border-t border-white/5">
+        F = tela cheia · H = modo TV · /painel?view=ready
+      </div>
+    </footer>
   );
 }
