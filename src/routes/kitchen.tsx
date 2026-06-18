@@ -21,11 +21,35 @@ export const Route = createFileRoute("/kitchen")({
 });
 
 function elapsed(ms: number) {
-  const s = Math.floor((Date.now() - ms) / 1000);
+  const s = Math.max(0, Math.floor((Date.now() - ms) / 1000));
   if (s < 60) return `${s}s`;
   const m = Math.floor(s / 60);
   return `${m}m ${String(s % 60).padStart(2, "0")}s`;
 }
+
+// Marca local (por aba) de quando o pedido entrou em "preparing" via clique.
+// Evita usar createdAt como cronômetro de preparo (pedidos antigos no banco
+// mostrariam horas de "preparo" antes mesmo de alguém clicar em Preparar).
+const PREP_KEY = "topb.prepStartedAt";
+function readPrepMap(): Record<string, number> {
+  if (typeof window === "undefined") return {};
+  try { return JSON.parse(localStorage.getItem(PREP_KEY) ?? "{}"); } catch { return {}; }
+}
+function writePrepMap(m: Record<string, number>) {
+  try { localStorage.setItem(PREP_KEY, JSON.stringify(m)); } catch {}
+}
+function markPrepStart(id: string) {
+  const m = readPrepMap();
+  if (!m[id]) { m[id] = Date.now(); writePrepMap(m); }
+}
+function clearPrepStart(id: string) {
+  const m = readPrepMap();
+  if (m[id]) { delete m[id]; writePrepMap(m); }
+}
+function getPrepStart(id: string): number | undefined {
+  return readPrepMap()[id];
+}
+
 
 const STATUS_LABEL: Record<OrderStatus, string> = {
   pending: "Novo",
