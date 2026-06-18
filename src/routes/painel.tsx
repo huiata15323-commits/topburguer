@@ -267,23 +267,6 @@ function PainelPage() {
         <div className="flex items-center gap-3 shrink-0">
           <button
             onClick={() => {
-              setDemoOn((v) => {
-                const next = !v;
-                toast.success(next ? "🎬 Demo ligado (atalho: D)" : "⏸ Demo desligado");
-                return next;
-              });
-            }}
-            title="Modo apresentador: gera pedidos automáticos (atalho: D)"
-            className={`grid place-items-center w-10 h-10 rounded-xl border transition ${
-              demoOn
-                ? "bg-purple-500/20 border-purple-400/50 text-purple-200 animate-live"
-                : "bg-white/5 border-white/10 text-white/40 hover:text-white/70"
-            }`}
-          >
-            🎬
-          </button>
-          <button
-            onClick={() => {
               const next = !voiceOn;
               setVoiceOn(next);
               if (next) speak("Anúncios de voz ativados.");
@@ -325,24 +308,6 @@ function PainelPage() {
           </div>
         </div>
       </header>
-
-      {/* Banner do modo demo */}
-      <AnimatePresence>
-        {demoOn && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="bg-gradient-to-r from-purple-600/30 via-fuchsia-500/15 to-transparent border-b border-purple-400/30 overflow-hidden"
-          >
-            <div className="px-4 sm:px-8 py-2 text-xs sm:text-sm font-bold flex items-center gap-3 text-purple-100">
-              <span className="text-lg animate-live">🎬</span>
-              <span>MODO APRESENTADOR · gerando pedidos sintéticos · pressione <kbd className="px-1.5 py-0.5 rounded bg-white/10 font-mono">D</kbd> para desligar</span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
 
       {/* Faixa de categorias ao vivo */}
       <CategoryStrip counts={byCategory} totalActive={preparing.length + pending.length} />
