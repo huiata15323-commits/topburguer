@@ -94,6 +94,63 @@ const DIFFERENCES = [
   { emoji: "📱", title: "Funciona como app", desc: "Cliente instala no celular, garçom usa no tablet. Sem download da Play Store." },
 ];
 
+const DIFFERENCES = [
+  {
+    icon: QrCode,
+    tag: "Operação",
+    title: "Pedido direto da mesa",
+    desc: "QR Code na mesa abre o cardápio no celular do cliente. Sem fila, sem app, sem cadastro — o pedido chega na cozinha em segundos.",
+  },
+  {
+    icon: ChefHat,
+    tag: "Cozinha",
+    title: "KDS em tempo real",
+    desc: "Painel da cozinha recebe cada pedido organizado por mesa e por status. Cronômetro, prioridade e baixa automática de estoque.",
+  },
+  {
+    icon: Volume2,
+    tag: "Atendimento",
+    title: "Painel de chamada por voz",
+    desc: "Quando o pedido fica pronto, o painel anuncia em voz alta a senha e a mesa. Ninguém precisa gritar do balcão.",
+  },
+  {
+    icon: Mic,
+    tag: "Acessibilidade",
+    title: "Comanda por voz",
+    desc: 'O cliente fala "dois X-Bacon e uma coca" e o pedido se monta sozinho. Pensado para idosos, pessoas com baixa visão e dias corridos.',
+  },
+  {
+    icon: ImageIcon,
+    tag: "Cardápio",
+    title: "Fotos profissionais sob demanda",
+    desc: "Sem precisar contratar fotógrafo: o sistema gera a foto do prato a partir do nome, no padrão visual da casa.",
+  },
+  {
+    icon: LineChart,
+    tag: "Gestão",
+    title: "Resumo do dia automático",
+    desc: "No fechamento, o sistema entrega o que vendeu mais, horário de pico, ticket médio e sugestão do que produzir amanhã.",
+  },
+  {
+    icon: Palette,
+    tag: "Marca",
+    title: "Identidade da sua casa",
+    desc: "Nome, logo, cores e tipografia mudam em 1 clique. Funciona no seu domínio — não fica com a cara de outra plataforma.",
+  },
+  {
+    icon: Smartphone,
+    tag: "Tecnologia",
+    title: "Funciona como aplicativo",
+    desc: "Cliente instala no celular, garçom usa no tablet. Tudo via navegador, sem passar pela Play Store ou App Store.",
+  },
+  {
+    icon: ShieldCheck,
+    tag: "Confiança",
+    title: "Construído por estudantes",
+    desc: "Projeto autoral dos alunos do Curso Técnico em Desenvolvimento de Sistemas — SENAI / CEPI Elberto Alves, turmas 2A e 2B (2025–2026).",
+  },
+];
+
 const fade = {
   hidden: { opacity: 0, y: 24 },
   show: (i = 0) => ({
