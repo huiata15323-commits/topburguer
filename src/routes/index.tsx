@@ -119,10 +119,10 @@ function Landing() {
                 Acompanhar pedido
               </Link>
               <Link
-                to="/status"
+                to="/painel"
                 className="inline-flex items-center gap-2 rounded-2xl border border-amber-warm/30 bg-amber-warm/10 px-6 py-4 font-semibold text-amber-warm hover:bg-amber-warm/20 transition"
               >
-                Ver status
+                📺 Painel ao vivo
               </Link>
             </motion.div>
 
