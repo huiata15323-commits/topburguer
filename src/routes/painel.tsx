@@ -258,6 +258,58 @@ function PainelPage() {
     navigate({ search: { view: v === "all" ? undefined : v } });
 
   const featured = ready[0];
+  const tvMode = view === "ready";
+
+  // Atalho: F = fullscreen, H = alterna TV puro
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() === "f") {
+        if (!document.fullscreenElement) document.documentElement.requestFullscreen?.().catch(() => {});
+        else document.exitFullscreen?.().catch(() => {});
+      }
+      if (e.key.toLowerCase() === "h") {
+        setView(tvMode ? "all" : "ready");
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tvMode]);
+
+  // Próximas senhas (para marquee)
+  const nextNumbers = useMemo(
+    () => [...preparing, ...pending].slice(0, 8).map((o) => `#${o.number}`).join("  ·  "),
+    [preparing, pending]
+  );
+
+  return (
+    <main className="min-h-screen bg-neutral-950 text-white overflow-hidden relative flex flex-col">
+      {/* Aurora animada de fundo */}
+      <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+        <motion.div
+          className="absolute -top-1/3 -left-1/4 w-[80vw] h-[80vw] rounded-full blur-3xl"
+          style={{ background: "radial-gradient(circle, rgba(16,185,129,0.18), transparent 60%)" }}
+          animate={{ x: [0, 60, -40, 0], y: [0, 40, -30, 0], scale: [1, 1.1, 0.95, 1] }}
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute -bottom-1/3 -right-1/4 w-[80vw] h-[80vw] rounded-full blur-3xl"
+          style={{ background: "radial-gradient(circle, rgba(245,166,35,0.18), transparent 60%)" }}
+          animate={{ x: [0, -80, 50, 0], y: [0, -50, 40, 0], scale: [1, 1.15, 0.9, 1] }}
+          transition={{ duration: 26, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute top-1/2 left-1/2 w-[60vw] h-[60vw] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl"
+          style={{ background: "radial-gradient(circle, rgba(232,93,58,0.10), transparent 60%)" }}
+          animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.2, 1] }}
+          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </div>
+
+      {/* conteúdo acima da aurora */}
+      <div className="relative z-10 flex flex-col flex-1 min-h-0">
+      {/* Top bar — escondido em modo TV puro (view=ready) */}
+      {!tvMode && (
 
   return (
     <main className="min-h-screen bg-neutral-950 text-white overflow-hidden relative flex flex-col">
