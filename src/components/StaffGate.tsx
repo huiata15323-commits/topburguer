@@ -10,43 +10,52 @@ const PINS: Record<string, StaffRole> = {
   "4554": "caixa",
 };
 
-const STORAGE_KEY = "topburguer.staff.role";
 const PIN_KEY = "topburguer.staff.pin";
+const AREA_PREFIX = "topburguer.staff.area.";
 
-export function getStaffRole(): StaffRole | null {
-  if (typeof window === "undefined") return null;
-  const r = localStorage.getItem(STORAGE_KEY);
-  return r === "admin" || r === "cozinha" || r === "caixa" ? r : null;
+function areaKey(area: string) {
+  return `${AREA_PREFIX}${area}`;
 }
 
 export function getStaffPin(): string | null {
   if (typeof window === "undefined") return null;
-  return localStorage.getItem(PIN_KEY);
+  return sessionStorage.getItem(PIN_KEY);
 }
 
-export function staffLogout() {
-  localStorage.removeItem(STORAGE_KEY);
-  localStorage.removeItem(PIN_KEY);
+export function staffLogout(area?: string) {
+  if (typeof window === "undefined") return;
+  if (area) {
+    sessionStorage.removeItem(areaKey(area));
+  } else {
+    // Clear everything
+    Object.keys(sessionStorage)
+      .filter((k) => k.startsWith(AREA_PREFIX))
+      .forEach((k) => sessionStorage.removeItem(k));
+    sessionStorage.removeItem(PIN_KEY);
+  }
   window.location.reload();
 }
 
-
 interface Props {
+  area: string;
   allow: StaffRole[];
   title?: string;
   children: React.ReactNode;
 }
 
-export function StaffGate({ allow, title = "Área restrita", children }: Props) {
+export function StaffGate({ area, allow, title = "Área restrita", children }: Props) {
   const [role, setRole] = useState<StaffRole | null>(null);
   const [ready, setReady] = useState(false);
   const [pin, setPin] = useState("");
   const [err, setErr] = useState("");
 
   useEffect(() => {
-    setRole(getStaffRole());
+    const stored = sessionStorage.getItem(areaKey(area));
+    if (stored === "admin" || stored === "cozinha" || stored === "caixa") {
+      setRole(stored);
+    }
     setReady(true);
-  }, []);
+  }, [area]);
 
   if (!ready) {
     return (
@@ -63,9 +72,9 @@ export function StaffGate({ allow, title = "Área restrita", children }: Props) 
           <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
           <span className="font-medium uppercase tracking-wide">{role}</span>
           <button
-            onClick={staffLogout}
+            onClick={() => staffLogout(area)}
             className="ml-1 text-muted-foreground hover:text-foreground"
-            title="Sair"
+            title="Sair desta área"
           >
             <LogOut className="h-3.5 w-3.5" />
           </button>
@@ -83,17 +92,14 @@ export function StaffGate({ allow, title = "Área restrita", children }: Props) 
       return;
     }
     if (!allow.includes(r)) {
-      setErr(`Acesso negado para ${r}. Requer: ${allow.join(", ")}`);
+      setErr(`Este PIN não tem acesso a esta área.`);
       return;
     }
-    localStorage.setItem(STORAGE_KEY, r);
-    localStorage.setItem(PIN_KEY, pin.trim());
+    sessionStorage.setItem(areaKey(area), r);
+    sessionStorage.setItem(PIN_KEY, pin.trim());
     setRole(r);
     setErr("");
   };
-
-
-
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/30 p-4">
@@ -107,7 +113,7 @@ export function StaffGate({ allow, title = "Área restrita", children }: Props) 
           </div>
           <div>
             <h1 className="font-semibold leading-tight">{title}</h1>
-            <p className="text-xs text-muted-foreground">Digite o PIN para continuar</p>
+            <p className="text-xs text-muted-foreground">Digite o PIN para entrar nesta área</p>
           </div>
         </div>
 
@@ -136,8 +142,8 @@ export function StaffGate({ allow, title = "Área restrita", children }: Props) 
           Entrar
         </button>
 
-        <Link to="/" className="block text-center text-xs text-muted-foreground hover:text-foreground">
-          ← Voltar para o cardápio
+        <Link to="/acesso" className="block text-center text-xs text-muted-foreground hover:text-foreground">
+          ← Escolher outra área
         </Link>
       </form>
     </div>
