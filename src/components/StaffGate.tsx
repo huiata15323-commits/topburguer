@@ -107,9 +107,7 @@ export function StaffGate({ allow, title = "Área restrita", children }: Props) 
           </div>
           <div>
             <h1 className="font-semibold leading-tight">{title}</h1>
-            <p className="text-xs text-muted-foreground">
-              Acesso: {allow.join(" / ")}
-            </p>
+            <p className="text-xs text-muted-foreground">Digite o PIN para continuar</p>
           </div>
         </div>
 
