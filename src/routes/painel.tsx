@@ -917,3 +917,88 @@ function PreparingKanban({ orders, menu }: { orders: Order[]; menu: EditableMenu
     </div>
   );
 }
+
+function TVFooter({
+  nextNumbers,
+  promos,
+  tvMode,
+  avgPrepMin,
+  clock,
+}: {
+  nextNumbers: string;
+  promos: string[];
+  tvMode: boolean;
+  avgPrepMin: number | null;
+  clock: Date | null;
+}) {
+  const orderUrl = typeof window !== "undefined" ? `${window.location.origin}/order` : "/order";
+  const [promoIdx, setPromoIdx] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setPromoIdx((i) => (i + 1) % promos.length), 5000);
+    return () => clearInterval(t);
+  }, [promos.length]);
+
+  return (
+    <footer className="border-t border-white/10 bg-gradient-to-r from-black/80 via-neutral-950/80 to-black/80 backdrop-blur-xl">
+      {nextNumbers && (
+        <div className="relative overflow-hidden border-b border-white/5 bg-amber-warm/[0.04]">
+          <div className="absolute left-0 top-0 bottom-0 z-10 w-24 bg-gradient-to-r from-black to-transparent" />
+          <div className="absolute right-0 top-0 bottom-0 z-10 w-24 bg-gradient-to-l from-black to-transparent" />
+          <div className="flex items-center gap-6 py-2 whitespace-nowrap will-change-transform animate-marquee">
+            {[0, 1].map((dup) => (
+              <div key={dup} className="flex items-center gap-6 shrink-0">
+                <span className="text-[10px] uppercase tracking-[0.4em] text-amber-warm font-black px-4">
+                  ▸ Próximas senhas
+                </span>
+                <span className="text-2xl sm:text-3xl font-black tabular-nums text-white/90 tracking-wider">
+                  {nextNumbers}
+                </span>
+                <span className="text-amber-warm">●</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-[1fr_auto] items-center gap-4 px-4 sm:px-6 py-3">
+        <div className="min-w-0">
+          <div className="text-[9px] uppercase tracking-[0.4em] text-white/40 font-bold mb-1">
+            {tvMode && clock ? clock.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "Top Burguer · ao vivo"}
+            {avgPrepMin != null && <span className="ml-3 text-amber-warm">⏱ {avgPrepMin}m médio</span>}
+          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={promoIdx}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.5 }}
+              className="text-lg sm:text-2xl font-black bg-gradient-to-r from-amber-200 via-amber-warm to-ember bg-clip-text text-transparent truncate"
+            >
+              {promos[promoIdx]}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="hidden sm:block text-right">
+            <div className="text-[9px] uppercase tracking-[0.3em] text-emerald-300 font-black">Sem fila</div>
+            <div className="text-sm font-black text-white">Pedido pelo celular</div>
+            <div className="text-[10px] text-white/40">aponte a câmera ▶</div>
+          </div>
+          <motion.div
+            animate={{ scale: [1, 1.04, 1] }}
+            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+            className="bg-white p-2 rounded-xl shadow-[0_0_30px_rgba(255,180,80,0.35)]"
+          >
+            <QRCode value={orderUrl} size={tvMode ? 88 : 64} level="M" />
+          </motion.div>
+        </div>
+      </div>
+
+      <div className="px-4 py-1 text-center text-[9px] uppercase tracking-[0.4em] text-white/25 border-t border-white/5">
+        F = tela cheia · H = modo TV · /painel?view=ready
+      </div>
+    </footer>
+  );
+}
