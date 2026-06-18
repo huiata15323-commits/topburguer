@@ -85,14 +85,6 @@ const PLANS = [
   },
 ];
 
-const DIFFERENCES = [
-  { emoji: "🎙️", title: "Garçom IA por voz", desc: 'Cliente fala "dois X-Bacon e uma coca" e o pedido aparece monta sozinho no carrinho.' },
-  { emoji: "📸", title: "Fotos geradas por IA", desc: "Você só digita o nome do prato — a IA cria a foto profissional do menu em segundos." },
-  { emoji: "🔊", title: "Chamada por voz", desc: "Painel anuncia em voz alta: 'Mesa 5, pedido pronto!' — chega de gritar na cozinha." },
-  { emoji: "🧠", title: "Resumo IA diário", desc: "Toda noite a IA te conta o que vendeu mais, horário de pico e o que melhorar amanhã." },
-  { emoji: "🎨", title: "Identidade própria", desc: "Mude nome, emoji e tema visual em 1 clique. Pode usar o seu domínio." },
-  { emoji: "📱", title: "Funciona como app", desc: "Cliente instala no celular, garçom usa no tablet. Sem download da Play Store." },
-];
 
 const DIFFERENCES = [
   {
