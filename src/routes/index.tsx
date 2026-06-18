@@ -371,18 +371,6 @@ function Landing() {
                 — Turmas 2A & 2B · Curso Técnico em Desenvolvimento de Sistemas · 2025–2026
               </footer>
             </motion.blockquote>
-
-            <div className="mt-10 flex flex-wrap gap-3">
-              <a
-                href={DRIVE_ACERVO_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center gap-2 rounded-2xl bg-gradient-ember px-6 py-4 font-bold shadow-ember hover:scale-[1.02] active:scale-[0.98] transition-transform"
-              >
-                ☁️ Ver todos os momentos no Drive
-                <span className="transition-transform group-hover:translate-x-1">→</span>
-              </a>
-            </div>
           </div>
         </motion.div>
       </section>
