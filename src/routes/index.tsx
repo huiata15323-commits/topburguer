@@ -4,7 +4,7 @@ import QRCode from "react-qr-code";
 import topBacon from "@/assets/menu/top-bacon.jpg";
 import topCheddar from "@/assets/menu/top-cheddar.jpg";
 import topClassic from "@/assets/menu/top-classic.jpg";
-import turmaFull from "@/assets/turma-2a-full.jpg.asset.json";
+import turmaFull from "@/assets/turma-2a-clean.jpg.asset.json";
 import visitaTecnica from "@/assets/visita-tecnica-clean.jpg.asset.json";
 import { useBranding } from "@/lib/branding";
 
@@ -282,8 +282,8 @@ function Landing() {
             </p>
             <div className="mt-6 grid grid-cols-1 gap-4">
               {[
-                { src: turmaFull.url, label: "Turma completa — 2º Ano A & B" },
-                { src: visitaTecnica.url, label: "Visita técnica — SENAI Everest Digital" },
+                { src: turmaFull.url, label: "Turma 2º Ano A — Técnico em Desenvolvimento de Sistemas" },
+                { src: visitaTecnica.url, label: "Turma 2º Ano B — Técnico em Desenvolvimento de Sistemas" },
               ].map((t) => (
                 <figure key={t.label} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/40">
                   <img
