@@ -39,7 +39,7 @@ const PLANS = [
     name: "Starter",
     price: "R$ 49",
     period: "/mês",
-    tagline: "Pra começar com cardápio digital",
+    tagline: "Para começar com cardápio digital",
     features: [
       "Cardápio QR por mesa",
       "Pedidos via celular do cliente",
@@ -320,9 +320,9 @@ function SobrePage() {
       {/* CTA final */}
       <section className="relative z-10 mx-auto max-w-3xl px-6 py-20 text-center">
         <h2 className="text-3xl md:text-5xl font-black mb-4 text-balance">
-          Pronto pra ver sua hamburgueria <span className="text-amber-warm">no nível</span>?
+          Pronto para ver sua hamburgueria <span className="text-amber-warm">em outro nível</span>?
         </h2>
-        <p className="text-white/65 mb-8">Sem cartão. Sem instalação. Em 5 minutos tá rodando.</p>
+        <p className="text-white/65 mb-8">Sem cartão. Sem instalação. Em 5 minutos está rodando.</p>
         <Link
           to="/order"
           className="inline-flex items-center gap-2 rounded-2xl bg-gradient-ember px-8 py-5 font-bold text-lg shadow-ember hover:scale-[1.02] transition-transform"
@@ -332,7 +332,7 @@ function SobrePage() {
       </section>
 
       <footer className="relative z-10 border-t border-white/10 mt-12 py-8 text-center text-xs text-white/40">
-        © Top Burguer System • Feito com IA pelos alunos do CEPI Elberto Alves
+        © Top Burguer System • Desenvolvido pelos alunos do CEPI Elberto Alves
       </footer>
     </main>
   );
