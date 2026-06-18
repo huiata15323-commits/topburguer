@@ -294,19 +294,22 @@ export function estimateWaitMinutes(orders: Order[]): number {
     .slice(0, 10);
   let avgPerOrder = 8;
   if (completed.length >= 2) {
+    // Cap por pedido em 30min para que pedidos esquecidos/antigos
+    // não distorçam a média (ex.: pedido concluído horas depois).
     const totalMs = completed.reduce(
-      (s, o) => s + Math.max(0, (o.doneAt ?? 0) - o.createdAt),
+      (s, o) => s + Math.min(30 * 60_000, Math.max(0, (o.doneAt ?? 0) - o.createdAt)),
       0
     );
-    avgPerOrder = Math.max(4, Math.round(totalMs / completed.length / 60000));
+    avgPerOrder = Math.max(4, Math.min(20, Math.round(totalMs / completed.length / 60000)));
   }
   const queue =
     orders.filter((o) => o.status === "pending" || o.status === "preparing").length;
   // Assume duas estações em paralelo na simulação
   const parallel = 2;
   const positions = Math.ceil((queue + 1) / parallel);
-  return Math.max(3, positions * avgPerOrder);
+  return Math.max(3, Math.min(45, positions * avgPerOrder));
 }
+
 
 // Para realtime e polling quando a aba é fechada
 if (typeof window !== "undefined") {
