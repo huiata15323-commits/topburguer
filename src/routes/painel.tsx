@@ -87,6 +87,7 @@ function PainelPage() {
   const lastReadyIds = useRef<Set<string>>(new Set());
   const lastWaiterIds = useRef<Set<string>>(new Set());
   const [, force] = useState(0);
+  const [now, setNow] = useState<Date | null>(null);
   const [voiceOn, setVoiceOn] = useState<boolean>(() => {
     if (typeof window === "undefined") return true;
     return localStorage.getItem("painel.voice") !== "off";
@@ -144,8 +145,13 @@ function PainelPage() {
 
   // tick para timer
   useEffect(() => {
+    setNow(new Date());
     const i = setInterval(() => force((x) => x + 1), 1000);
-    return () => clearInterval(i);
+    const clock = setInterval(() => setNow(new Date()), 1000);
+    return () => {
+      clearInterval(i);
+      clearInterval(clock);
+    };
   }, []);
 
   // Som ao ficar pronto um novo pedido
@@ -301,9 +307,9 @@ function PainelPage() {
             )}
           </div>
           <div className="text-right">
-            <div className="text-2xl sm:text-3xl font-black tabular-nums">{new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}</div>
+            <div className="text-2xl sm:text-3xl font-black tabular-nums">{now ? now.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "--:--"}</div>
             <div className="text-[10px] uppercase tracking-widest text-white/40 hidden sm:block">
-              {new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" })}
+              {now ? now.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" }) : ""}
             </div>
           </div>
         </div>
