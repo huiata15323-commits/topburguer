@@ -21,11 +21,35 @@ export const Route = createFileRoute("/kitchen")({
 });
 
 function elapsed(ms: number) {
-  const s = Math.floor((Date.now() - ms) / 1000);
+  const s = Math.max(0, Math.floor((Date.now() - ms) / 1000));
   if (s < 60) return `${s}s`;
   const m = Math.floor(s / 60);
   return `${m}m ${String(s % 60).padStart(2, "0")}s`;
 }
+
+// Marca local (por aba) de quando o pedido entrou em "preparing" via clique.
+// Evita usar createdAt como cronômetro de preparo (pedidos antigos no banco
+// mostrariam horas de "preparo" antes mesmo de alguém clicar em Preparar).
+const PREP_KEY = "topb.prepStartedAt";
+function readPrepMap(): Record<string, number> {
+  if (typeof window === "undefined") return {};
+  try { return JSON.parse(localStorage.getItem(PREP_KEY) ?? "{}"); } catch { return {}; }
+}
+function writePrepMap(m: Record<string, number>) {
+  try { localStorage.setItem(PREP_KEY, JSON.stringify(m)); } catch {}
+}
+function markPrepStart(id: string) {
+  const m = readPrepMap();
+  if (!m[id]) { m[id] = Date.now(); writePrepMap(m); }
+}
+function clearPrepStart(id: string) {
+  const m = readPrepMap();
+  if (m[id]) { delete m[id]; writePrepMap(m); }
+}
+function getPrepStart(id: string): number | undefined {
+  return readPrepMap()[id];
+}
+
 
 const STATUS_LABEL: Record<OrderStatus, string> = {
   pending: "Novo",
@@ -375,9 +399,27 @@ function OrderCard({ order, onStatus, onNotified }: { order: Order; onStatus: (s
           }`}>
             {STATUS_LABEL[order.status]}
           </div>
-          <div className="text-xs font-mono text-white/50">{elapsed(order.createdAt)}</div>
+          {order.status === "pending" && (
+            <div className="text-xs font-mono text-white/50" title="Aguardando na fila">
+              ⏳ {elapsed(order.createdAt)}
+            </div>
+          )}
+          {order.status === "preparing" && (() => {
+            const start = getPrepStart(order.id) ?? order.createdAt;
+            return (
+              <div className="text-xs font-mono text-amber-warm" title="Tempo de preparo">
+                🔥 {elapsed(start)}
+              </div>
+            );
+          })()}
+          {order.status === "done" && order.doneAt && (
+            <div className="text-xs font-mono text-emerald-400/70" title="Pronto há">
+              ✓ {elapsed(order.doneAt)}
+            </div>
+          )}
         </div>
       </div>
+
 
       <ul className="space-y-2 flex-1">
         {order.items.map((i) => (
@@ -403,7 +445,7 @@ function OrderCard({ order, onStatus, onNotified }: { order: Order; onStatus: (s
       <div className="flex gap-2 pt-2 border-t border-white/10">
         {order.status === "pending" && (
           <button
-            onClick={() => onStatus("preparing")}
+            onClick={() => { markPrepStart(order.id); onStatus("preparing"); }}
             className="flex-1 py-2.5 rounded-lg bg-amber-warm hover:brightness-110 text-charcoal font-bold text-sm transition active:scale-95"
           >
             ▶ Preparar
@@ -411,7 +453,7 @@ function OrderCard({ order, onStatus, onNotified }: { order: Order; onStatus: (s
         )}
         {order.status === "preparing" && (
           <button
-            onClick={() => onStatus("done")}
+            onClick={() => { clearPrepStart(order.id); onStatus("done"); }}
             className="flex-1 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm transition active:scale-95"
           >
             ✓ Concluir
@@ -419,12 +461,13 @@ function OrderCard({ order, onStatus, onNotified }: { order: Order; onStatus: (s
         )}
         {order.status === "done" && (
           <button
-            onClick={() => onStatus("preparing")}
+            onClick={() => { markPrepStart(order.id); onStatus("preparing"); }}
             className="flex-1 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white/70 text-xs transition"
           >
             ↺ Reabrir
           </button>
         )}
+
         <a
           href={`/receipt?n=${order.number}`}
           target="_blank"
@@ -441,9 +484,11 @@ function OrderCard({ order, onStatus, onNotified }: { order: Order; onStatus: (s
               if (reason === null) return;
               const ok = window.confirm(`Confirmar cancelamento do pedido #${order.number}?${reason ? `\n\nMotivo: ${reason}` : ""}`);
               if (!ok) return;
+              clearPrepStart(order.id);
               onStatus("done");
               toast.warning(`❌ Pedido #${order.number} cancelado${reason ? ` — ${reason}` : ""}`);
             }}
+
             className="px-3 py-2 rounded-lg bg-red-500/15 hover:bg-red-500/30 border border-red-500/30 text-red-300 text-xs font-bold transition"
             title="Cancelar pedido"
           >
