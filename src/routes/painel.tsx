@@ -88,10 +88,7 @@ function PainelPage() {
   const lastWaiterIds = useRef<Set<string>>(new Set());
   const [, force] = useState(0);
   const [now, setNow] = useState<Date | null>(null);
-  const [voiceOn, setVoiceOn] = useState<boolean>(() => {
-    if (typeof window === "undefined") return true;
-    return localStorage.getItem("painel.voice") !== "off";
-  });
+  const [voiceOn, setVoiceOn] = useState(true);
   // Fila de pedidos a exibir em tela cheia (takeover cinematográfico)
   const [spotlightQueue, setSpotlightQueue] = useState<Order[]>([]);
   const currentSpotlight = spotlightQueue[0];
@@ -137,7 +134,10 @@ function PainelPage() {
     return () => clearTimeout(t);
   }, [currentSpotlight]);
 
-  useEffect(() => { initVoice(); }, []);
+  useEffect(() => {
+    initVoice();
+    setVoiceOn(localStorage.getItem("painel.voice") !== "off");
+  }, []);
   useEffect(() => {
     if (typeof window !== "undefined")
       localStorage.setItem("painel.voice", voiceOn ? "on" : "off");
