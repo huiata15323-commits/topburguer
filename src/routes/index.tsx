@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import { Lock } from "lucide-react";
 import QRCode from "react-qr-code";
 import topBacon from "@/assets/menu/top-bacon.jpg";
 import topCheddar from "@/assets/menu/top-cheddar.jpg";
@@ -56,6 +57,12 @@ function Landing() {
         </div>
         <div className="flex items-center gap-3 text-xs">
           <Link to="/sobre" className="text-amber-warm/90 hover:text-amber-warm font-bold transition">💼 Para sua hamburgueria</Link>
+          <Link
+            to="/acesso"
+            className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 font-semibold text-white/80 hover:bg-white/10 hover:text-white transition"
+          >
+            <Lock className="h-3 w-3" /> Acesso equipe
+          </Link>
           <div className="hidden md:flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-live" />
             <span className="text-white/60 uppercase tracking-widest">Sistema online</span>
