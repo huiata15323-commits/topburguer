@@ -52,7 +52,7 @@ const cards = [
 
 function AcessoPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30 px-4 py-10">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30 px-4 py-10" lang="pt-BR" translate="no">
       <div className="mx-auto max-w-4xl">
         <Link to="/" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6">
           <ArrowLeft className="h-4 w-4" /> Voltar para o site
