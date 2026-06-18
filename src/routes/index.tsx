@@ -4,7 +4,7 @@ import QRCode from "react-qr-code";
 import topBacon from "@/assets/menu/top-bacon.jpg";
 import topCheddar from "@/assets/menu/top-cheddar.jpg";
 import topClassic from "@/assets/menu/top-classic.jpg";
-import turmaFull from "@/assets/turma-2a-full.jpg.asset.json";
+import turmaFull from "@/assets/turma-2a-clean.jpg.asset.json";
 import visitaTecnica from "@/assets/visita-tecnica-clean.jpg.asset.json";
 import { useBranding } from "@/lib/branding";
 
