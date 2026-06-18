@@ -6,8 +6,8 @@ export type StaffRole = "admin" | "cozinha" | "caixa";
 
 const PINS: Record<string, StaffRole> = {
   "9999": "admin",
-  "1234": "cozinha",
-  "4321": "caixa",
+  "2113": "cozinha",
+  "4554": "caixa",
 };
 
 const STORAGE_KEY = "topburguer.staff.role";
@@ -107,9 +107,7 @@ export function StaffGate({ allow, title = "Área restrita", children }: Props) 
           </div>
           <div>
             <h1 className="font-semibold leading-tight">{title}</h1>
-            <p className="text-xs text-muted-foreground">
-              Acesso: {allow.join(" / ")}
-            </p>
+            <p className="text-xs text-muted-foreground">Digite o PIN para continuar</p>
           </div>
         </div>
 
