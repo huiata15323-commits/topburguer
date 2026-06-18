@@ -6,7 +6,6 @@ import { useOrders } from "@/lib/orders-store";
 import { useExpenses, CATEGORY_LABEL, type ExpenseCategory } from "@/lib/expenses-store";
 import { generateReportPDF } from "@/lib/report-pdf";
 import { StaffGate } from "@/components/StaffGate";
-import { RoleGate } from "@/components/RoleGate";
 
 export const Route = createFileRoute("/finance")({
   head: () => ({
@@ -17,11 +16,9 @@ export const Route = createFileRoute("/finance")({
     ],
   }),
   component: () => (
-    <RoleGate roles={["admin", "cashier"]}>
-      <StaffGate area="finance" allow={["admin", "caixa"]} title="Financeiro / Caixa">
-        <FinancePage />
-      </StaffGate>
-    </RoleGate>
+    <StaffGate area="finance" allow={["admin", "caixa"]} title="Financeiro / Caixa">
+      <FinancePage />
+    </StaffGate>
   ),
 });
 

@@ -196,14 +196,14 @@ export function StaffGate({ area, allow, title = "Área restrita", children }: P
 
         <div>
           <label htmlFor="staff-pin" className="text-xs font-medium text-muted-foreground">
-            PIN de funcionário
+            PIN de acesso
           </label>
           <input
             id="staff-pin"
             autoFocus
             type="password"
             inputMode="numeric"
-            aria-label="PIN de funcionário"
+            aria-label="PIN de acesso"
             aria-invalid={!!err}
             disabled={isLocked}
             value={pin}
