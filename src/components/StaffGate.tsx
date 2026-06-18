@@ -6,8 +6,8 @@ export type StaffRole = "admin" | "cozinha" | "caixa";
 
 const PINS: Record<string, StaffRole> = {
   "9999": "admin",
-  "1234": "cozinha",
-  "4321": "caixa",
+  "2113": "cozinha",
+  "4554": "caixa",
 };
 
 const STORAGE_KEY = "topburguer.staff.role";
