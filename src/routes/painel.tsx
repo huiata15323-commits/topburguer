@@ -7,10 +7,20 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { z } from "zod";
 import { toast } from "sonner";
+import QRCode from "react-qr-code";
 import { useOrders, type Order } from "@/lib/orders-store";
 import { useMenu, type EditableMenuItem } from "@/lib/menu-store";
 import { initVoice, announceReady, announceWaiter, speak } from "@/lib/voice";
 import confetti from "canvas-confetti";
+
+const PROMO_MESSAGES = [
+  "🍔 Combo duplo bacon · R$ 32,90",
+  "🥤 Refil de refrigerante grátis até as 18h",
+  "🍟 Batata cheddar bacon · acompanhe seu burguer",
+  "📱 Faça o pedido pelo QR ao lado — sem fila",
+  "⭐ Avalie seu pedido e ganhe 10% no próximo",
+  "🔥 Top Burguer · cada pedido é arte na chapa",
+];
 
 const search = z.object({
   view: z.enum(["all", "ready", "preparing"]).optional().default("all").catch("all"),
