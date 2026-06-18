@@ -282,8 +282,8 @@ function Landing() {
             </p>
             <div className="mt-6 grid grid-cols-1 gap-4">
               {[
-                { src: turmaFull.url, label: "Turma completa — 2º Ano A & B" },
-                { src: visitaTecnica.url, label: "Visita técnica — SENAI Everest Digital" },
+                { src: turmaFull.url, label: "Turma 2º Ano A — Técnico em Desenvolvimento de Sistemas" },
+                { src: visitaTecnica.url, label: "Turma 2º Ano B — Técnico em Desenvolvimento de Sistemas" },
               ].map((t) => (
                 <figure key={t.label} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/40">
                   <img
