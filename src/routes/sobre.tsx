@@ -1,6 +1,18 @@
 // Landing comercial — vende o Top Burguer System para outras hamburguerias.
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import {
+  Mic,
+  ImageIcon,
+  Volume2,
+  LineChart,
+  Palette,
+  Smartphone,
+  QrCode,
+  ChefHat,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 
 export const Route = createFileRoute("/sobre")({
   head: () => ({
@@ -73,13 +85,62 @@ const PLANS = [
   },
 ];
 
+
 const DIFFERENCES = [
-  { emoji: "🎙️", title: "Garçom IA por voz", desc: 'Cliente fala "dois X-Bacon e uma coca" e o pedido aparece monta sozinho no carrinho.' },
-  { emoji: "📸", title: "Fotos geradas por IA", desc: "Você só digita o nome do prato — a IA cria a foto profissional do menu em segundos." },
-  { emoji: "🔊", title: "Chamada por voz", desc: "Painel anuncia em voz alta: 'Mesa 5, pedido pronto!' — chega de gritar na cozinha." },
-  { emoji: "🧠", title: "Resumo IA diário", desc: "Toda noite a IA te conta o que vendeu mais, horário de pico e o que melhorar amanhã." },
-  { emoji: "🎨", title: "Identidade própria", desc: "Mude nome, emoji e tema visual em 1 clique. Pode usar o seu domínio." },
-  { emoji: "📱", title: "Funciona como app", desc: "Cliente instala no celular, garçom usa no tablet. Sem download da Play Store." },
+  {
+    icon: QrCode,
+    tag: "Operação",
+    title: "Pedido direto da mesa",
+    desc: "QR Code na mesa abre o cardápio no celular do cliente. Sem fila, sem app, sem cadastro — o pedido chega na cozinha em segundos.",
+  },
+  {
+    icon: ChefHat,
+    tag: "Cozinha",
+    title: "KDS em tempo real",
+    desc: "Painel da cozinha recebe cada pedido organizado por mesa e por status. Cronômetro, prioridade e baixa automática de estoque.",
+  },
+  {
+    icon: Volume2,
+    tag: "Atendimento",
+    title: "Painel de chamada por voz",
+    desc: "Quando o pedido fica pronto, o painel anuncia em voz alta a senha e a mesa. Ninguém precisa gritar do balcão.",
+  },
+  {
+    icon: Mic,
+    tag: "Acessibilidade",
+    title: "Comanda por voz",
+    desc: 'O cliente fala "dois X-Bacon e uma coca" e o pedido se monta sozinho. Pensado para idosos, pessoas com baixa visão e dias corridos.',
+  },
+  {
+    icon: ImageIcon,
+    tag: "Cardápio",
+    title: "Fotos profissionais sob demanda",
+    desc: "Sem precisar contratar fotógrafo: o sistema gera a foto do prato a partir do nome, no padrão visual da casa.",
+  },
+  {
+    icon: LineChart,
+    tag: "Gestão",
+    title: "Resumo do dia automático",
+    desc: "No fechamento, o sistema entrega o que vendeu mais, horário de pico, ticket médio e sugestão do que produzir amanhã.",
+  },
+  {
+    icon: Palette,
+    tag: "Marca",
+    title: "Identidade da sua casa",
+    desc: "Nome, logo, cores e tipografia mudam em 1 clique. Funciona no seu domínio — não fica com a cara de outra plataforma.",
+  },
+  {
+    icon: Smartphone,
+    tag: "Tecnologia",
+    title: "Funciona como aplicativo",
+    desc: "Cliente instala no celular, garçom usa no tablet. Tudo via navegador, sem passar pela Play Store ou App Store.",
+  },
+  {
+    icon: ShieldCheck,
+    tag: "Confiança",
+    title: "Construído por estudantes",
+    desc: "Projeto autoral dos alunos do Curso Técnico em Desenvolvimento de Sistemas — SENAI / CEPI Elberto Alves, turmas 2A e 2B (2025–2026).",
+  },
 ];
 
 const fade = {
@@ -154,26 +215,46 @@ function SobrePage() {
       </section>
 
       {/* Diferenciais */}
-      <section className="relative z-10 mx-auto max-w-6xl px-6 py-16">
-        <h2 className="text-3xl md:text-4xl font-black text-center mb-3 text-balance">
-          O que torna o Top Burguer <span className="text-amber-warm">diferente</span>
-        </h2>
-        <p className="text-center text-white/60 max-w-2xl mx-auto mb-12">
-          Outros sistemas digitalizam o cardápio. O nosso usa IA pra vender mais.
-        </p>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {DIFFERENCES.map((d, i) => (
-            <motion.div
-              key={d.title}
-              initial="hidden" whileInView="show" viewport={{ once: true, margin: "-50px" }}
-              variants={fade} custom={i}
-              className="rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur p-6 hover:border-amber-warm/40 hover:bg-white/[0.06] transition-all"
-            >
-              <div className="text-4xl mb-3">{d.emoji}</div>
-              <h3 className="font-black text-lg mb-1.5">{d.title}</h3>
-              <p className="text-sm text-white/65 leading-relaxed">{d.desc}</p>
-            </motion.div>
-          ))}
+      <section className="relative z-10 mx-auto max-w-6xl px-6 py-20">
+        <div className="flex flex-col items-center mb-14">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-white/60 mb-5">
+            <Sparkles className="h-3 w-3 text-amber-warm" /> O que entregamos
+          </div>
+          <h2 className="text-3xl md:text-5xl font-black text-center text-balance leading-[1.05]">
+            Engenharia que se sente <span className="text-amber-warm">no salão</span>
+          </h2>
+          <p className="mt-4 text-center text-white/60 max-w-2xl text-balance">
+            Uma plataforma completa de operação — projetada, programada e desenhada do zero
+            pelos alunos do curso técnico, com foco em hamburguerias reais.
+          </p>
+        </div>
+
+        <div className="grid gap-px bg-white/5 rounded-3xl overflow-hidden border border-white/10 sm:grid-cols-2 lg:grid-cols-3">
+          {DIFFERENCES.map((d, i) => {
+            const Icon = d.icon;
+            return (
+              <motion.div
+                key={d.title}
+                initial="hidden" whileInView="show" viewport={{ once: true, margin: "-40px" }}
+                variants={fade} custom={i}
+                className="group relative bg-charcoal/60 backdrop-blur p-7 hover:bg-charcoal/30 transition-colors"
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-amber-warm/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <div className="relative h-11 w-11 rounded-xl border border-white/10 bg-gradient-to-br from-white/[0.08] to-white/[0.02] grid place-items-center">
+                      <Icon className="h-5 w-5 text-amber-warm" strokeWidth={1.75} />
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/35">
+                    {String(i + 1).padStart(2, "0")} · {d.tag}
+                  </span>
+                </div>
+                <h3 className="font-bold text-lg mb-2 text-white">{d.title}</h3>
+                <p className="text-sm text-white/60 leading-relaxed">{d.desc}</p>
+              </motion.div>
+            );
+          })}
         </div>
       </section>
 
