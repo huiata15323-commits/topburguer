@@ -3,6 +3,7 @@
 // e devolve um texto curto em português, pronto para exibir no admin.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const SummaryInput = z.object({
   doneCount: z.number().int().nonnegative(),
