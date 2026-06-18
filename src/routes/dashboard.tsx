@@ -19,7 +19,7 @@ export const Route = createFileRoute("/dashboard")({
     ],
   }),
   component: () => (
-    <StaffGate allow={["admin"]} title="Dashboard">
+    <StaffGate area="dashboard" allow={["admin"]} title="Dashboard">
       <DashboardPage />
     </StaffGate>
   ),

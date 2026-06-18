@@ -18,7 +18,7 @@ export const Route = createFileRoute("/finance")({
   }),
   component: () => (
     <RoleGate roles={["admin", "cashier"]}>
-      <StaffGate allow={["admin", "caixa"]} title="Financeiro / Caixa">
+      <StaffGate area="finance" allow={["admin", "caixa"]} title="Financeiro / Caixa">
         <FinancePage />
       </StaffGate>
     </RoleGate>

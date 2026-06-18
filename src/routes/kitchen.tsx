@@ -14,7 +14,7 @@ export const Route = createFileRoute("/kitchen")({
     ],
   }),
   component: () => (
-    <StaffGate allow={["admin", "cozinha", "caixa"]} title="Painel da Cozinha">
+    <StaffGate area="kitchen" allow={["admin", "cozinha", "caixa"]} title="Painel da Cozinha">
       <KitchenPage />
     </StaffGate>
   ),
