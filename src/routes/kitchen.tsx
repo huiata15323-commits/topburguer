@@ -399,9 +399,27 @@ function OrderCard({ order, onStatus, onNotified }: { order: Order; onStatus: (s
           }`}>
             {STATUS_LABEL[order.status]}
           </div>
-          <div className="text-xs font-mono text-white/50">{elapsed(order.createdAt)}</div>
+          {order.status === "pending" && (
+            <div className="text-xs font-mono text-white/50" title="Aguardando na fila">
+              ⏳ {elapsed(order.createdAt)}
+            </div>
+          )}
+          {order.status === "preparing" && (() => {
+            const start = getPrepStart(order.id) ?? order.createdAt;
+            return (
+              <div className="text-xs font-mono text-amber-warm" title="Tempo de preparo">
+                🔥 {elapsed(start)}
+              </div>
+            );
+          })()}
+          {order.status === "done" && order.doneAt && (
+            <div className="text-xs font-mono text-emerald-400/70" title="Pronto há">
+              ✓ {elapsed(order.doneAt)}
+            </div>
+          )}
         </div>
       </div>
+
 
       <ul className="space-y-2 flex-1">
         {order.items.map((i) => (
