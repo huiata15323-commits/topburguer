@@ -1,6 +1,18 @@
 // Landing comercial — vende o Top Burguer System para outras hamburguerias.
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import {
+  Mic,
+  ImageIcon,
+  Volume2,
+  LineChart,
+  Palette,
+  Smartphone,
+  QrCode,
+  ChefHat,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 
 export const Route = createFileRoute("/sobre")({
   head: () => ({
