@@ -53,8 +53,18 @@ function buildPrompt(kind: string, style: string, name: string, desc?: string) {
 }
 
 export const generateDishImage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((i: unknown) => Input.parse(i))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    // Admin-only: verifica role no servidor para impedir abuso de créditos de IA.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: roles } = await supabaseAdmin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", context.userId);
+    if (!roles?.some((r) => r.role === "admin")) {
+      return { dataUrl: null, error: "forbidden" as const };
+    }
     try {
       const { getRequestIP } = await import("@tanstack/react-start/server");
       const ip = getRequestIP({ xForwardedFor: true }) ?? "unknown";
