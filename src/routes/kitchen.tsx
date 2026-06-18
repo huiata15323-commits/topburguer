@@ -484,9 +484,11 @@ function OrderCard({ order, onStatus, onNotified }: { order: Order; onStatus: (s
               if (reason === null) return;
               const ok = window.confirm(`Confirmar cancelamento do pedido #${order.number}?${reason ? `\n\nMotivo: ${reason}` : ""}`);
               if (!ok) return;
+              clearPrepStart(order.id);
               onStatus("done");
               toast.warning(`❌ Pedido #${order.number} cancelado${reason ? ` — ${reason}` : ""}`);
             }}
+
             className="px-3 py-2 rounded-lg bg-red-500/15 hover:bg-red-500/30 border border-red-500/30 text-red-300 text-xs font-bold transition"
             title="Cancelar pedido"
           >
