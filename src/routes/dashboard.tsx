@@ -60,21 +60,65 @@ function DashboardPage() {
   );
   const filteredExpenses = useMemo(() => expenses.filter((e) => e.createdAt >= fromTs), [expenses, fromTs]);
 
+  // Período anterior (mesma duração) para comparação
+  const previousRevenue = useMemo(() => {
+    if (range === "all" || fromTs === 0) return null;
+    const duration = Date.now() - fromTs;
+    const prevFrom = fromTs - duration;
+    return orders
+      .filter((o) => o.createdAt >= prevFrom && o.createdAt < fromTs)
+      .reduce((a, o) => a + o.total, 0);
+  }, [orders, fromTs, range]);
+
   const stats = useMemo(() => computeStats(filtered), [filtered]);
   const trend = useMemo(() => computeTrend(filtered, range), [filtered, range]);
   const expenseTotal = filteredExpenses.reduce((a, e) => a + e.amount, 0);
   const profit = stats.revenue - expenseTotal;
+  const donePct = stats.count > 0 ? Math.round((stats.done / stats.count) * 100) : 0;
+  const tablesServed = useMemo(
+    () => new Set(filtered.filter((o) => o.tableNumber).map((o) => o.tableNumber)).size,
+    [filtered]
+  );
+  const revenueDelta = previousRevenue !== null && previousRevenue > 0
+    ? ((stats.revenue - previousRevenue) / previousRevenue) * 100
+    : null;
 
   const pieData = stats.topItems.map((it) => ({ name: it.name, value: it.qty }));
 
+  const rangeLabel = range === "today" ? "Hoje" : range === "7d" ? "Últimos 7 dias" : range === "30d" ? "Últimos 30 dias" : "Histórico completo";
+
   const exportPDF = () => {
-    const label = range === "today" ? "Hoje" : range === "7d" ? "Últimos 7 dias" : range === "30d" ? "Últimos 30 dias" : "Histórico completo";
     generateReportPDF({
       orders: filtered,
       expenses: filteredExpenses,
-      range: { label, from: fromTs, to: Date.now() },
+      range: { label: rangeLabel, from: fromTs, to: Date.now() },
     });
     toast.success("Relatório PDF gerado");
+  };
+
+  const exportCSV = () => {
+    const header = ["numero","cliente","telefone","mesa","itens","status","total","criado_em","concluido_em","avaliacao"];
+    const rows = filtered.map((o) => [
+      o.number,
+      `"${(o.customer ?? "").replace(/"/g, '""')}"`,
+      o.phone ?? "",
+      o.tableNumber ?? "",
+      o.items.reduce((a, b) => a + b.quantity, 0),
+      o.status,
+      o.total.toFixed(2).replace(".", ","),
+      new Date(o.createdAt).toLocaleString("pt-BR"),
+      o.doneAt ? new Date(o.doneAt).toLocaleString("pt-BR") : "",
+      o.rating ?? "",
+    ].join(";"));
+    const csv = "\uFEFF" + [header.join(";"), ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `pedidos-${rangeLabel.toLowerCase().replace(/\s+/g, "-")}-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("CSV exportado");
   };
 
   const resetOrders = () => {
