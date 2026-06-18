@@ -308,10 +308,6 @@ function PainelPage() {
 
       {/* conteúdo acima da aurora */}
       <div className="relative z-10 flex flex-col flex-1 min-h-0">
-      {/* Top bar — escondido em modo TV puro (view=ready) */}
-      {!tvMode && (
-
-  return (
       {!tvMode && (
         <>
           {/* Top bar */}
