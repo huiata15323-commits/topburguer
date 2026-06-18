@@ -60,21 +60,65 @@ function DashboardPage() {
   );
   const filteredExpenses = useMemo(() => expenses.filter((e) => e.createdAt >= fromTs), [expenses, fromTs]);
 
+  // Período anterior (mesma duração) para comparação
+  const previousRevenue = useMemo(() => {
+    if (range === "all" || fromTs === 0) return null;
+    const duration = Date.now() - fromTs;
+    const prevFrom = fromTs - duration;
+    return orders
+      .filter((o) => o.createdAt >= prevFrom && o.createdAt < fromTs)
+      .reduce((a, o) => a + o.total, 0);
+  }, [orders, fromTs, range]);
+
   const stats = useMemo(() => computeStats(filtered), [filtered]);
   const trend = useMemo(() => computeTrend(filtered, range), [filtered, range]);
   const expenseTotal = filteredExpenses.reduce((a, e) => a + e.amount, 0);
   const profit = stats.revenue - expenseTotal;
+  const donePct = stats.count > 0 ? Math.round((stats.done / stats.count) * 100) : 0;
+  const tablesServed = useMemo(
+    () => new Set(filtered.filter((o) => o.tableNumber).map((o) => o.tableNumber)).size,
+    [filtered]
+  );
+  const revenueDelta = previousRevenue !== null && previousRevenue > 0
+    ? ((stats.revenue - previousRevenue) / previousRevenue) * 100
+    : null;
 
   const pieData = stats.topItems.map((it) => ({ name: it.name, value: it.qty }));
 
+  const rangeLabel = range === "today" ? "Hoje" : range === "7d" ? "Últimos 7 dias" : range === "30d" ? "Últimos 30 dias" : "Histórico completo";
+
   const exportPDF = () => {
-    const label = range === "today" ? "Hoje" : range === "7d" ? "Últimos 7 dias" : range === "30d" ? "Últimos 30 dias" : "Histórico completo";
     generateReportPDF({
       orders: filtered,
       expenses: filteredExpenses,
-      range: { label, from: fromTs, to: Date.now() },
+      range: { label: rangeLabel, from: fromTs, to: Date.now() },
     });
     toast.success("Relatório PDF gerado");
+  };
+
+  const exportCSV = () => {
+    const header = ["numero","cliente","telefone","mesa","itens","status","total","criado_em","concluido_em","avaliacao"];
+    const rows = filtered.map((o) => [
+      o.number,
+      `"${(o.customer ?? "").replace(/"/g, '""')}"`,
+      o.phone ?? "",
+      o.tableNumber ?? "",
+      o.items.reduce((a, b) => a + b.quantity, 0),
+      o.status,
+      o.total.toFixed(2).replace(".", ","),
+      new Date(o.createdAt).toLocaleString("pt-BR"),
+      o.doneAt ? new Date(o.doneAt).toLocaleString("pt-BR") : "",
+      o.rating ?? "",
+    ].join(";"));
+    const csv = "\uFEFF" + [header.join(";"), ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `pedidos-${rangeLabel.toLowerCase().replace(/\s+/g, "-")}-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("CSV exportado");
   };
 
   const resetOrders = () => {
@@ -108,7 +152,14 @@ function DashboardPage() {
               onClick={exportPDF}
               className="px-3 py-2 text-xs rounded-lg bg-ember/20 text-ember border border-ember/40 hover:bg-ember/30 font-bold transition"
             >
-              📄 Relatório PDF
+              📄 PDF
+            </button>
+            <button
+              onClick={exportCSV}
+              className="px-3 py-2 text-xs rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 font-bold transition"
+              title="Exportar pedidos para CSV (Excel)"
+            >
+              📊 CSV
             </button>
             <button
               onClick={resetOrders}
@@ -133,8 +184,25 @@ function DashboardPage() {
             active={statusFilter === "pending"} onClick={() => setStatusFilter("pending")} />
           <KpiCard label="Preparando" value={String(stats.preparing)} sub="em produção" accent="ember"
             active={statusFilter === "preparing"} onClick={() => setStatusFilter("preparing")} />
-          <KpiCard label="Faturamento" value={fmtBRL(stats.revenue)} sub={`Ticket ${fmtBRL(stats.avgTicket)}`} accent="emerald" />
+          <KpiCard
+            label="Faturamento"
+            value={fmtBRL(stats.revenue)}
+            sub={
+              revenueDelta !== null
+                ? `${revenueDelta >= 0 ? "▲" : "▼"} ${Math.abs(revenueDelta).toFixed(1)}% vs período anterior`
+                : `Ticket ${fmtBRL(stats.avgTicket)}`
+            }
+            accent="emerald"
+          />
           <KpiCard label="Lucro" value={fmtBRL(profit)} sub={`Despesas ${fmtBRL(expenseTotal)}`} accent={profit >= 0 ? "violet" : "red"} />
+        </div>
+
+        {/* KPIs secundários */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <KpiCard label="Tempo médio preparo" value={fmtMin(stats.avgPrepMs)} sub={`${stats.done} concluídos`} accent="amber" />
+          <KpiCard label="Itens vendidos" value={String(stats.itemsSold)} sub={`${stats.uniqueItems} produtos diferentes`} accent="ember" />
+          <KpiCard label="Mesas atendidas" value={String(tablesServed)} sub="únicas no período" accent="violet" />
+          <KpiCard label="Taxa de conclusão" value={`${donePct}%`} sub={`${stats.done}/${stats.count} pedidos`} accent={donePct >= 80 ? "emerald" : "amber"} />
         </div>
 
         {/* Trend line chart */}
