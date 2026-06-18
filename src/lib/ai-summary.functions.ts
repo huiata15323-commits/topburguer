@@ -3,6 +3,7 @@
 // e devolve um texto curto em português, pronto para exibir no admin.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const SummaryInput = z.object({
   doneCount: z.number().int().nonnegative(),
@@ -34,8 +35,18 @@ function rateLimit(ip: string) {
 }
 
 export const generateDaySummary = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => SummaryInput.parse(input))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    // Admin-only: bloqueia chamadas não autorizadas que consumiriam créditos de IA.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: roles } = await supabaseAdmin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", context.userId);
+    if (!roles?.some((r) => r.role === "admin")) {
+      return { summary: "Acesso negado: apenas administradores podem gerar o resumo." };
+    }
     // Bloqueia abuso de chamadas vazias contra crédito de IA
     if (data.totalCount === 0 && data.doneCount === 0 && data.revenue === 0) {
       return { summary: "Sem pedidos hoje ainda — gere o resumo depois do primeiro pedido." };
