@@ -6,7 +6,7 @@ import topBacon from "@/assets/menu/top-bacon.jpg";
 import topCheddar from "@/assets/menu/top-cheddar.jpg";
 import topClassic from "@/assets/menu/top-classic.jpg";
 import turmaFull from "@/assets/turma-2a-clean.jpg.asset.json";
-import visitaTecnica from "@/assets/visita-tecnica-clean.jpg.asset.json";
+import visitaTecnica from "@/assets/turma-2b-new.jpg.asset.json";
 import { useBranding } from "@/lib/branding";
 
 const DRIVE_ACERVO_URL = "https://drive.google.com/drive/folders/1Wv8JwaqaLX1Awhp_HPAC_hjb1Pz1YBPu?usp=drive_link";
