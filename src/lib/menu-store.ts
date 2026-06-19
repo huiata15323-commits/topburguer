@@ -144,7 +144,7 @@ export function useMenu() {
     if (patch.image !== undefined) dbPatch.image = patch.image;
     if (patch.description !== undefined) dbPatch.description = patch.description ?? null;
     if (patch.soldOut !== undefined) dbPatch.sold_out = patch.soldOut;
-    if (patch.stock !== undefined) dbPatch.stock = patch.stock ?? null;
+    if ("stock" in patch) dbPatch.stock = patch.stock ?? null;
     if (patch.badges !== undefined) dbPatch.badges = patch.badges ?? [];
     if (patch.prepMinutes !== undefined) dbPatch.prep_minutes = patch.prepMinutes ?? null;
     const { error } = await supabase.from("menu_items").update(dbPatch).eq("id", id);
