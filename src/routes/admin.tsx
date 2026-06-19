@@ -283,6 +283,43 @@ function AdminPage() {
             </div>
 
             <div>
+              <label className="text-xs text-muted-foreground">Selos / etiquetas</label>
+              <div className="flex flex-wrap gap-1.5 mt-1">
+                {BADGE_OPTIONS.map((b) => {
+                  const on = form.badges.includes(b.key);
+                  return (
+                    <button
+                      key={b.key}
+                      type="button"
+                      onClick={() => toggleBadge(b.key)}
+                      className={`text-[11px] font-bold px-2.5 py-1 rounded-full border transition ${
+                        on
+                          ? `${b.color} text-white border-transparent shadow-sm`
+                          : "bg-background border-border text-muted-foreground hover:border-foreground/30"
+                      }`}
+                    >
+                      {b.emoji} {b.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs text-muted-foreground">⏱ Tempo de preparo (min)</label>
+              <input
+                type="number"
+                min={1}
+                max={180}
+                value={form.prepMinutes}
+                onChange={(e) => setForm({ ...form, prepMinutes: e.target.value.replace(/[^\d]/g, "") })}
+                placeholder="Ex: 12"
+                className="w-full px-3 py-2.5 rounded-xl border border-border bg-background"
+              />
+              <p className="text-[10px] text-muted-foreground mt-1">Deixe vazio para usar o tempo médio do restaurante.</p>
+            </div>
+
+            <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="text-xs text-muted-foreground">Imagem do prato</label>
                 <button
