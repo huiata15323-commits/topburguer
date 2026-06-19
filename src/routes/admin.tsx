@@ -146,6 +146,8 @@ function AdminPage() {
       description: m.description ?? "",
       image: m.image,
       aiStyle: form.aiStyle,
+      badges: m.badges ?? [],
+      prepMinutes: typeof m.prepMinutes === "number" ? String(m.prepMinutes) : "",
     });
     setEditing(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -153,11 +155,19 @@ function AdminPage() {
 
   const cancel = () => { setForm(EMPTY); setEditing(false); };
 
+  const toggleBadge = (key: string) => {
+    setForm((f) => ({
+      ...f,
+      badges: f.badges.includes(key) ? f.badges.filter((b) => b !== key) : [...f.badges, key],
+    }));
+  };
+
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     const price = parseFloat(form.price.replace(",", "."));
     if (!form.name.trim()) return toast.error("Informe o nome");
     if (!Number.isFinite(price) || price <= 0) return toast.error("Preço inválido");
+    const prep = form.prepMinutes.trim() === "" ? undefined : Math.max(1, Math.min(180, parseInt(form.prepMinutes, 10) || 0));
     const payload = {
       name: form.name.trim().slice(0, 60),
       price: Math.round(price * 100) / 100,
@@ -165,6 +175,8 @@ function AdminPage() {
       emoji: form.emoji || "🍴",
       description: form.description.trim().slice(0, 600) || undefined,
       image: form.image.trim() || DEFAULT_IMG,
+      badges: form.badges,
+      prepMinutes: prep,
     };
     if (editing && form.id) {
       updateItem(form.id, payload);
