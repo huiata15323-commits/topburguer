@@ -23,6 +23,8 @@ type DbRow = {
   sold_out: boolean;
   stock: number | null;
   sort_order: number;
+  badges: string[] | null;
+  prep_minutes: number | null;
 };
 
 const SEED_IMAGE_BY_ID = new Map(SEED.map((m) => [m.id, m.image]));
@@ -38,6 +40,8 @@ function rowToItem(r: DbRow): EditableMenuItem {
     description: r.description ?? undefined,
     soldOut: r.sold_out,
     stock: r.stock ?? undefined,
+    badges: r.badges ?? [],
+    prepMinutes: r.prep_minutes ?? undefined,
   };
 }
 
