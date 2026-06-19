@@ -1,0 +1,1 @@
+ALTER TABLE public.menu_items ADD COLUMN IF NOT EXISTS badges text[] NOT NULL DEFAULT '{}', ADD COLUMN IF NOT EXISTS prep_minutes integer;
