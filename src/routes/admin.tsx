@@ -42,9 +42,24 @@ type FormState = {
   description: string;
   image: string;
   aiStyle: AiStyle;
+  badges: string[];
+  prepMinutes: string;
 };
 
-const EMPTY: FormState = { name: "", price: "", category: "burger", emoji: "🍔", description: "", image: "", aiStyle: "premium" };
+const EMPTY: FormState = { name: "", price: "", category: "burger", emoji: "🍔", description: "", image: "", aiStyle: "premium", badges: [], prepMinutes: "" };
+
+const BADGE_OPTIONS = [
+  { key: "novo", label: "Novo", emoji: "✨", color: "bg-emerald-500" },
+  { key: "promo", label: "Promoção", emoji: "🏷️", color: "bg-red-500" },
+  { key: "picante", label: "Picante", emoji: "🌶️", color: "bg-orange-500" },
+  { key: "vegano", label: "Vegano", emoji: "🌱", color: "bg-green-600" },
+  { key: "vegetariano", label: "Vegetariano", emoji: "🥬", color: "bg-lime-600" },
+  { key: "sem-gluten", label: "Sem Glúten", emoji: "🌾", color: "bg-amber-600" },
+  { key: "popular", label: "Mais Pedido", emoji: "🔥", color: "bg-rose-500" },
+  { key: "chef", label: "Escolha do Chef", emoji: "👨‍🍳", color: "bg-violet-500" },
+  { key: "premium", label: "Premium", emoji: "👑", color: "bg-amber-500" },
+  { key: "kids", label: "Infantil", emoji: "🧸", color: "bg-pink-500" },
+];
 
 const AI_STYLES: { key: AiStyle; label: string; emoji: string }[] = [
   { key: "premium", label: "Premium", emoji: "🔥" },
