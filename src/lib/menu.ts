@@ -18,6 +18,8 @@ export type MenuItem = {
   description?: string;
   emoji: string;
   image: string;
+  badges?: string[];
+  prepMinutes?: number;
 };
 
 export const MENU: MenuItem[] = [
