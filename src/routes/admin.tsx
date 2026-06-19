@@ -48,11 +48,21 @@ const EMPTY: FormState = { name: "", price: "", category: "burger", emoji: "🍔
 
 const AI_STYLES: { key: AiStyle; label: string; emoji: string }[] = [
   { key: "premium", label: "Premium", emoji: "🔥" },
+  { key: "gourmet", label: "Gourmet", emoji: "⭐" },
   { key: "rustic", label: "Rústico", emoji: "🪵" },
   { key: "minimal", label: "Minimal", emoji: "⚪" },
+  { key: "dark", label: "Dark & Moody", emoji: "🌑" },
+  { key: "topview", label: "Top View", emoji: "🔽" },
+  { key: "closeup", label: "Close-up", emoji: "🔍" },
+  { key: "bbq", label: "Churrasco", emoji: "🔥" },
+  { key: "fresh", label: "Fresh", emoji: "🥗" },
+  { key: "streetfood", label: "Street Food", emoji: "🚚" },
   { key: "neon", label: "Neon", emoji: "💜" },
   { key: "american", label: "Diner US", emoji: "🇺🇸" },
-  { key: "cartoon", label: "Cartoon", emoji: "🎨" },
+  { key: "japanese", label: "Japonês", emoji: "🎌" },
+  { key: "vintage", label: "Vintage", emoji: "📷" },
+  { key: "watercolor", label: "Aquarela", emoji: "🎨" },
+  { key: "cartoon", label: "Cartoon", emoji: "✏️" },
 ];
 
 const CATS: { key: EditableMenuItem["category"]; label: string; emoji: string }[] = [
