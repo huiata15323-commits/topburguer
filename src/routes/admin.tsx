@@ -32,7 +32,7 @@ export const Route = createFileRoute("/admin")({
   ),
 });
 
-type AiStyle = "premium" | "rustic" | "minimal" | "neon" | "american" | "cartoon";
+type AiStyle = "premium" | "rustic" | "minimal" | "neon" | "american" | "cartoon" | "gourmet" | "dark" | "topview" | "closeup" | "streetfood" | "watercolor" | "vintage" | "japanese" | "bbq" | "fresh";
 type FormState = {
   id?: string;
   name: string;
