@@ -58,7 +58,7 @@ function notify() {
 async function fetchAll() {
   const { data, error } = await supabase
     .from("menu_items")
-    .select("id,name,price,category,emoji,image,description,sold_out,stock,sort_order")
+    .select("id,name,price,category,emoji,image,description,sold_out,stock,sort_order,badges,prep_minutes")
     .order("sort_order", { ascending: true });
   if (error) {
     console.error("[menu] fetch failed", error);
