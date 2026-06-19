@@ -241,14 +241,17 @@ function AdminPage() {
             </div>
 
             <div>
-              <label className="text-xs text-muted-foreground">Descrição (opcional)</label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs text-muted-foreground">Descrição (opcional)</label>
+                <span className="text-[10px] text-muted-foreground tabular-nums">{form.description.length}/600</span>
+              </div>
               <textarea
                 value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
-                rows={2}
-                maxLength={140}
-                placeholder="Ex: Pão brioche, blend 160g, queijo…"
-                className="w-full px-3 py-2 text-sm rounded-xl border border-border bg-background resize-none"
+                onChange={(e) => setForm({ ...form, description: e.target.value.slice(0, 600) })}
+                rows={5}
+                maxLength={600}
+                placeholder="Ex: Pão brioche artesanal, blend bovino 160g, queijo cheddar derretido, alface fresca, tomate, cebola caramelizada, molho especial da casa…"
+                className="w-full px-3 py-2 text-sm rounded-xl border border-border bg-background resize-y min-h-[120px]"
               />
             </div>
 
