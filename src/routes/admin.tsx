@@ -377,11 +377,11 @@ function AdminPage() {
                             <input
                               type="number"
                               min={0}
-                              max={999}
+                              max={99999}
                               value={typeof m.stock === "number" ? m.stock : ""}
                               onChange={(e) => {
                                 const v = e.target.value;
-                                setStock(m.id, v === "" ? undefined : Math.max(0, Math.min(999, parseInt(v, 10) || 0)));
+                                setStock(m.id, v === "" ? undefined : Math.max(0, Math.min(99999, parseInt(v, 10) || 0)));
                               }}
                               placeholder="∞"
                               className="w-16 px-2 py-1 rounded-md border border-border bg-background text-center tabular-nums"
