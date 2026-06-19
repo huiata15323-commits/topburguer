@@ -148,7 +148,7 @@ function AdminPage() {
       price: Math.round(price * 100) / 100,
       category: form.category,
       emoji: form.emoji || "🍴",
-      description: form.description.trim().slice(0, 140) || undefined,
+      description: form.description.trim().slice(0, 600) || undefined,
       image: form.image.trim() || DEFAULT_IMG,
     };
     if (editing && form.id) {
