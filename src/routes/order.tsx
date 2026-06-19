@@ -329,6 +329,20 @@ function OrderPage() {
                       </div>
                       <div className="p-3 sm:p-4 flex-1 flex flex-col">
                         <h3 className="font-bold text-card-foreground text-sm sm:text-base leading-tight">{m.name}</h3>
+                        {(m.badges?.length || m.prepMinutes) && (
+                          <div className="flex flex-wrap gap-1 mt-1.5">
+                            {m.badges?.map((b) => (
+                              <span key={b} className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-ember/10 text-ember border border-ember/30">
+                                {b}
+                              </span>
+                            ))}
+                            {m.prepMinutes && (
+                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground">
+                                ⏱ {m.prepMinutes}min
+                              </span>
+                            )}
+                          </div>
+                        )}
                         {m.description && (
                           <p className="text-[11px] sm:text-xs text-muted-foreground mt-1 line-clamp-2">{m.description}</p>
                         )}

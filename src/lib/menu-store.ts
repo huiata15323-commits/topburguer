@@ -23,6 +23,8 @@ type DbRow = {
   sold_out: boolean;
   stock: number | null;
   sort_order: number;
+  badges: string[] | null;
+  prep_minutes: number | null;
 };
 
 const SEED_IMAGE_BY_ID = new Map(SEED.map((m) => [m.id, m.image]));
@@ -38,6 +40,8 @@ function rowToItem(r: DbRow): EditableMenuItem {
     description: r.description ?? undefined,
     soldOut: r.sold_out,
     stock: r.stock ?? undefined,
+    badges: r.badges ?? [],
+    prepMinutes: r.prep_minutes ?? undefined,
   };
 }
 
@@ -54,7 +58,7 @@ function notify() {
 async function fetchAll() {
   const { data, error } = await supabase
     .from("menu_items")
-    .select("id,name,price,category,emoji,image,description,sold_out,stock,sort_order")
+    .select("id,name,price,category,emoji,image,description,sold_out,stock,sort_order,badges,prep_minutes")
     .order("sort_order", { ascending: true });
   if (error) {
     console.error("[menu] fetch failed", error);
@@ -92,6 +96,8 @@ function itemToInsert(data: Omit<EditableMenuItem, "id">, id?: string) {
     sold_out: data.soldOut ?? false,
     stock: data.stock ?? null,
     sort_order: cache.length + 1,
+    badges: data.badges ?? [],
+    prep_minutes: data.prepMinutes ?? null,
   };
 }
 
@@ -128,6 +134,8 @@ export function useMenu() {
       description?: string | null;
       sold_out?: boolean;
       stock?: number | null;
+      badges?: string[];
+      prep_minutes?: number | null;
     } = {};
     if (patch.name !== undefined) dbPatch.name = patch.name;
     if (patch.price !== undefined) dbPatch.price = patch.price;
@@ -137,6 +145,8 @@ export function useMenu() {
     if (patch.description !== undefined) dbPatch.description = patch.description ?? null;
     if (patch.soldOut !== undefined) dbPatch.sold_out = patch.soldOut;
     if (patch.stock !== undefined) dbPatch.stock = patch.stock ?? null;
+    if (patch.badges !== undefined) dbPatch.badges = patch.badges ?? [];
+    if (patch.prepMinutes !== undefined) dbPatch.prep_minutes = patch.prepMinutes ?? null;
     const { error } = await supabase.from("menu_items").update(dbPatch).eq("id", id);
     if (error) console.error("[menu] updateItem failed", error);
   }, []);
@@ -187,6 +197,8 @@ export function useMenu() {
       sold_out: false,
       stock: null,
       sort_order: i + 1,
+      badges: [],
+      prep_minutes: null,
     }));
     const { error } = await supabase.from("menu_items").insert(rows);
     if (error) console.error("[menu] reset insert failed", error);

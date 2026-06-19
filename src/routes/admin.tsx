@@ -42,9 +42,24 @@ type FormState = {
   description: string;
   image: string;
   aiStyle: AiStyle;
+  badges: string[];
+  prepMinutes: string;
 };
 
-const EMPTY: FormState = { name: "", price: "", category: "burger", emoji: "🍔", description: "", image: "", aiStyle: "premium" };
+const EMPTY: FormState = { name: "", price: "", category: "burger", emoji: "🍔", description: "", image: "", aiStyle: "premium", badges: [], prepMinutes: "" };
+
+const BADGE_OPTIONS = [
+  { key: "novo", label: "Novo", emoji: "✨", color: "bg-emerald-500" },
+  { key: "promo", label: "Promoção", emoji: "🏷️", color: "bg-red-500" },
+  { key: "picante", label: "Picante", emoji: "🌶️", color: "bg-orange-500" },
+  { key: "vegano", label: "Vegano", emoji: "🌱", color: "bg-green-600" },
+  { key: "vegetariano", label: "Vegetariano", emoji: "🥬", color: "bg-lime-600" },
+  { key: "sem-gluten", label: "Sem Glúten", emoji: "🌾", color: "bg-amber-600" },
+  { key: "popular", label: "Mais Pedido", emoji: "🔥", color: "bg-rose-500" },
+  { key: "chef", label: "Escolha do Chef", emoji: "👨‍🍳", color: "bg-violet-500" },
+  { key: "premium", label: "Premium", emoji: "👑", color: "bg-amber-500" },
+  { key: "kids", label: "Infantil", emoji: "🧸", color: "bg-pink-500" },
+];
 
 const AI_STYLES: { key: AiStyle; label: string; emoji: string }[] = [
   { key: "premium", label: "Premium", emoji: "🔥" },
@@ -131,6 +146,8 @@ function AdminPage() {
       description: m.description ?? "",
       image: m.image,
       aiStyle: form.aiStyle,
+      badges: m.badges ?? [],
+      prepMinutes: typeof m.prepMinutes === "number" ? String(m.prepMinutes) : "",
     });
     setEditing(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -138,11 +155,19 @@ function AdminPage() {
 
   const cancel = () => { setForm(EMPTY); setEditing(false); };
 
+  const toggleBadge = (key: string) => {
+    setForm((f) => ({
+      ...f,
+      badges: f.badges.includes(key) ? f.badges.filter((b) => b !== key) : [...f.badges, key],
+    }));
+  };
+
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     const price = parseFloat(form.price.replace(",", "."));
     if (!form.name.trim()) return toast.error("Informe o nome");
     if (!Number.isFinite(price) || price <= 0) return toast.error("Preço inválido");
+    const prep = form.prepMinutes.trim() === "" ? undefined : Math.max(1, Math.min(180, parseInt(form.prepMinutes, 10) || 0));
     const payload = {
       name: form.name.trim().slice(0, 60),
       price: Math.round(price * 100) / 100,
@@ -150,6 +175,8 @@ function AdminPage() {
       emoji: form.emoji || "🍴",
       description: form.description.trim().slice(0, 600) || undefined,
       image: form.image.trim() || DEFAULT_IMG,
+      badges: form.badges,
+      prepMinutes: prep,
     };
     if (editing && form.id) {
       updateItem(form.id, payload);
@@ -253,6 +280,43 @@ function AdminPage() {
                 placeholder="Ex: Pão brioche artesanal, blend bovino 160g, queijo cheddar derretido, alface fresca, tomate, cebola caramelizada, molho especial da casa…"
                 className="w-full px-3 py-2 text-sm rounded-xl border border-border bg-background resize-y min-h-[120px]"
               />
+            </div>
+
+            <div>
+              <label className="text-xs text-muted-foreground">Selos / etiquetas</label>
+              <div className="flex flex-wrap gap-1.5 mt-1">
+                {BADGE_OPTIONS.map((b) => {
+                  const on = form.badges.includes(b.key);
+                  return (
+                    <button
+                      key={b.key}
+                      type="button"
+                      onClick={() => toggleBadge(b.key)}
+                      className={`text-[11px] font-bold px-2.5 py-1 rounded-full border transition ${
+                        on
+                          ? `${b.color} text-white border-transparent shadow-sm`
+                          : "bg-background border-border text-muted-foreground hover:border-foreground/30"
+                      }`}
+                    >
+                      {b.emoji} {b.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs text-muted-foreground">⏱ Tempo de preparo (min)</label>
+              <input
+                type="number"
+                min={1}
+                max={180}
+                value={form.prepMinutes}
+                onChange={(e) => setForm({ ...form, prepMinutes: e.target.value.replace(/[^\d]/g, "") })}
+                placeholder="Ex: 12"
+                className="w-full px-3 py-2.5 rounded-xl border border-border bg-background"
+              />
+              <p className="text-[10px] text-muted-foreground mt-1">Deixe vazio para usar o tempo médio do restaurante.</p>
             </div>
 
             <div>

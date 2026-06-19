@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       menu_items: {
         Row: {
+          badges: string[]
           category: string
           created_at: string
           description: string | null
@@ -23,6 +24,7 @@ export type Database = {
           id: string
           image: string
           name: string
+          prep_minutes: number | null
           price: number
           sold_out: boolean
           sort_order: number
@@ -30,6 +32,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          badges?: string[]
           category: string
           created_at?: string
           description?: string | null
@@ -37,6 +40,7 @@ export type Database = {
           id: string
           image?: string
           name: string
+          prep_minutes?: number | null
           price?: number
           sold_out?: boolean
           sort_order?: number
@@ -44,6 +48,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          badges?: string[]
           category?: string
           created_at?: string
           description?: string | null
@@ -51,6 +56,7 @@ export type Database = {
           id?: string
           image?: string
           name?: string
+          prep_minutes?: number | null
           price?: number
           sold_out?: boolean
           sort_order?: number
