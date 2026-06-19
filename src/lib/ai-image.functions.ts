@@ -6,7 +6,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const Input = z.object({
   dishName: z.string().min(1).max(80),
-  description: z.string().max(200).optional(),
+  description: z.string().max(600).optional(),
   kind: z.enum(["dish", "logo", "promo"]).default("dish"),
   style: z
     .enum([
@@ -16,6 +16,16 @@ const Input = z.object({
       "neon",
       "american",
       "cartoon",
+      "gourmet",
+      "dark",
+      "topview",
+      "closeup",
+      "streetfood",
+      "watercolor",
+      "vintage",
+      "japanese",
+      "bbq",
+      "fresh",
     ])
     .default("premium"),
 });
@@ -33,12 +43,22 @@ function rateLimit(ip: string) {
 }
 
 const STYLE_HINTS: Record<string, string> = {
-  premium:  "fundo escuro de madeira queimada, iluminação cinematográfica quente, ângulo 45°, estilo menu premium",
-  rustic:   "tábua de madeira rústica, luz natural suave, vapor leve, vibe artesanal de boteco",
-  minimal:  "fundo branco limpo, sombra suave, composição minimalista estilo Apple, vista superior",
-  neon:     "ambiente noturno urbano, luzes neon rosa e ciano, reflexos vibrantes, estilo cyberpunk",
-  american: "estilo diner americano anos 50, fundo vermelho com xadrez, cores saturadas, vibe vintage",
-  cartoon:  "ilustração cartoon vibrante, traços fortes, cores planas saturadas, estilo mascote de fast-food",
+  premium:    "fundo escuro de madeira queimada, iluminação cinematográfica quente, ângulo 45°, estilo menu premium",
+  rustic:     "tábua de madeira rústica, luz natural suave, vapor leve, vibe artesanal de boteco",
+  minimal:    "fundo branco limpo, sombra suave, composição minimalista estilo Apple, vista superior",
+  neon:       "ambiente noturno urbano, luzes neon rosa e ciano, reflexos vibrantes, estilo cyberpunk",
+  american:   "estilo diner americano anos 50, fundo vermelho com xadrez, cores saturadas, vibe vintage",
+  cartoon:    "ilustração cartoon vibrante, traços fortes, cores planas saturadas, estilo mascote de fast-food",
+  gourmet:    "apresentação de restaurante michelin, prato de porcelana branca, molhos pintados, microervas, iluminação dramática lateral",
+  dark:       "estilo dark & moody food photography, fundo preto, luz de janela lateral, contraste alto, sombras profundas, vapor visível",
+  topview:    "vista superior flat lay 90°, ingredientes espalhados ao redor, tábua de madeira clara, luz natural difusa, estilo editorial gastronômico",
+  closeup:    "macro extremo close-up, foco super raso, textura visível (queijo derretido, gotas, brilho), gotas de óleo, ultra apetitoso",
+  streetfood: "vibe food truck de rua, papel kraft, luzes amarelas de festival, fundo desfocado com pessoas, autêntico e descontraído",
+  watercolor: "ilustração aquarela artística, traços de pincel suaves, cores aguadas, fundo papel texturizado, estilo livro de receitas",
+  vintage:    "fotografia analógica anos 70, filme granulado, cores quentes desbotadas, tons sépia, vibe retrô nostálgica",
+  japanese:   "estilo washoku japonês minimalista, louça de cerâmica artesanal, fundo de bambu/madeira clara, composição zen equilibrada",
+  bbq:        "churrasco americano texano, brasas acesas ao fundo, fumaça densa, grelha de ferro, luz dourada do pôr do sol, vibe smokehouse",
+  fresh:      "estilo fresh & natural, luz natural brilhante, fundo de mármore branco, ingredientes frescos visíveis, vibe saudável e clean",
 };
 
 function buildPrompt(kind: string, style: string, name: string, desc?: string) {
