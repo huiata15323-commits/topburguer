@@ -256,7 +256,9 @@ function AdminPage() {
                 <label className="text-xs text-muted-foreground">Emoji</label>
                 <input
                   value={form.emoji}
-                  onChange={(e) => setForm({ ...form, emoji: e.target.value.slice(0, 2) })}
+                  onChange={(e) => setForm({ ...form, emoji: firstGrapheme(e.target.value) })}
+                  onFocus={(e) => e.currentTarget.select()}
+                  maxLength={8}
                   className="w-full text-center text-2xl px-2 py-2.5 rounded-xl border border-border bg-background"
                 />
               </div>
@@ -270,6 +272,24 @@ function AdminPage() {
                   className="w-full px-3 py-2.5 rounded-xl border border-border bg-background"
                 />
               </div>
+            </div>
+
+            <div className="flex flex-wrap gap-1.5 -mt-1">
+              {EMOJI_QUICK.map((e) => (
+                <button
+                  key={e}
+                  type="button"
+                  onClick={() => setForm({ ...form, emoji: e })}
+                  className={`text-xl w-9 h-9 grid place-items-center rounded-lg border transition ${
+                    form.emoji === e
+                      ? "border-ember bg-ember/15 ring-2 ring-ember/40"
+                      : "border-border bg-background hover:border-ember/40"
+                  }`}
+                  aria-label={`Usar emoji ${e}`}
+                >
+                  {e}
+                </button>
+              ))}
             </div>
 
             <div className="grid grid-cols-2 gap-3">
