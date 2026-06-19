@@ -32,7 +32,7 @@ export const Route = createFileRoute("/admin")({
   ),
 });
 
-type AiStyle = "premium" | "rustic" | "minimal" | "neon" | "american" | "cartoon";
+type AiStyle = "premium" | "rustic" | "minimal" | "neon" | "american" | "cartoon" | "gourmet" | "dark" | "topview" | "closeup" | "streetfood" | "watercolor" | "vintage" | "japanese" | "bbq" | "fresh";
 type FormState = {
   id?: string;
   name: string;
@@ -48,11 +48,21 @@ const EMPTY: FormState = { name: "", price: "", category: "burger", emoji: "🍔
 
 const AI_STYLES: { key: AiStyle; label: string; emoji: string }[] = [
   { key: "premium", label: "Premium", emoji: "🔥" },
+  { key: "gourmet", label: "Gourmet", emoji: "⭐" },
   { key: "rustic", label: "Rústico", emoji: "🪵" },
   { key: "minimal", label: "Minimal", emoji: "⚪" },
+  { key: "dark", label: "Dark & Moody", emoji: "🌑" },
+  { key: "topview", label: "Top View", emoji: "🔽" },
+  { key: "closeup", label: "Close-up", emoji: "🔍" },
+  { key: "bbq", label: "Churrasco", emoji: "🔥" },
+  { key: "fresh", label: "Fresh", emoji: "🥗" },
+  { key: "streetfood", label: "Street Food", emoji: "🚚" },
   { key: "neon", label: "Neon", emoji: "💜" },
   { key: "american", label: "Diner US", emoji: "🇺🇸" },
-  { key: "cartoon", label: "Cartoon", emoji: "🎨" },
+  { key: "japanese", label: "Japonês", emoji: "🎌" },
+  { key: "vintage", label: "Vintage", emoji: "📷" },
+  { key: "watercolor", label: "Aquarela", emoji: "🎨" },
+  { key: "cartoon", label: "Cartoon", emoji: "✏️" },
 ];
 
 const CATS: { key: EditableMenuItem["category"]; label: string; emoji: string }[] = [
@@ -138,7 +148,7 @@ function AdminPage() {
       price: Math.round(price * 100) / 100,
       category: form.category,
       emoji: form.emoji || "🍴",
-      description: form.description.trim().slice(0, 140) || undefined,
+      description: form.description.trim().slice(0, 600) || undefined,
       image: form.image.trim() || DEFAULT_IMG,
     };
     if (editing && form.id) {
@@ -231,14 +241,17 @@ function AdminPage() {
             </div>
 
             <div>
-              <label className="text-xs text-muted-foreground">Descrição (opcional)</label>
+              <div className="flex items-center justify-between">
+                <label className="text-xs text-muted-foreground">Descrição (opcional)</label>
+                <span className="text-[10px] text-muted-foreground tabular-nums">{form.description.length}/600</span>
+              </div>
               <textarea
                 value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
-                rows={2}
-                maxLength={140}
-                placeholder="Ex: Pão brioche, blend 160g, queijo…"
-                className="w-full px-3 py-2 text-sm rounded-xl border border-border bg-background resize-none"
+                onChange={(e) => setForm({ ...form, description: e.target.value.slice(0, 600) })}
+                rows={5}
+                maxLength={600}
+                placeholder="Ex: Pão brioche artesanal, blend bovino 160g, queijo cheddar derretido, alface fresca, tomate, cebola caramelizada, molho especial da casa…"
+                className="w-full px-3 py-2 text-sm rounded-xl border border-border bg-background resize-y min-h-[120px]"
               />
             </div>
 
@@ -364,11 +377,11 @@ function AdminPage() {
                             <input
                               type="number"
                               min={0}
-                              max={999}
+                              max={99999}
                               value={typeof m.stock === "number" ? m.stock : ""}
                               onChange={(e) => {
                                 const v = e.target.value;
-                                setStock(m.id, v === "" ? undefined : Math.max(0, Math.min(999, parseInt(v, 10) || 0)));
+                                setStock(m.id, v === "" ? undefined : Math.max(0, Math.min(99999, parseInt(v, 10) || 0)));
                               }}
                               placeholder="∞"
                               className="w-16 px-2 py-1 rounded-md border border-border bg-background text-center tabular-nums"
