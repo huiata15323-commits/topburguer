@@ -96,6 +96,8 @@ function itemToInsert(data: Omit<EditableMenuItem, "id">, id?: string) {
     sold_out: data.soldOut ?? false,
     stock: data.stock ?? null,
     sort_order: cache.length + 1,
+    badges: data.badges ?? [],
+    prep_minutes: data.prepMinutes ?? null,
   };
 }
 
@@ -132,6 +134,8 @@ export function useMenu() {
       description?: string | null;
       sold_out?: boolean;
       stock?: number | null;
+      badges?: string[];
+      prep_minutes?: number | null;
     } = {};
     if (patch.name !== undefined) dbPatch.name = patch.name;
     if (patch.price !== undefined) dbPatch.price = patch.price;
@@ -141,6 +145,8 @@ export function useMenu() {
     if (patch.description !== undefined) dbPatch.description = patch.description ?? null;
     if (patch.soldOut !== undefined) dbPatch.sold_out = patch.soldOut;
     if (patch.stock !== undefined) dbPatch.stock = patch.stock ?? null;
+    if (patch.badges !== undefined) dbPatch.badges = patch.badges ?? [];
+    if (patch.prepMinutes !== undefined) dbPatch.prep_minutes = patch.prepMinutes ?? null;
     const { error } = await supabase.from("menu_items").update(dbPatch).eq("id", id);
     if (error) console.error("[menu] updateItem failed", error);
   }, []);
