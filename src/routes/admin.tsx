@@ -49,6 +49,33 @@ type FormState = {
 
 const EMPTY: FormState = { name: "", price: "", category: "burger", emoji: "🍔", description: "", image: "", aiStyle: "premium", badges: [], prepMinutes: "" };
 
+// Quick emoji presets para o form de item
+const EMOJI_QUICK = [
+  "🍔","🍟","🌭","🥪","🌮","🌯","🥙","🥗",
+  "🍕","🥩","🍗","🥓","🧀","🍣","🍱","🍛",
+  "🍜","🍝","🍤","🍲","🥘","🍚","🍙","🍢",
+  "🥞","🧇","🍳","🥐","🥖","🥯","🍞","🧈",
+  "🍰","🧁","🍮","🍩","🍪","🍫","🍬","🍦",
+  "🥤","🧋","☕","🍺","🍻","🍷","🥂","🍹",
+];
+
+// Extrai o primeiro grafema (emoji completo, incluindo ZWJ e modificadores)
+function firstGrapheme(input: string): string {
+  if (!input) return "";
+  // Usa Intl.Segmenter quando disponível para suportar emojis compostos (👨‍🍳, 🏷️, 🇺🇸…)
+  try {
+    const Seg = (Intl as unknown as { Segmenter?: typeof Intl.Segmenter }).Segmenter;
+    if (Seg) {
+      const seg = new Seg(undefined, { granularity: "grapheme" });
+      const it = seg.segment(input)[Symbol.iterator]().next();
+      return it.done ? "" : (it.value as { segment: string }).segment;
+    }
+  } catch { /* fallback abaixo */ }
+  // Fallback: pega um code point (não cobre ZWJ, mas evita cortar surrogate pair)
+  const arr = Array.from(input);
+  return arr[0] ?? "";
+}
+
 const BADGE_OPTIONS = [
   { key: "novo", label: "Novo", emoji: "✨", color: "bg-emerald-500" },
   { key: "promo", label: "Promoção", emoji: "🏷️", color: "bg-red-500" },
