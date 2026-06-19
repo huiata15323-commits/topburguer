@@ -197,6 +197,8 @@ export function useMenu() {
       sold_out: false,
       stock: null,
       sort_order: i + 1,
+      badges: [],
+      prep_minutes: null,
     }));
     const { error } = await supabase.from("menu_items").insert(rows);
     if (error) console.error("[menu] reset insert failed", error);
