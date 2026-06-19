@@ -438,17 +438,9 @@ function AdminPage() {
                           {/* Controle de estoque inline */}
                           <div className="mt-2 flex items-center gap-2 text-xs">
                             <label className="text-muted-foreground shrink-0">Estoque:</label>
-                            <input
-                              type="number"
-                              min={0}
-                              max={99999}
-                              value={typeof m.stock === "number" ? m.stock : ""}
-                              onChange={(e) => {
-                                const v = e.target.value;
-                                setStock(m.id, v === "" ? undefined : Math.max(0, Math.min(99999, parseInt(v, 10) || 0)));
-                              }}
-                              placeholder="∞"
-                              className="w-16 px-2 py-1 rounded-md border border-border bg-background text-center tabular-nums"
+                            <StockInput
+                              value={typeof m.stock === "number" ? m.stock : undefined}
+                              onCommit={(v) => setStock(m.id, v)}
                             />
                             {typeof m.stock === "number" && (
                               <button
