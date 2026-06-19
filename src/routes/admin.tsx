@@ -13,6 +13,7 @@ import { PromosAdmin } from "@/components/PromosAdmin";
 import { TableHeatmap } from "@/components/TableHeatmap";
 import { BrandingAdmin } from "@/components/BrandingAdmin";
 import { AdminHeroHeader } from "@/components/AdminHeroHeader";
+import { StockInput } from "@/components/StockInput";
 import { generateDishImage } from "@/lib/ai-image.functions";
 
 export const Route = createFileRoute("/admin")({
