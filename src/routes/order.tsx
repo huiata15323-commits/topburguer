@@ -226,7 +226,7 @@ function OrderPage() {
           <span className="text-2xl">⏱️</span>
           <div className="flex-1 text-sm">
             <span className="font-bold">{t("order.wait")}: </span>
-            <span className="text-ember font-black">~{waitMin} min</span>
+            <span className="text-ember font-black">~20 min</span>
           </div>
         </div>
         {isHappyHourNow && (
