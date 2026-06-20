@@ -148,7 +148,7 @@ function Landing() {
             initial={{ opacity: 0, scale: 0.92, rotate: -4 }}
             animate={{ opacity: 1, scale: 1, rotate: 0 }}
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className="relative aspect-square max-w-md mx-auto"
+            className="relative aspect-square max-w-md mx-auto mt-16 lg:mt-0 order-last lg:order-none"
           >
             <div className="absolute -inset-10 bg-gradient-ember blur-3xl opacity-30 rounded-full" />
             <motion.img
