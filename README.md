@@ -1,93 +1,92 @@
-# 🍔 Top Burguer
+<div align="center">
 
-Sistema para Hamburgueria Inteligente desenvolvido como Projeto Integrador do Curso Técnico em Desenvolvimento de Sistemas do SENAI.
+# 🍔 TOP BURGUER
 
-## 📋 Sobre o Projeto
+### Sistema para Hamburgueria Inteligente
 
-O Top Burguer é uma plataforma web criada para simular o gerenciamento de uma hamburgueria moderna, integrando tecnologia, inovação e empreendedorismo.
+Projeto Integrador desenvolvido pelos alunos do Curso Técnico em Desenvolvimento de Sistemas – SENAI.
 
-O sistema foi desenvolvido com foco em:
+[![Deploy](https://img.shields.io/badge/Deploy-Em%20Breve-success)](#)
+![React](https://img.shields.io/badge/React-19-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
+![Vite](https://img.shields.io/badge/Vite-Latest-purple)
+![Supabase](https://img.shields.io/badge/Supabase-Backend-green)
 
-- Gestão de pedidos
-- Cardápio digital
-- Experiência do cliente
-- Interface moderna e responsiva
-- Demonstração prática de desenvolvimento de software
+</div>
+
+---
+
+## 📖 Sobre o Projeto
+
+O Top Burguer é uma plataforma web desenvolvida para demonstrar o funcionamento de uma hamburgueria inteligente, integrando tecnologia, empreendedorismo e experiência do usuário.
+
+---
 
 ## 🚀 Funcionalidades
 
-- Visualização de produtos
-- Cardápio digital
-- Controle de pedidos
-- Interface responsiva
-- Integração com banco de dados
-- Dashboard administrativo
+- 🍔 Cardápio Digital
+- 🛒 Gestão de Pedidos
+- 👤 Cadastro de Clientes
+- 📦 Controle de Produtos
+- 📱 Layout Responsivo
+- 📊 Dashboard Administrativo
 
-## 🛠️ Tecnologias Utilizadas
+---
+
+## 🛠 Tecnologias
 
 - React
 - TypeScript
 - Vite
 - Tailwind CSS
 - Supabase
+- GitHub
+- Vercel
 - Lovable.dev
 
-## 📦 Instalação
+---
 
-Clone o repositório:
+## 👥 Equipes
 
-```bash
-git clone https://github.com/huiata15323-commits/topburguer.git
-```
+### 🎨 Design & Marketing
+Responsável pela identidade visual e divulgação.
 
-Acesse a pasta:
+### 🛠 Support Team
+Responsável pelo suporte e organização.
 
-```bash
-cd topburguer
-```
+### 🍔 Food Team
+Responsável pelos produtos e cardápio.
 
-Instale as dependências:
+### 🎤 Pitch Team
+Responsável pela apresentação do projeto.
 
-```bash
-npm install
-```
+### 💻 Desenvolvimento
+Responsável pela construção do sistema.
 
-Execute o projeto:
-
-```bash
-npm run dev
-```
+---
 
 ## 🌐 Deploy
 
-O projeto pode ser publicado facilmente utilizando:
+Em breve disponível online.
 
-- GitHub
-- Vercel
+---
 
-## 👥 Equipe
+## 📸 Demonstração
 
-Projeto desenvolvido pelos alunos do Curso Técnico em Desenvolvimento de Sistemas – SENAI.
+### Tela Inicial
 
-### Equipes do Projeto
+![Home](docs/home.png)
 
-- Design & Marketing
-- Support Team
-- Food Team
-- Pitch Team
-- Desenvolvimento
+### Cardápio
 
-## 🎯 Objetivo Acadêmico
+![Cardápio](docs/cardapio.png)
 
-Demonstrar na prática a aplicação de conceitos de:
+### Dashboard
 
-- Desenvolvimento Web
-- Banco de Dados
-- UX/UI
-- Gestão de Projetos
-- Empreendedorismo
-- Trabalho em Equipe
+![Dashboard](docs/dashboard.png)
 
-## 📄 Licença
+---
 
-Projeto acadêmico desenvolvido para fins educacionais.
+## 🎓 Projeto Integrador SENAI
+
+Tecnologia, inovação e empreendedorismo aplicados a uma solução real.
