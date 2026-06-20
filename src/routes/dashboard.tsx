@@ -128,81 +128,87 @@ function DashboardPage() {
   };
 
   return (
-    <main className="min-h-screen bg-neutral-950 text-white">
-      <header className="border-b border-white/10 bg-black/80 backdrop-blur sticky top-0 z-10">
-        <div className="px-6 py-4 flex items-center justify-between gap-4 flex-wrap">
-          <div className="flex items-center gap-4">
-            <Link to="/" className="w-10 h-10 rounded-xl bg-gradient-ember grid place-items-center font-black shadow-ember">T</Link>
-            <div>
-              <h1 className="text-2xl font-black tracking-tight">
-                Top Burguer <span className="text-amber-warm">| Dashboard</span>
+    <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_rgba(255,138,61,0.08),_transparent_60%),_#0a0a0b] text-white">
+      <header className="relative overflow-hidden border-b border-white/10 bg-gradient-night sticky top-0 z-10 backdrop-blur">
+        <div className="kitchen-aurora opacity-60 pointer-events-none" aria-hidden />
+        <div className="kitchen-grid pointer-events-none" aria-hidden />
+        <div className="relative px-4 sm:px-6 py-4 flex items-center justify-between gap-3 flex-wrap">
+          <div className="flex items-center gap-3 min-w-0">
+            <Link to="/" className="w-11 h-11 rounded-2xl bg-gradient-ember grid place-items-center font-black shadow-ember ring-2 ring-white/10 text-lg">T</Link>
+            <div className="min-w-0">
+              <h1 className="text-xl sm:text-2xl font-black tracking-tight truncate">
+                Top Burguer <span className="bg-gradient-amber bg-clip-text text-transparent">| Dashboard</span>
               </h1>
               <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-white/50">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-live" /> Métricas em tempo real
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-live" />
+                Tempo real · <span className="text-amber-warm">{rangeLabel}</span>
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            {(["today","7d","30d","all"] as Range[]).map((r) => (
-              <Chip key={r} active={range === r} onClick={() => setRange(r)}>
-                {r === "today" ? "Hoje" : r === "7d" ? "7 dias" : r === "30d" ? "30 dias" : "Tudo"}
-              </Chip>
-            ))}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <div className="flex items-center gap-1 p-1 rounded-xl bg-white/5 border border-white/10">
+              {(["today","7d","30d","all"] as Range[]).map((r) => (
+                <Chip key={r} active={range === r} onClick={() => setRange(r)}>
+                  {r === "today" ? "Hoje" : r === "7d" ? "7d" : r === "30d" ? "30d" : "Tudo"}
+                </Chip>
+              ))}
+            </div>
             <button
               onClick={exportPDF}
-              className="px-3 py-2 text-xs rounded-lg bg-ember/20 text-ember border border-ember/40 hover:bg-ember/30 font-bold transition"
+              className="px-3 py-2 text-xs rounded-lg bg-ember/20 text-ember border border-ember/40 hover:bg-ember/30 hover:scale-105 font-bold transition-all"
             >
               📄 PDF
             </button>
             <button
               onClick={exportCSV}
-              className="px-3 py-2 text-xs rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 font-bold transition"
+              className="px-3 py-2 text-xs rounded-lg bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/25 hover:scale-105 font-bold transition-all"
               title="Exportar pedidos para CSV (Excel)"
             >
               📊 CSV
             </button>
             <button
               onClick={resetOrders}
-              className="px-3 py-2 text-xs rounded-lg bg-red-500/15 text-red-300 hover:bg-red-500/25 border border-red-500/30 font-bold transition"
+              className="px-3 py-2 text-xs rounded-lg bg-red-500/15 text-red-300 hover:bg-red-500/25 hover:scale-105 border border-red-500/30 font-bold transition-all"
               title="Zerar pedidos"
             >
               🗑 Zerar
             </button>
-            <Link to="/finance" className="px-3 py-2 text-xs rounded-lg bg-white/10 hover:bg-white/20 font-bold transition">
+            <Link to="/finance" className="px-3 py-2 text-xs rounded-lg bg-white/10 hover:bg-white/20 hover:scale-105 font-bold transition-all">
               Financeiro →
             </Link>
           </div>
         </div>
       </header>
 
-      <div className="p-6 space-y-6 max-w-7xl mx-auto">
+      <div className="p-4 sm:p-6 space-y-6 max-w-7xl mx-auto">
         {/* KPIs clicáveis */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-          <KpiCard label="Pedidos" value={String(stats.count)} sub={`${stats.done} concluídos`} accent="ember"
+          <KpiCard label="Pedidos" value={String(stats.count)} sub={`${stats.done} concluídos`} accent="ember" icon="🧾"
             active={statusFilter === "all"} onClick={() => setStatusFilter("all")} />
-          <KpiCard label="Novos" value={String(stats.pending)} sub="aguardando" accent="amber"
+          <KpiCard label="Novos" value={String(stats.pending)} sub="aguardando" accent="amber" icon="🆕"
             active={statusFilter === "pending"} onClick={() => setStatusFilter("pending")} />
-          <KpiCard label="Preparando" value={String(stats.preparing)} sub="em produção" accent="ember"
+          <KpiCard label="Preparando" value={String(stats.preparing)} sub="em produção" accent="ember" icon="🍳"
             active={statusFilter === "preparing"} onClick={() => setStatusFilter("preparing")} />
           <KpiCard
             label="Faturamento"
             value={fmtBRL(stats.revenue)}
+            icon="💰"
             sub={
               revenueDelta !== null
-                ? `${revenueDelta >= 0 ? "▲" : "▼"} ${Math.abs(revenueDelta).toFixed(1)}% vs período anterior`
+                ? `${revenueDelta >= 0 ? "▲" : "▼"} ${Math.abs(revenueDelta).toFixed(1)}% vs anterior`
                 : `Ticket ${fmtBRL(stats.avgTicket)}`
             }
             accent="emerald"
           />
-          <KpiCard label="Lucro" value={fmtBRL(profit)} sub={`Despesas ${fmtBRL(expenseTotal)}`} accent={profit >= 0 ? "violet" : "red"} />
+          <KpiCard label="Lucro" value={fmtBRL(profit)} icon={profit >= 0 ? "📈" : "📉"} sub={`Despesas ${fmtBRL(expenseTotal)}`} accent={profit >= 0 ? "violet" : "red"} />
         </div>
 
         {/* KPIs secundários */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <KpiCard label="Tempo médio preparo" value={fmtMin(stats.avgPrepMs)} sub={`${stats.done} concluídos`} accent="amber" />
-          <KpiCard label="Itens vendidos" value={String(stats.itemsSold)} sub={`${stats.uniqueItems} produtos diferentes`} accent="ember" />
-          <KpiCard label="Mesas atendidas" value={String(tablesServed)} sub="únicas no período" accent="violet" />
-          <KpiCard label="Taxa de conclusão" value={`${donePct}%`} sub={`${stats.done}/${stats.count} pedidos`} accent={donePct >= 80 ? "emerald" : "amber"} />
+          <KpiCard label="Tempo médio preparo" value={fmtMin(stats.avgPrepMs)} sub={`${stats.done} concluídos`} accent="amber" icon="⏱" />
+          <KpiCard label="Itens vendidos" value={String(stats.itemsSold)} sub={`${stats.uniqueItems} produtos`} accent="ember" icon="🍔" />
+          <KpiCard label="Mesas atendidas" value={String(tablesServed)} sub="únicas no período" accent="violet" icon="🪑" />
+          <KpiCard label="Taxa de conclusão" value={`${donePct}%`} sub={`${stats.done}/${stats.count} pedidos`} accent={donePct >= 80 ? "emerald" : "amber"} icon="✅" />
         </div>
 
         {/* Trend line chart */}
@@ -390,11 +396,11 @@ function DashboardPage() {
 }
 
 function KpiCard({
-  label, value, sub, accent, active, onClick,
+  label, value, sub, accent, active, onClick, icon,
 }: {
   label: string; value: string; sub: string;
   accent: "ember" | "emerald" | "amber" | "violet" | "red";
-  active?: boolean; onClick?: () => void;
+  active?: boolean; onClick?: () => void; icon?: string;
 }) {
   const accentCls = {
     ember: "from-ember/30 to-transparent",
@@ -403,17 +409,29 @@ function KpiCard({
     violet: "from-violet-500/30 to-transparent",
     red: "from-red-500/30 to-transparent",
   }[accent];
+  const ringCls = {
+    ember: "ring-ember/40",
+    emerald: "ring-emerald-500/40",
+    amber: "ring-amber-warm/40",
+    violet: "ring-violet-500/40",
+    red: "ring-red-500/40",
+  }[accent];
   const Comp = onClick ? "button" : "div";
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-      className={`relative rounded-2xl border bg-neutral-900 p-4 overflow-hidden text-left transition ${active ? "border-amber-warm/60 shadow-tv-glow" : "border-white/10"}`}
+      whileHover={{ y: -2 }}
+      className={`group relative rounded-2xl border bg-neutral-900/80 backdrop-blur p-4 overflow-hidden text-left transition-all hover:shadow-lg ${active ? `border-amber-warm/60 shadow-tv-glow ring-1 ${ringCls}` : "border-white/10 hover:border-white/20"}`}
     >
       <Comp onClick={onClick} className="block w-full text-left">
-        <div className={`absolute inset-0 bg-gradient-to-br ${accentCls} opacity-60 pointer-events-none`} />
+        <div className={`absolute inset-0 bg-gradient-to-br ${accentCls} opacity-60 pointer-events-none group-hover:opacity-90 transition-opacity`} />
+        <div className="absolute -top-6 -right-6 text-7xl opacity-[0.06] pointer-events-none select-none">{icon}</div>
         <div className="relative">
-          <div className="text-[10px] uppercase tracking-widest text-white/50">{label}</div>
-          <div className="text-2xl font-black mt-1 tabular-nums">{value}</div>
+          <div className="flex items-center gap-1.5">
+            {icon && <span className="text-sm">{icon}</span>}
+            <div className="text-[10px] uppercase tracking-widest text-white/60 font-bold">{label}</div>
+          </div>
+          <div className="text-2xl font-black mt-1.5 tabular-nums">{value}</div>
           <div className="text-[11px] text-white/50 mt-1">{sub}</div>
         </div>
       </Comp>
