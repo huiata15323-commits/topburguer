@@ -396,11 +396,11 @@ function DashboardPage() {
 }
 
 function KpiCard({
-  label, value, sub, accent, active, onClick,
+  label, value, sub, accent, active, onClick, icon,
 }: {
   label: string; value: string; sub: string;
   accent: "ember" | "emerald" | "amber" | "violet" | "red";
-  active?: boolean; onClick?: () => void;
+  active?: boolean; onClick?: () => void; icon?: string;
 }) {
   const accentCls = {
     ember: "from-ember/30 to-transparent",
@@ -409,17 +409,29 @@ function KpiCard({
     violet: "from-violet-500/30 to-transparent",
     red: "from-red-500/30 to-transparent",
   }[accent];
+  const ringCls = {
+    ember: "ring-ember/40",
+    emerald: "ring-emerald-500/40",
+    amber: "ring-amber-warm/40",
+    violet: "ring-violet-500/40",
+    red: "ring-red-500/40",
+  }[accent];
   const Comp = onClick ? "button" : "div";
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-      className={`relative rounded-2xl border bg-neutral-900 p-4 overflow-hidden text-left transition ${active ? "border-amber-warm/60 shadow-tv-glow" : "border-white/10"}`}
+      whileHover={{ y: -2 }}
+      className={`group relative rounded-2xl border bg-neutral-900/80 backdrop-blur p-4 overflow-hidden text-left transition-all hover:shadow-lg ${active ? `border-amber-warm/60 shadow-tv-glow ring-1 ${ringCls}` : "border-white/10 hover:border-white/20"}`}
     >
       <Comp onClick={onClick} className="block w-full text-left">
-        <div className={`absolute inset-0 bg-gradient-to-br ${accentCls} opacity-60 pointer-events-none`} />
+        <div className={`absolute inset-0 bg-gradient-to-br ${accentCls} opacity-60 pointer-events-none group-hover:opacity-90 transition-opacity`} />
+        <div className="absolute -top-6 -right-6 text-7xl opacity-[0.06] pointer-events-none select-none">{icon}</div>
         <div className="relative">
-          <div className="text-[10px] uppercase tracking-widest text-white/50">{label}</div>
-          <div className="text-2xl font-black mt-1 tabular-nums">{value}</div>
+          <div className="flex items-center gap-1.5">
+            {icon && <span className="text-sm">{icon}</span>}
+            <div className="text-[10px] uppercase tracking-widest text-white/60 font-bold">{label}</div>
+          </div>
+          <div className="text-2xl font-black mt-1.5 tabular-nums">{value}</div>
           <div className="text-[11px] text-white/50 mt-1">{sub}</div>
         </div>
       </Comp>
