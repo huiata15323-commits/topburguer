@@ -177,13 +177,13 @@ function Landing() {
             <motion.div
               initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.6 }}
-              className="absolute -bottom-6 right-2 sm:right-6 bg-white/95 text-charcoal rounded-2xl shadow-2xl px-4 py-3 backdrop-blur"
+              className="absolute -bottom-4 right-2 sm:right-6 bg-white/95 text-charcoal rounded-xl shadow-2xl px-2.5 py-1.5 backdrop-blur max-w-[150px]"
             >
-              <div className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-ember font-bold">
-                <span className="w-1.5 h-1.5 rounded-full bg-ember animate-live" /> Pedido #42
+              <div className="flex items-center gap-1 text-[8px] uppercase tracking-widest text-ember font-bold">
+                <span className="w-1 h-1 rounded-full bg-ember animate-live" /> Pedido #42
               </div>
-              <div className="text-sm font-bold mt-0.5">2× Top Bacon + Batata</div>
-              <div className="text-[10px] text-muted-foreground">Pronto em ~6 min</div>
+              <div className="text-[11px] font-bold mt-0.5 leading-tight whitespace-nowrap">2× Top Bacon + Batata</div>
+              <div className="text-[9px] text-muted-foreground">Pronto em ~6 min</div>
             </motion.div>
           </motion.div>
         </div>
