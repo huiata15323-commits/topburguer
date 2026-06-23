@@ -535,26 +535,15 @@ export function TableQRGenerator() {
   }
 `;
 
-    // SVG ornamental art-déco corner (folha dourada)
-    const cornerSVG = `
-      <svg class="corner tl" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#B8924A" stroke-width="1.2">
-        <path d="M8 8 L8 60 M8 8 L60 8" stroke-width="1.6"/>
-        <path d="M14 14 L14 48 M14 14 L48 14" opacity="0.7"/>
-        <path d="M14 48 Q22 48 22 40 Q22 32 30 32 Q38 32 38 24 Q38 16 48 14" stroke-width="0.9" opacity="0.85"/>
-        <circle cx="14" cy="48" r="1.6" fill="#B8924A" stroke="none"/>
-        <circle cx="48" cy="14" r="1.6" fill="#B8924A" stroke="none"/>
-        <circle cx="30" cy="30" r="1" fill="#B8924A" stroke="none"/>
-        <path d="M22 22 L26 26 M30 18 L34 22 M18 30 L22 34" stroke-width="0.6" opacity="0.7"/>
-      </svg>
-    `;
+    // Tech corner accent (removed for cleaner tech look; corners now handled by CSS pseudo-elements)
+    const cornerSVG = "";
 
     const css = isPoster ? posterCSS : (isTent ? tentCSS : cardCSS);
-    const tentCorners = isTent ? `<style>.corner-src{display:none}</style>` : "";
     const html = `<!doctype html><html><head><title>QR Codes — Mesas (${tpl.label})</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-<style>${css}</style>${tentCorners}</head><body>${node.innerHTML.replace(/__CORNER__/g, cornerSVG)}</body></html>`;
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+<style>${css}</style></head><body>${node.innerHTML.replace(/__CORNER__/g, cornerSVG)}</body></html>`;
     const w = window.open("", "_blank", "width=900,height=1200");
     if (!w) return;
     w.document.write(html);
@@ -622,14 +611,11 @@ export function TableQRGenerator() {
     const url = buildTableMenuUrl(n);
     return (
       <div className="tent-card">
-        {/* Cantos ornamentais — substituídos por SVG no print */}
-        <span className="corner tl" dangerouslySetInnerHTML={{ __html: "__CORNER__" }} />
-        <span className="corner tr" dangerouslySetInnerHTML={{ __html: "__CORNER__" }} />
-        <span className="corner bl" dangerouslySetInnerHTML={{ __html: "__CORNER__" }} />
-        <span className="corner br" dangerouslySetInnerHTML={{ __html: "__CORNER__" }} />
+        <div className="tech-lines" />
+        <div className="tech-lines bottom" />
 
         <div className="head">
-          <div className="ornament">❦ · ❦ · ❦</div>
+          <div className="ornament">◆ ◆ ◆</div>
           <div className="toplabel">{tpl.topLabel}</div>
           <div className="brand-wrap">
             <span className="brand-rule" />
@@ -637,7 +623,7 @@ export function TableQRGenerator() {
             <span className="brand-rule" />
           </div>
           <div className="smart">· SISTEMA INTELIGENTE ·</div>
-          {branding.slogan && <div className="slogan">— {branding.slogan} —</div>}
+          {branding.slogan && <div className="slogan">{branding.slogan}</div>}
         </div>
 
         <div className="row">
@@ -649,7 +635,7 @@ export function TableQRGenerator() {
         </div>
 
         <div className="project">
-          <div className="pmark">· ❦ ·</div>
+          <div className="pmark">◆ ◆ ◆</div>
           <div className="pline">CRIADO PELOS ALUNOS DO</div>
           <div className="pline">TÉCNICO EM DESENVOLVIMENTO DE SISTEMAS</div>
           <div className="pclass">Turmas 2º Ano “A” e “B” — SENAI</div>
@@ -835,7 +821,7 @@ export function TableQRGenerator() {
         {isTent ? (
           <div
             className="mx-auto rounded-lg overflow-hidden shadow-2xl relative"
-            style={{ width: 210, aspectRatio: "210 / 297", background: "#FBF7EE", fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+            style={{ width: 210, aspectRatio: "210 / 297", background: "#0F0F12", fontFamily: "'Inter', ui-sans-serif, sans-serif" }}
           >
             {[1, 0].map((rot) => (
               <div
@@ -851,32 +837,32 @@ export function TableQRGenerator() {
                   position: "relative", width: "92%", height: "88%", padding: "8px 10px",
                   display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between",
                 }}>
-                  <div style={{ position: "absolute", inset: 4, border: "1px solid #B8924A", borderRadius: 4 }} />
-                  <div style={{ position: "absolute", inset: 6, border: "0.5px solid #B8924A", borderRadius: 3 }} />
+                  <div style={{ position: "absolute", inset: 4, border: "1.5px solid #E85D3A", borderRadius: 4, boxShadow: "0 0 6px rgba(232,93,58,0.2)" }} />
+                  <div style={{ position: "absolute", inset: 7, border: "0.5px solid rgba(232,93,58,0.35)", borderRadius: 3 }} />
                   <div style={{ position: "relative", zIndex: 2, textAlign: "center" }}>
-                    <div style={{ color: "#B8924A", fontSize: 9, letterSpacing: "0.3em" }}>❦ ❧ ❦</div>
-                    <div style={{ fontSize: 5.5, letterSpacing: "0.4em", color: "#8a6a2e", fontWeight: 700, marginTop: 2, fontFamily: "ui-sans-serif" }}>{tpl.topLabel}</div>
-                    <div style={{ fontWeight: 600, fontSize: 14, color: "#2a1d0c", lineHeight: 1, marginTop: 2, letterSpacing: "0.04em" }}>{brand}</div>
+                    <div style={{ color: "#E85D3A", fontSize: 9, letterSpacing: "0.2em", fontWeight: 800 }}>◆ ◆ ◆</div>
+                    <div style={{ fontSize: 5.5, letterSpacing: "0.3em", color: "#E85D3A", fontWeight: 700, marginTop: 2, fontFamily: "ui-sans-serif" }}>{tpl.topLabel}</div>
+                    <div style={{ fontWeight: 800, fontSize: 14, color: "#f2f2f2", lineHeight: 1, marginTop: 2, letterSpacing: "0.06em" }}>{brand}</div>
                   </div>
                   <div style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", gap: 6 }}>
-                    <div style={{ background: "#fff", padding: 2, border: "0.5px solid #B8924A", borderRadius: 2 }}>
+                    <div style={{ background: "#f5f5f5", padding: 2, border: "0.5px solid #E85D3A", borderRadius: 2, boxShadow: "0 0 4px rgba(232,93,58,0.2)" }}>
                       {previewUrl && <QRCode value={previewUrl} size={48} level="M" />}
                     </div>
                     <div style={{ textAlign: "left" }}>
-                      <div style={{ fontSize: 5, letterSpacing: "0.35em", color: "#8a6a2e", fontWeight: 700, fontFamily: "ui-sans-serif" }}>MESA Nº</div>
-                      <div style={{ fontSize: 26, fontWeight: 700, color: "#2a1d0c", lineHeight: 0.9 }}>1</div>
+                      <div style={{ fontSize: 5, letterSpacing: "0.25em", color: "#E85D3A", fontWeight: 700, fontFamily: "ui-sans-serif" }}>MESA Nº</div>
+                      <div style={{ fontSize: 26, fontWeight: 900, color: "#f2f2f2", lineHeight: 0.9, textShadow: "0 0 4px rgba(232,93,58,0.3)" }}>1</div>
                     </div>
                   </div>
-                  <div style={{ position: "relative", zIndex: 2, fontSize: 5, color: "#5a4a2a", textAlign: "center", fontFamily: "ui-sans-serif" }}>{tpl.hint}</div>
+                  <div style={{ position: "relative", zIndex: 2, fontSize: 5, color: "#9E9E9E", textAlign: "center", fontFamily: "ui-sans-serif" }}>{tpl.hint}</div>
                 </div>
               </div>
             ))}
             <div style={{
               position: "absolute", top: "50%", left: 8, right: 8,
-              borderTop: "0.5px dashed #B8924A", transform: "translateY(-50%)",
+              borderTop: "0.5px dashed #E85D3A", opacity: 0.5, transform: "translateY(-50%)",
               textAlign: "center",
             }}>
-              <span style={{ position: "relative", top: -5, background: "#FBF7EE", padding: "0 6px", fontSize: 5, letterSpacing: "0.4em", color: "#B8924A", fontWeight: 700, fontFamily: "ui-sans-serif" }}>DOBRE AQUI</span>
+              <span style={{ position: "relative", top: -5, background: "#0F0F12", padding: "0 6px", fontSize: 5, letterSpacing: "0.3em", color: "#E85D3A", fontWeight: 700, fontFamily: "ui-sans-serif" }}>DOBRE AQUI</span>
             </div>
           </div>
         ) : isPoster ? (
