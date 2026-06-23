@@ -16,6 +16,48 @@ import { VoiceOrderButton } from "@/components/VoiceOrderButton";
 import { useComboSuggestions } from "@/lib/combos";
 import { useBranding } from "@/lib/branding";
 
+function SmartDishImage({ src, alt, emoji, soldOut }: { src?: string; alt: string; emoji: string; soldOut?: boolean }) {
+  const [failed, setFailed] = useState(false);
+  if (!src || failed) {
+    return (
+      <div className={`w-full h-full grid place-items-center bg-gradient-to-br from-amber-warm/15 via-card to-ember/10 text-5xl ${soldOut ? "grayscale" : ""}`}>
+        {emoji}
+      </div>
+    );
+  }
+  return (
+    <img
+      src={src}
+      alt={alt}
+      loading="lazy"
+      width={512}
+      height={384}
+      onError={() => setFailed(true)}
+      className={`w-full h-full object-cover transition-transform duration-500 ${soldOut ? "grayscale" : "group-hover:scale-105"}`}
+    />
+  );
+}
+
+function SmartThumb({ src, alt, emoji }: { src?: string; alt: string; emoji: string }) {
+  const [failed, setFailed] = useState(false);
+  if (!src || failed) {
+    return (
+      <div className="w-10 h-10 rounded-md grid place-items-center bg-muted text-xl flex-shrink-0" aria-label={alt}>
+        {emoji}
+      </div>
+    );
+  }
+  return (
+    <img
+      src={src}
+      alt={alt}
+      onError={() => setFailed(true)}
+      className="w-10 h-10 rounded-md object-cover flex-shrink-0"
+    />
+  );
+}
+
+
 const search = z.object({
   mesa: z.coerce.number().int().positive().max(999).optional().catch(undefined),
 });
