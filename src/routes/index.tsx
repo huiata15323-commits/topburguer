@@ -1,3 +1,4 @@
+import fryingPanQ from "@/assets/frying-pan-q.png";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Lock } from "lucide-react";
