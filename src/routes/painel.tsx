@@ -931,7 +931,10 @@ function TVFooter({
   avgPrepMin: number | null;
   clock: Date | null;
 }) {
-  const orderUrl = typeof window !== "undefined" ? `${window.location.origin}/order` : "/order";
+  const [orderUrl, setOrderUrl] = useState<string | null>(null);
+  useEffect(() => {
+    setOrderUrl(`${window.location.origin}/order`);
+  }, []);
   const [promoIdx, setPromoIdx] = useState(0);
   useEffect(() => {
     const t = setInterval(() => setPromoIdx((i) => (i + 1) % promos.length), 5000);
