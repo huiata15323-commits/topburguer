@@ -94,7 +94,8 @@ async function fetchAll() {
   const { data, error } = await supabase
     .from("orders")
     .select("id, number, customer, table_number, items, notes, total, status, created_at, done_at, notified_at, rating, review, rated_at, waiter_called_at")
-    .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(200);
   if (error) {
     console.error("[orders] fetch failed", error);
     return;
