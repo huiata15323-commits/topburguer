@@ -73,7 +73,7 @@ function Landing() {
 
       <section className="relative z-10 mx-auto max-w-7xl px-6 pt-10 pb-20 md:pt-20 md:pb-28">
         <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
-          <div>
+          <div className="text-center">
             <motion.div
               initial="hidden" animate="show" variants={fadeUp}
               className="inline-flex items-center gap-2 rounded-full border border-amber-warm/30 bg-amber-warm/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-amber-warm"
