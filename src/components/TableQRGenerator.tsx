@@ -415,14 +415,77 @@ export function TableQRGenerator() {
   .hint { font-size: 10px; opacity: 0.85; line-height: 1.35; padding: 0 4mm; font-weight: 600; }
 `;
 
-    const css = isPoster ? posterCSS : cardCSS;
+    const tentCSS = `
+  @page { size: A4 portrait; margin: 0; }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-family: "Cormorant Garamond", "Playfair Display", Georgia, serif; margin: 0; padding: 0; background: #FBF7EE; }
+  .page { width: 210mm; height: 297mm; position: relative; background: #FBF7EE; page-break-after: always; display: flex; flex-direction: column; }
+  .page:last-child { page-break-after: auto; }
+  .half { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; padding: 10mm; }
+  .half.top { transform: rotate(180deg); }
+  .fold {
+    position: absolute; left: 6mm; right: 6mm; top: 50%; height: 0;
+    border-top: 1px dashed #B8924A; opacity: 0.55; transform: translateY(-50%);
+    text-align: center;
+  }
+  .fold span {
+    position: relative; top: -2.5mm; background: #FBF7EE; padding: 0 4mm;
+    font-family: ui-sans-serif, sans-serif; font-size: 7pt; letter-spacing: 0.4em;
+    color: #B8924A; font-weight: 700;
+  }
+  .tent-card {
+    width: 175mm; height: 122mm; position: relative;
+    background: #FBF7EE;
+    padding: 8mm 10mm;
+    display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  }
+  /* Moldura dupla dourada */
+  .tent-card::before {
+    content: ""; position: absolute; inset: 4mm;
+    border: 1.2pt solid #B8924A; border-radius: 2mm;
+  }
+  .tent-card::after {
+    content: ""; position: absolute; inset: 5.5mm;
+    border: 0.4pt solid #B8924A; border-radius: 1.5mm;
+  }
+  .ornament {
+    font-size: 22pt; color: #B8924A; line-height: 1; margin-top: 1mm;
+    letter-spacing: 0.3em; position: relative; z-index: 2;
+  }
+  .toplabel {
+    font-family: ui-sans-serif, sans-serif; font-size: 8pt; letter-spacing: 0.45em;
+    color: #8a6a2e; font-weight: 700; margin-top: 2mm; position: relative; z-index: 2;
+  }
+  .brand {
+    font-family: "Cormorant Garamond", "Playfair Display", Georgia, serif;
+    font-weight: 600; font-size: 34pt; color: #2a1d0c; letter-spacing: 0.04em;
+    line-height: 1; margin-top: 2mm; position: relative; z-index: 2;
+    text-align: center;
+  }
+  .slogan {
+    font-style: italic; color: #8a6a2e; font-size: 10pt; margin-top: 1.5mm;
+    position: relative; z-index: 2;
+  }
+  .row { display: flex; align-items: center; gap: 7mm; margin-top: 3mm; position: relative; z-index: 2; }
+  .qr-box { background: #fff; padding: 2.5mm; border: 0.6pt solid #B8924A; border-radius: 1.5mm; }
+  .qr-box svg { width: 38mm; height: 38mm; display: block; }
+  .mesa { text-align: left; }
+  .mesa .lbl { font-family: ui-sans-serif, sans-serif; font-size: 9pt; letter-spacing: 0.4em; color: #8a6a2e; font-weight: 700; }
+  .mesa .num { font-family: "Cormorant Garamond", "Playfair Display", Georgia, serif; font-weight: 700; font-size: 56pt; color: #2a1d0c; line-height: 0.9; }
+  .hint { font-family: ui-sans-serif, sans-serif; font-size: 8.5pt; color: #5a4a2a; margin-top: 1mm; position: relative; z-index: 2; text-align: center; max-width: 130mm; }
+`;
+
+    const css = isPoster ? posterCSS : (isTent ? tentCSS : cardCSS);
     const html = `<!doctype html><html><head><title>QR Codes — Mesas (${tpl.label})</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <style>${css}</style></head><body>${node.innerHTML}</body></html>`;
     const w = window.open("", "_blank", "width=900,height=1200");
     if (!w) return;
     w.document.write(html);
     w.document.close();
-    setTimeout(() => { w.focus(); w.print(); }, 400);
+    setTimeout(() => { w.focus(); w.print(); }, 600);
   };
 
   // ===== Render do conteúdo de impressão (oculto) =====
