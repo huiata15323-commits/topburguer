@@ -137,7 +137,7 @@ function Landing() {
 
             <motion.div
               initial="hidden" animate="show" variants={fadeUp} custom={4}
-              className="mt-12 grid grid-cols-3 gap-6 max-w-md"
+              className="mt-12 grid grid-cols-3 gap-6 max-w-md mx-auto text-center"
             >
               {[
                 { k: "<3s", v: "Sincronização" },
