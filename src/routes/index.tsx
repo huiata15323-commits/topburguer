@@ -1,3 +1,4 @@
+import fryingPanQ from "@/assets/frying-pan-q.png";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Lock } from "lucide-react";
@@ -72,7 +73,7 @@ function Landing() {
 
       <section className="relative z-10 mx-auto max-w-7xl px-6 pt-10 pb-20 md:pt-20 md:pb-28">
         <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-12 items-center">
-          <div>
+          <div className="text-center">
             <motion.div
               initial="hidden" animate="show" variants={fadeUp}
               className="inline-flex items-center gap-2 rounded-full border border-amber-warm/30 bg-amber-warm/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-amber-warm"
@@ -85,7 +86,15 @@ function Landing() {
               initial="hidden" animate="show" variants={fadeUp} custom={1}
               className="mt-6 text-display text-balance text-[clamp(3.5rem,9vw,7.5rem)]"
             >
-              <span className="block">DO TOQUE</span>
+              <span className="block">
+                DO TO
+                <img
+                  src={fryingPanQ}
+                  alt="Q"
+                  className="inline-block align-middle h-[0.85em] w-[0.85em] mx-[0.02em] -mt-[0.08em]"
+                />
+                UE
+              </span>
               <span className="block">
                 <span className="text-outline">À</span>{" "}
                 <span className="bg-gradient-to-br from-amber-warm via-gold to-ember bg-clip-text text-transparent">CHAPA</span>
@@ -96,7 +105,7 @@ function Landing() {
 
             <motion.p
               initial="hidden" animate="show" variants={fadeUp} custom={2}
-              className="mt-6 text-lg md:text-xl text-white/70 max-w-xl text-balance"
+              className="mt-6 text-lg md:text-xl text-white/70 max-w-xl text-balance mx-auto"
             >
               O Top Burguer conecta o cliente, o painel de status e a cozinha
               numa única experiência. Pediu, fritou, entregou.
@@ -104,7 +113,7 @@ function Landing() {
 
             <motion.div
               initial="hidden" animate="show" variants={fadeUp} custom={3}
-              className="mt-10 flex flex-wrap gap-3"
+              className="mt-10 flex flex-wrap gap-3 justify-center"
             >
               <Link
                 to="/order"
@@ -128,7 +137,7 @@ function Landing() {
 
             <motion.div
               initial="hidden" animate="show" variants={fadeUp} custom={4}
-              className="mt-12 grid grid-cols-3 gap-6 max-w-md"
+              className="mt-12 grid grid-cols-3 gap-6 max-w-md mx-auto text-center"
             >
               {[
                 { k: "<3s", v: "Sincronização" },
