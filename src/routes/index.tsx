@@ -350,7 +350,13 @@ function Landing() {
                   info: '2º Ano "A" TDS · SENAI',
                   real: true,
                 },
-                ...[2, 3, 4, 5, 6].map((i) => ({
+                {
+                  quote: "Durante o curso aprendi várias coisas que não fazia ideia que conseguia, com o auxílio do professor Huiatã Ribeiro aprendemos não só a lidar com os desafios dentro de sala de aula, mais também com os desafios da vida, vou sempre levar comigo a certeza de que fazer o curso foi a minha melhor escolha.",
+                  name: "Izabelly Ramos",
+                  info: '2º Ano "A" TDS · SENAI',
+                  real: true,
+                },
+                ...[3, 4, 5, 6].map((i) => ({
                   quote: "Espaço reservado para o depoimento de um aluno da turma.",
                   name: "Aluno(a)",
                   info: "2º Ano · SENAI",
