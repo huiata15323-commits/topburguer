@@ -312,6 +312,7 @@ export function TableQRGenerator() {
   const tables = useMemo(() => Array.from({ length: count }, (_, i) => i + 1), [count]);
   const tpl = TEMPLATES.find((t) => t.id === templateId) ?? TEMPLATES[0];
   const isPoster = tpl.layout === "poster";
+  const isTent = tpl.layout === "tent";
   const effectiveBaseUrl = useMemo(() => sanitizeBaseUrl(baseUrl, origin), [baseUrl, origin]);
 
   const updateCount = (n: number) => {
