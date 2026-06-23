@@ -356,7 +356,13 @@ function Landing() {
                   info: '2º Ano "A" TDS · SENAI',
                   real: true,
                 },
-                ...[3, 4, 5, 6].map((i) => ({
+                {
+                  quote: "Ter a oportunidade de fazer o curso de Desenvolvimento de Sistemas juntamente ao professor Huiatã Ribeiro não foi somente um aprendizado escolar, mas são lições que eu vou levar para vida, ele não é apenas um professor para nossa turma, mas também é um pai. Ele ensina, educa, pega no pé sempre que necessário e é nosso amigo que sempre estará ali caso a gente precise de apoio ou qualquer ajuda. Ter a oportunidade de ter um professor igual a ele foi a melhor coisa que me aconteceu, sou muito grata por tudo.",
+                  name: "Isadora Gomes Lima",
+                  info: '2º Ano "A" TDS · SENAI',
+                  real: true,
+                },
+                ...[4, 5, 6].map((i) => ({
                   quote: "Espaço reservado para o depoimento de um aluno da turma.",
                   name: "Aluno(a)",
                   info: "2º Ano · SENAI",
