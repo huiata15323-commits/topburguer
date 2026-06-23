@@ -118,7 +118,7 @@ const CATS: { key: EditableMenuItem["category"]; label: string; emoji: string }[
 const DEFAULT_IMG = SEED[0].image;
 
 function AdminPage() {
-  const { items, addItem, updateItem, removeItem, toggleSoldOut, setStock, resetToDefaults } = useMenu();
+  const { items, isLoading: menuLoading, addItem, updateItem, removeItem, toggleSoldOut, setStock, resetToDefaults } = useMenu();
   const [form, setForm] = useState<FormState>(EMPTY);
   const [editing, setEditing] = useState(false);
   const [generatingImg, setGeneratingImg] = useState(false);
@@ -158,7 +158,7 @@ function AdminPage() {
       if (r.error === "rate_limit") toast.error("⏳ Aguarde 1min", { id: tid });
       else if (r.error === "no_credits") toast.error("💳 Sem créditos de IA", { id: tid });
       else if (r.error || !r.dataUrl) toast.error("Falhou. Tente novamente.", { id: tid });
-      else { updateItem(m.id, { image: r.dataUrl }); toast.success("✨ Nova foto!", { id: tid }); }
+      else { await updateItem(m.id, { image: r.dataUrl }); toast.success("✨ Nova foto!", { id: tid }); }
     } finally {
       setRegenId(null);
     }
@@ -190,7 +190,7 @@ function AdminPage() {
     }));
   };
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const price = parseFloat(form.price.replace(",", "."));
     if (!form.name.trim()) return toast.error("Informe o nome");
@@ -206,21 +206,29 @@ function AdminPage() {
       badges: form.badges,
       prepMinutes: prep,
     };
-    if (editing && form.id) {
-      updateItem(form.id, payload);
-      toast.success("Item atualizado");
-    } else {
-      addItem(payload);
-      toast.success("Item adicionado");
+    try {
+      if (editing && form.id) {
+        await updateItem(form.id, payload);
+        toast.success("Item atualizado");
+      } else {
+        await addItem(payload);
+        toast.success("Item adicionado");
+      }
+      cancel();
+    } catch {
+      toast.error("Não foi possível salvar o item");
     }
-    cancel();
   };
 
-  const reset = () => {
+  const reset = async () => {
     if (!confirm("Restaurar o cardápio padrão? Suas alterações serão perdidas.")) return;
-    resetToDefaults();
-    cancel();
-    toast.success("Cardápio restaurado");
+    try {
+      await resetToDefaults();
+      cancel();
+      toast.success("Cardápio restaurado");
+    } catch {
+      toast.error("Não foi possível restaurar o cardápio");
+    }
   };
 
   return (
