@@ -31,6 +31,7 @@ type MenuStatus = "loading" | "ready" | "error";
 type MenuSnapshot = { items: EditableMenuItem[]; status: MenuStatus; error: string | null };
 
 const MENU_SELECT = "id,name,price,category,emoji,image,description,sold_out,stock,sort_order,badges,prep_minutes";
+const MENU_FRESH_MS = 3_000;
 const SEED_IMAGE_BY_ID = new Map(SEED.map((m) => [m.id, m.image]));
 
 function rowToItem(r: DbRow): EditableMenuItem {
@@ -65,6 +66,7 @@ let initialized = false;
 let fetchPromise: Promise<void> | null = null;
 let channel: ReturnType<typeof supabase.channel> | null = null;
 let cacheOrder = new Map<string, number>();
+let lastFetchedAt = 0;
 const listeners = new Set<(snapshot: MenuSnapshot) => void>();
 
 function getSnapshot(): MenuSnapshot {
@@ -81,10 +83,16 @@ function applyRows(rows: DbRow[]) {
   cache = rows.map(rowToItem);
   status = "ready";
   errorMessage = null;
+  lastFetchedAt = Date.now();
   notify();
 }
 
-async function fetchAll() {
+async function fetchAll({ hideDuringFetch = false }: { hideDuringFetch?: boolean } = {}) {
+  if (hideDuringFetch && status !== "loading") {
+    status = "loading";
+    errorMessage = null;
+    notify();
+  }
   if (fetchPromise) return fetchPromise;
   fetchPromise = (async () => {
     const { data, error } = await supabase
@@ -106,15 +114,17 @@ async function fetchAll() {
 }
 
 function ensureStreaming() {
-  if (initialized) return;
-  initialized = true;
-  channel = supabase
-    .channel("menu-stream")
-    .on("postgres_changes", { event: "*", schema: "public", table: "menu_items" }, () => {
-      void fetchAll();
-    })
-    .subscribe();
-  void fetchAll();
+  if (!initialized) {
+    initialized = true;
+    channel = supabase
+      .channel("menu-stream")
+      .on("postgres_changes", { event: "*", schema: "public", table: "menu_items" }, (payload) => {
+        applyRealtimePayload(payload as { eventType: string; new?: Record<string, unknown>; old?: Record<string, unknown> });
+      })
+      .subscribe();
+  }
+  const stale = Date.now() - lastFetchedAt > MENU_FRESH_MS;
+  if (stale) void fetchAll({ hideDuringFetch: true });
 }
 
 function uid() {
