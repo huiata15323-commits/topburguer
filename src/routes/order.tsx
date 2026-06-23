@@ -30,6 +30,7 @@ function SmartDishImage({ src, alt, emoji, soldOut }: { src?: string; alt: strin
       src={src}
       alt={alt}
       loading="lazy"
+      decoding="async"
       width={512}
       height={384}
       onError={() => setFailed(true)}
