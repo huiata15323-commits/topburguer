@@ -191,7 +191,17 @@ function AdminPage() {
       if (r.error === "rate_limit") toast.error("⏳ Aguarde 1min", { id: tid });
       else if (r.error === "no_credits") toast.error("💳 Sem créditos de IA", { id: tid });
       else if (r.error || !r.dataUrl) toast.error("Falhou. Tente novamente.", { id: tid });
-      else { await updateItem(m.id, { image: r.dataUrl }); toast.success("✨ Nova foto!", { id: tid }); }
+      else {
+        try {
+          const url = await uploadDataUrlToStorage(r.dataUrl, m.id);
+          await updateItem(m.id, { image: url });
+          toast.success("✨ Nova foto!", { id: tid });
+        } catch (e) {
+          console.error("[admin] upload failed", e);
+          toast.error("Falhou ao salvar a foto.", { id: tid });
+        }
+      }
+
     } finally {
       setRegenId(null);
     }
