@@ -610,7 +610,7 @@ function CartCard({
               exit={{ opacity: 0, x: -20 }}
               className="flex items-center gap-2 text-sm"
             >
-              <img src={i.image} alt="" className="w-10 h-10 rounded-md object-cover flex-shrink-0" />
+              <SmartThumb src={i.image} alt={i.name} emoji={i.emoji} />
               <div className="flex-1 min-w-0">
                 <div className="truncate"><span className="font-bold text-ember">{i.quantity}×</span> {i.name}</div>
                 {i.notes && <div className="text-[10px] text-amber-warm truncate">📝 {i.notes}</div>}
