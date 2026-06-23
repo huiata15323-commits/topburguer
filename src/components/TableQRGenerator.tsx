@@ -475,24 +475,25 @@ export function TableQRGenerator() {
     letter-spacing: 0.25em; font-weight: 800;
   }
   .toplabel {
-    font-family: "Cinzel", "Cormorant Garamond", serif;
-    font-size: 7.5pt; letter-spacing: 0.55em;
-    color: #8a6a2e; font-weight: 600; margin-top: 2mm;
+    font-family: "Inter", ui-sans-serif, sans-serif;
+    font-size: 7.5pt; letter-spacing: 0.45em;
+    color: #E85D3A; font-weight: 700; margin-top: 2mm;
   }
   .brand-wrap { display: flex; align-items: center; justify-content: center; gap: 4mm; margin-top: 1.5mm; }
-  .brand-rule { height: 0; flex: 0 0 18mm; border-top: 0.5pt solid #B8924A; opacity: 0.6; }
+  .brand-rule { height: 0; flex: 0 0 18mm; border-top: 0.6pt solid #E85D3A; opacity: 0.5; }
   .brand {
-    font-family: "Cinzel", "Playfair Display", serif;
-    font-weight: 700; font-size: 28pt; color: #2a1d0c; letter-spacing: 0.08em;
+    font-family: "Inter", "Bricolage Grotesque", ui-sans-serif, sans-serif;
+    font-weight: 900; font-size: 28pt; color: #f2f2f2; letter-spacing: 0.12em;
     line-height: 1; text-transform: uppercase;
+    text-shadow: 0 0.3mm 0.6mm rgba(232,93,58,0.35);
   }
   .slogan {
-    font-style: italic; color: #8a6a2e; font-size: 10pt; margin-top: 1.5mm;
-    letter-spacing: 0.04em;
+    font-style: normal; color: #9E9E9E; font-size: 10pt; margin-top: 1.5mm;
+    letter-spacing: 0.06em; font-weight: 500;
   }
   .smart {
-    font-family: "Cinzel", serif; font-size: 8pt; letter-spacing: 0.45em;
-    color: #B8924A; font-weight: 600; margin-top: 1mm;
+    font-family: "Inter", ui-sans-serif, sans-serif; font-size: 8pt; letter-spacing: 0.35em;
+    color: #E85D3A; font-weight: 700; margin-top: 1mm;
   }
 
   .row {
@@ -500,20 +501,20 @@ export function TableQRGenerator() {
     position: relative; z-index: 2;
   }
   .qr-box {
-    background: #fff; padding: 3mm;
-    border: 0.5pt solid #B8924A; border-radius: 1mm;
-    box-shadow: 0 0.8mm 2mm rgba(184,146,74,0.18);
+    background: #f5f5f5; padding: 3mm;
+    border: 0.5pt solid #E85D3A; border-radius: 1.5mm;
+    box-shadow: 0 0 2mm rgba(232,93,58,0.25);
   }
   .qr-box svg { width: 40mm; height: 40mm; display: block; }
   .mesa { text-align: left; }
   .mesa .lbl {
-    font-family: "Cinzel", serif; font-size: 8pt; letter-spacing: 0.45em;
-    color: #8a6a2e; font-weight: 600;
+    font-family: "Inter", ui-sans-serif, sans-serif; font-size: 8pt; letter-spacing: 0.35em;
+    color: #E85D3A; font-weight: 700;
   }
   .mesa .num {
-    font-family: "Cormorant Garamond", "Playfair Display", serif;
-    font-weight: 700; font-size: 64pt; color: #2a1d0c; line-height: 0.9;
-    text-shadow: 0 0.3mm 0 #B8924A;
+    font-family: "Inter", "Bricolage Grotesque", ui-sans-serif, sans-serif;
+    font-weight: 900; font-size: 64pt; color: #f2f2f2; line-height: 0.9;
+    text-shadow: 0 0.3mm 0.8mm rgba(232,93,58,0.45);
   }
 
   .project {
@@ -521,16 +522,16 @@ export function TableQRGenerator() {
     max-width: 150mm;
   }
   .project .pmark {
-    font-family: "Cormorant Garamond", serif; color: #B8924A;
-    font-size: 11pt; letter-spacing: 0.5em;
+    font-family: "Inter", ui-sans-serif, sans-serif; color: #E85D3A;
+    font-size: 11pt; letter-spacing: 0.3em; font-weight: 700;
   }
   .project .pline {
-    font-family: "Cinzel", serif; font-size: 7pt; letter-spacing: 0.4em;
-    color: #5a4a2a; font-weight: 600; margin-top: 1mm; line-height: 1.5;
+    font-family: "Inter", ui-sans-serif, sans-serif; font-size: 7pt; letter-spacing: 0.3em;
+    color: #9E9E9E; font-weight: 600; margin-top: 1mm; line-height: 1.5;
   }
   .project .pclass {
-    font-family: "Cormorant Garamond", serif; font-style: italic;
-    font-size: 9.5pt; color: #2a1d0c; margin-top: 0.5mm; letter-spacing: 0.06em;
+    font-family: "Inter", ui-sans-serif, sans-serif; font-style: normal;
+    font-size: 9pt; color: #f2f2f2; margin-top: 0.5mm; letter-spacing: 0.08em; font-weight: 500;
   }
 `;
 
