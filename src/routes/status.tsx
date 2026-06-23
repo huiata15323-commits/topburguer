@@ -128,9 +128,9 @@ function StatusPage() {
 
         <AnimatePresence mode="wait">
           {!n ? (
-            <EmptyState key="empty" />
+            <EmptyState key="empty" orders={orders} />
           ) : !order ? (
-            <NotFound key="nf" n={n} />
+            <NotFound key="nf" n={n} orders={orders} />
           ) : (
             <motion.div
               key={order.id}
@@ -333,25 +333,70 @@ function StatusPage() {
   );
 }
 
-function EmptyState() {
+function RecentOrders({ orders }: { orders: Order[] }) {
+  const recent = useMemo(
+    () => [...orders].sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0)).slice(0, 7),
+    [orders]
+  );
+  if (recent.length === 0) return null;
+  const labelOf = (s: Order["status"]) =>
+    s === "done" ? "Pronto" : s === "preparing" ? "Preparando" : "Recebido";
+  const dotOf = (s: Order["status"]) =>
+    s === "done" ? "bg-emerald-500" : s === "preparing" ? "bg-amber-warm" : "bg-muted-foreground";
   return (
-    <motion.div
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-      className="text-center py-16 text-muted-foreground"
-    >
-      <div className="text-6xl mb-4">🔍</div>
-      <p>Digite o número do seu pedido para acompanhar.</p>
+    <div className="mt-8">
+      <div className="text-xs uppercase tracking-widest text-muted-foreground font-bold mb-3">
+        Pedidos recentes
+      </div>
+      <ul className="space-y-2">
+        {recent.map((o) => (
+          <li key={o.id}>
+            <Link
+              to="/status"
+              search={{ n: o.number }}
+              className="flex items-center gap-3 p-3 rounded-2xl bg-card border border-border hover:border-ember/40 hover:shadow-card-soft transition"
+            >
+              <div className="w-12 h-12 rounded-xl bg-gradient-ember text-ember-foreground grid place-items-center font-black shadow-ember shrink-0">
+                #{o.number}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="font-semibold truncate">
+                  {o.customer || "Cliente"}
+                  {o.tableNumber ? ` · Mesa ${o.tableNumber}` : ""}
+                </div>
+                <div className="text-xs text-muted-foreground inline-flex items-center gap-1.5">
+                  <span className={`w-1.5 h-1.5 rounded-full ${dotOf(o.status)}`} />
+                  {labelOf(o.status)} · R$ {o.total.toFixed(2)}
+                </div>
+              </div>
+              <span className="text-muted-foreground">→</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function EmptyState({ orders }: { orders: Order[] }) {
+  return (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      <div className="text-center py-10 text-muted-foreground">
+        <div className="text-6xl mb-4">🔍</div>
+        <p>Digite o número do seu pedido para acompanhar.</p>
+      </div>
+      <RecentOrders orders={orders} />
     </motion.div>
   );
 }
-function NotFound({ n }: { n: number }) {
+function NotFound({ n, orders }: { n: number; orders: Order[] }) {
   return (
-    <motion.div
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-      className="text-center py-16"
-    >
-      <div className="text-6xl mb-4">😕</div>
-      <p className="text-muted-foreground">Pedido #{n} não encontrado.</p>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+      <div className="text-center py-10">
+        <div className="text-6xl mb-4">😕</div>
+        <p className="text-muted-foreground">Pedido #{n} não encontrado.</p>
+      </div>
+      <RecentOrders orders={orders} />
     </motion.div>
   );
 }
