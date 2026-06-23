@@ -128,9 +128,9 @@ function StatusPage() {
 
         <AnimatePresence mode="wait">
           {!n ? (
-            <EmptyState key="empty" />
+            <EmptyState key="empty" orders={orders} />
           ) : !order ? (
-            <NotFound key="nf" n={n} />
+            <NotFound key="nf" n={n} orders={orders} />
           ) : (
             <motion.div
               key={order.id}
