@@ -113,6 +113,23 @@ async function fetchAll({ hideDuringFetch = false }: { hideDuringFetch?: boolean
   return fetchPromise;
 }
 
+function applyRealtimePayload(payload: { eventType: string; new?: Record<string, unknown>; old?: Record<string, unknown> }) {
+  if (payload.eventType === "DELETE") {
+    const id = typeof payload.old?.id === "string" ? payload.old.id : undefined;
+    if (!id) return void fetchAll();
+    cacheOrder.delete(id);
+    cache = cache.filter((m) => m.id !== id);
+    status = "ready";
+    errorMessage = null;
+    lastFetchedAt = Date.now();
+    notify();
+    return;
+  }
+  if (!payload.new) return void fetchAll();
+  upsertCached(payload.new as unknown as DbRow);
+  lastFetchedAt = Date.now();
+}
+
 function ensureStreaming() {
   if (!initialized) {
     initialized = true;
