@@ -79,7 +79,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: "TOP BURGUER" },
       { name: "description", content: "TOP BURGUER conecta o cliente, o painel de status e a cozinha numa única experiência. Pediu, fritou, entregou." },
       { name: "author", content: "Lovable" },
