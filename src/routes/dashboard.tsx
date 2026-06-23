@@ -128,8 +128,8 @@ function DashboardPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_rgba(255,138,61,0.08),_transparent_60%),_#0a0a0b] text-white">
-      <header className="relative overflow-hidden border-b border-white/10 bg-gradient-night sticky top-0 z-10 backdrop-blur">
+    <main className="min-h-screen bg-black text-white">
+      <header className="relative overflow-hidden border-b-2 border-[#FF4500] bg-black shadow-[0_0_24px_rgba(255,69,0,0.5)] sticky top-0 z-10 backdrop-blur">
         <div className="kitchen-aurora opacity-60 pointer-events-none" aria-hidden />
         <div className="kitchen-grid pointer-events-none" aria-hidden />
         <div className="relative px-4 sm:px-6 py-4 flex items-center justify-between gap-3 flex-wrap">
@@ -212,7 +212,7 @@ function DashboardPage() {
         </div>
 
         {/* Trend line chart */}
-        <section className="rounded-2xl bg-neutral-900 border border-white/10 p-5">
+        <section className="rounded-2xl bg-black border-2 border-[#FF4500] shadow-[0_0_18px_rgba(255,69,0,0.55)] p-5">
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-black text-lg">📈 Receita ao longo do tempo</h2>
             <span className="text-xs text-white/40">{trend.bucketLabel}</span>
@@ -240,7 +240,7 @@ function DashboardPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Pie + Bar */}
-          <section className="rounded-2xl bg-neutral-900 border border-white/10 p-5">
+          <section className="rounded-2xl bg-black border-2 border-[#FF4500] shadow-[0_0_18px_rgba(255,69,0,0.55)] p-5">
             <h2 className="font-black text-lg mb-3">🥧 Distribuição de itens</h2>
             {pieData.length === 0 ? (
               <EmptyHint label="Sem vendas." />
@@ -296,7 +296,7 @@ function DashboardPage() {
           </section>
 
           {/* Hourly bar */}
-          <section className="rounded-2xl bg-neutral-900 border border-white/10 p-5">
+          <section className="rounded-2xl bg-black border-2 border-[#FF4500] shadow-[0_0_18px_rgba(255,69,0,0.55)] p-5">
             <h2 className="font-black text-lg mb-3">⏱ Pedidos por horário</h2>
             <div className="h-64">
               <ResponsiveContainer>
@@ -325,7 +325,7 @@ function DashboardPage() {
 
 
         {/* Top items list */}
-        <section className="rounded-2xl bg-neutral-900 border border-white/10 p-5">
+        <section className="rounded-2xl bg-black border-2 border-[#FF4500] shadow-[0_0_18px_rgba(255,69,0,0.55)] p-5">
           <h2 className="font-black text-lg mb-4">🔥 Mais vendidos</h2>
           {stats.topItems.length === 0 ? (
             <EmptyHint label="Sem vendas no período." />
@@ -366,7 +366,7 @@ function DashboardPage() {
         </section>
 
         {/* History table */}
-        <section className="rounded-2xl bg-neutral-900 border border-white/10 overflow-hidden">
+        <section className="rounded-2xl bg-black border-2 border-[#FF4500] shadow-[0_0_18px_rgba(255,69,0,0.55)] overflow-hidden">
           <div className="p-5 flex items-center justify-between flex-wrap gap-2">
             <h2 className="font-black text-lg">📋 Histórico</h2>
             <span className="text-xs text-white/40">
@@ -441,7 +441,7 @@ function KpiCard({
     <motion.div
       initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -2 }}
-      className={`group relative rounded-2xl border bg-neutral-900/80 backdrop-blur p-4 overflow-hidden text-left transition-all hover:shadow-lg ${active ? `border-amber-warm/60 shadow-tv-glow ring-1 ${ringCls}` : "border-white/10 hover:border-white/20"}`}
+      className={`group relative rounded-2xl border-2 bg-black backdrop-blur p-4 overflow-hidden text-left transition-all ${active ? `border-[#FF4500] shadow-[0_0_24px_rgba(255,69,0,0.8)] ring-1 ${ringCls}` : "border-[#FF4500]/70 shadow-[0_0_14px_rgba(255,69,0,0.45)] hover:border-[#FF4500] hover:shadow-[0_0_22px_rgba(255,69,0,0.75)]"}`}
     >
       <Comp onClick={onClick} className="block w-full text-left">
         <div className={`absolute inset-0 bg-gradient-to-br ${accentCls} opacity-60 pointer-events-none group-hover:opacity-90 transition-opacity`} />
@@ -516,7 +516,7 @@ function OperationsRow({ orders }: { orders: Order[] }) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       {/* Performance */}
-      <section className="rounded-2xl bg-neutral-900 border border-white/10 p-5">
+      <section className="rounded-2xl bg-black border-2 border-[#FF4500] shadow-[0_0_18px_rgba(255,69,0,0.55)] p-5">
         <h2 className="font-black text-lg mb-4">⚡ Performance da cozinha</h2>
         <div className="grid grid-cols-2 gap-3 mb-4">
           <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-3">
@@ -544,7 +544,7 @@ function OperationsRow({ orders }: { orders: Order[] }) {
       </section>
 
       {/* Satisfação */}
-      <section className="rounded-2xl bg-neutral-900 border border-white/10 p-5">
+      <section className="rounded-2xl bg-black border-2 border-[#FF4500] shadow-[0_0_18px_rgba(255,69,0,0.55)] p-5">
         <h2 className="font-black text-lg mb-4">⭐ Satisfação</h2>
         {rated.length === 0 ? (
           <EmptyHint label="Sem avaliações ainda." />
@@ -579,7 +579,7 @@ function OperationsRow({ orders }: { orders: Order[] }) {
       </section>
 
       {/* Heatmap de mesas */}
-      <section className="rounded-2xl bg-neutral-900 border border-white/10 p-5">
+      <section className="rounded-2xl bg-black border-2 border-[#FF4500] shadow-[0_0_18px_rgba(255,69,0,0.55)] p-5">
         <h2 className="font-black text-lg mb-4">🪑 Mesas mais ativas</h2>
         {tables.length === 0 ? (
           <EmptyHint label="Sem pedidos por mesa." />
