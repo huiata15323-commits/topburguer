@@ -847,12 +847,16 @@ export function TableQRGenerator() {
 
       {/* Conteúdo de impressão (oculto) */}
       <div ref={printRef} className="hidden">
-        {isPoster ? tables.map(renderPosterPage) : <div className="grid">{tables.map(renderCard)}</div>}
+        {isPoster
+          ? tables.map(renderPosterPage)
+          : isTent
+            ? tables.map(renderTentPage)
+            : <div className="grid">{tables.map(renderCard)}</div>}
       </div>
 
       <p className="text-[11px] text-muted-foreground text-center">
         🖨 {count} placa{count > 1 ? "s" : ""} — modelo <strong>{tpl.label}</strong>
-        {isPoster ? " (1 por folha A4)" : " (2 por folha A4, prontas para recortar)"}.
+        {isPoster ? " (1 por folha A4)" : isTent ? " (1 por folha A4 — dobre ao meio)" : " (2 por folha A4, prontas para recortar)"}.
       </p>
     </section>
   );
