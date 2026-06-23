@@ -931,7 +931,10 @@ function TVFooter({
   avgPrepMin: number | null;
   clock: Date | null;
 }) {
-  const orderUrl = typeof window !== "undefined" ? `${window.location.origin}/order` : "/order";
+  const [orderUrl, setOrderUrl] = useState<string | null>(null);
+  useEffect(() => {
+    setOrderUrl(`${window.location.origin}/order`);
+  }, []);
   const [promoIdx, setPromoIdx] = useState(0);
   useEffect(() => {
     const t = setInterval(() => setPromoIdx((i) => (i + 1) % promos.length), 5000);
@@ -991,7 +994,11 @@ function TVFooter({
             transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
             className="bg-white p-2 rounded-xl shadow-[0_0_30px_rgba(255,180,80,0.35)]"
           >
-            <QRCode value={orderUrl} size={tvMode ? 88 : 64} level="M" />
+            {orderUrl ? (
+              <QRCode value={orderUrl} size={tvMode ? 88 : 64} level="M" />
+            ) : (
+              <div style={{ width: tvMode ? 88 : 64, height: tvMode ? 88 : 64 }} />
+            )}
           </motion.div>
         </div>
       </div>

@@ -106,7 +106,9 @@ function OrderPage() {
       if (!e || e.qty <= 0) continue;
       const m = menu.find((x) => x.id === id);
       if (!m) continue;
-      out.push({ menuId: m.id, name: m.name, emoji: m.emoji, image: m.image, price: m.price, quantity: e.qty, notes: e.notes });
+      // Nunca persistir data URLs nos pedidos — quebra o painel/cozinha por timeout.
+      const safeImage = typeof m.image === "string" && !m.image.startsWith("data:") ? m.image : "";
+      out.push({ menuId: m.id, name: m.name, emoji: m.emoji, image: safeImage, price: m.price, quantity: e.qty, notes: e.notes });
     }
     return out;
   }, [cart, menu]);
