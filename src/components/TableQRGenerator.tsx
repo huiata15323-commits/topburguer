@@ -623,12 +623,24 @@ export function TableQRGenerator() {
     const url = buildTableMenuUrl(n);
     return (
       <div className="tent-card">
-        <div style={{ position: "relative", zIndex: 2, textAlign: "center" }}>
-          <div className="ornament">❦ ❧ ❦</div>
+        {/* Cantos ornamentais — substituídos por SVG no print */}
+        <span className="corner tl" dangerouslySetInnerHTML={{ __html: "__CORNER__" }} />
+        <span className="corner tr" dangerouslySetInnerHTML={{ __html: "__CORNER__" }} />
+        <span className="corner bl" dangerouslySetInnerHTML={{ __html: "__CORNER__" }} />
+        <span className="corner br" dangerouslySetInnerHTML={{ __html: "__CORNER__" }} />
+
+        <div className="head">
+          <div className="ornament">❦ · ❦ · ❦</div>
           <div className="toplabel">{tpl.topLabel}</div>
-          <div className="brand">{brand}</div>
+          <div className="brand-wrap">
+            <span className="brand-rule" />
+            <span className="brand">{brand}</span>
+            <span className="brand-rule" />
+          </div>
+          <div className="smart">· SISTEMA INTELIGENTE ·</div>
           {branding.slogan && <div className="slogan">— {branding.slogan} —</div>}
         </div>
+
         <div className="row">
           <div className="qr-box">{url && <QRCode value={url} size={160} level="M" />}</div>
           <div className="mesa">
@@ -636,7 +648,13 @@ export function TableQRGenerator() {
             <div className="num">{n}</div>
           </div>
         </div>
-        <div className="hint">{tpl.hint}</div>
+
+        <div className="project">
+          <div className="pmark">· ❦ ·</div>
+          <div className="pline">CRIADO PELOS ALUNOS DO</div>
+          <div className="pline">TÉCNICO EM DESENVOLVIMENTO DE SISTEMAS</div>
+          <div className="pclass">Turmas 2º Ano “A” e “B” — SENAI</div>
+        </div>
       </div>
     );
   };
