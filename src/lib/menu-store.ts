@@ -18,7 +18,7 @@ type DbRow = {
   price: number | string;
   category: "burger" | "side" | "drink";
   emoji: string;
-  image: string | null;
+  image?: string | null;
   description: string | null;
   sold_out: boolean;
   stock: number | null;
@@ -30,18 +30,28 @@ type DbRow = {
 type MenuStatus = "loading" | "ready" | "error";
 type MenuSnapshot = { items: EditableMenuItem[]; status: MenuStatus; error: string | null };
 
-const MENU_SELECT = "id,name,price,category,emoji,image,description,sold_out,stock,sort_order,badges,prep_minutes";
+const MENU_BASE_SELECT = "id,name,price,category,emoji,description,sold_out,stock,sort_order,badges,prep_minutes";
+const MENU_SELECT = `${MENU_BASE_SELECT},image`;
+const MENU_IMAGE_SELECT = "id,image,sort_order";
 const MENU_FRESH_MS = 3_000;
 const SEED_IMAGE_BY_ID = new Map(SEED.map((m) => [m.id, m.image]));
 
 function rowToItem(r: DbRow): EditableMenuItem {
+  const hasImageField = Object.prototype.hasOwnProperty.call(r, "image");
+  const cachedImage = cache.find((m) => m.id === r.id)?.image;
+  const fallbackImage = SEED_IMAGE_BY_ID.get(r.id) ?? "";
+  const image = r.image && r.image.length > 0
+    ? r.image
+    : hasImageField
+      ? fallbackImage
+      : cachedImage || fallbackImage;
   return {
     id: r.id,
     name: r.name,
     price: typeof r.price === "string" ? parseFloat(r.price) : r.price,
     category: r.category,
     emoji: r.emoji,
-    image: r.image && r.image.length > 0 ? r.image : (SEED_IMAGE_BY_ID.get(r.id) ?? ""),
+    image,
     description: r.description ?? undefined,
     soldOut: r.sold_out,
     stock: r.stock ?? undefined,
