@@ -1,7 +1,7 @@
 // Cardápio na nuvem (Lovable Cloud) com Realtime + estoque atômico.
-// Mantém a mesma API consumida pelo app:
-//   useMenu() => { items, addItem, updateItem, removeItem, toggleSoldOut, setStock, decrementStock, resetToDefaults }
-// Imagens: se a linha do banco não tem image, usamos o asset local do SEED por id.
+// Importante: nunca renderiza o SEED como estado inicial do cliente.
+// O SEED existe apenas para imagem fallback e restauração admin; assim o cliente
+// não vê o cardápio antigo por alguns segundos antes do cardápio real carregar.
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { MENU as SEED, type MenuItem } from "./menu";
@@ -27,6 +27,10 @@ type DbRow = {
   prep_minutes: number | null;
 };
 
+type MenuStatus = "loading" | "ready" | "error";
+type MenuSnapshot = { items: EditableMenuItem[]; status: MenuStatus; error: string | null };
+
+const MENU_SELECT = "id,name,price,category,emoji,image,description,sold_out,stock,sort_order,badges,prep_minutes";
 const SEED_IMAGE_BY_ID = new Map(SEED.map((m) => [m.id, m.image]));
 
 function rowToItem(r: DbRow): EditableMenuItem {
@@ -45,39 +49,72 @@ function rowToItem(r: DbRow): EditableMenuItem {
   };
 }
 
+function sortItems(items: EditableMenuItem[]) {
+  return [...items].sort((a, b) => {
+    const ai = cacheOrder.get(a.id) ?? Number.MAX_SAFE_INTEGER;
+    const bi = cacheOrder.get(b.id) ?? Number.MAX_SAFE_INTEGER;
+    return ai - bi || a.name.localeCompare(b.name, "pt-BR");
+  });
+}
+
 // ===== Cache compartilhado entre hooks/abas =====
-let cache: EditableMenuItem[] = SEED;
-const listeners = new Set<(items: EditableMenuItem[]) => void>();
+let cache: EditableMenuItem[] = [];
+let status: MenuStatus = "loading";
+let errorMessage: string | null = null;
 let initialized = false;
+let fetchPromise: Promise<void> | null = null;
 let channel: ReturnType<typeof supabase.channel> | null = null;
+let cacheOrder = new Map<string, number>();
+const listeners = new Set<(snapshot: MenuSnapshot) => void>();
+
+function getSnapshot(): MenuSnapshot {
+  return { items: cache, status, error: errorMessage };
+}
 
 function notify() {
-  for (const fn of listeners) fn(cache);
+  const snapshot = getSnapshot();
+  for (const fn of listeners) fn(snapshot);
+}
+
+function applyRows(rows: DbRow[]) {
+  cacheOrder = new Map(rows.map((r) => [r.id, r.sort_order]));
+  cache = rows.map(rowToItem);
+  status = "ready";
+  errorMessage = null;
+  notify();
 }
 
 async function fetchAll() {
-  const { data, error } = await supabase
-    .from("menu_items")
-    .select("id,name,price,category,emoji,image,description,sold_out,stock,sort_order,badges,prep_minutes")
-    .order("sort_order", { ascending: true });
-  if (error) {
-    console.error("[menu] fetch failed", error);
-    return;
-  }
-  cache = (data as unknown as DbRow[]).map(rowToItem);
-  notify();
+  if (fetchPromise) return fetchPromise;
+  fetchPromise = (async () => {
+    const { data, error } = await supabase
+      .from("menu_items")
+      .select(MENU_SELECT)
+      .order("sort_order", { ascending: true });
+    if (error) {
+      console.error("[menu] fetch failed", error);
+      status = cache.length > 0 ? "ready" : "error";
+      errorMessage = "Não foi possível carregar o cardápio atualizado.";
+      notify();
+      return;
+    }
+    applyRows(data as unknown as DbRow[]);
+  })().finally(() => {
+    fetchPromise = null;
+  });
+  return fetchPromise;
 }
 
 function ensureStreaming() {
   if (initialized) return;
   initialized = true;
-  void fetchAll();
   channel = supabase
     .channel("menu-stream")
     .on("postgres_changes", { event: "*", schema: "public", table: "menu_items" }, () => {
       void fetchAll();
     })
     .subscribe();
+  void fetchAll();
 }
 
 function uid() {
@@ -85,6 +122,7 @@ function uid() {
 }
 
 function itemToInsert(data: Omit<EditableMenuItem, "id">, id?: string) {
+  const nextOrder = cache.length > 0 ? Math.max(...[...cacheOrder.values(), cache.length]) + 1 : 1;
   return {
     id: id ?? uid(),
     name: data.name,
@@ -95,33 +133,42 @@ function itemToInsert(data: Omit<EditableMenuItem, "id">, id?: string) {
     description: data.description ?? null,
     sold_out: data.soldOut ?? false,
     stock: data.stock ?? null,
-    sort_order: cache.length + 1,
+    sort_order: nextOrder,
     badges: data.badges ?? [],
     prep_minutes: data.prepMinutes ?? null,
   };
 }
 
+function upsertCached(row: DbRow) {
+  cacheOrder.set(row.id, row.sort_order);
+  const item = rowToItem(row);
+  cache = sortItems([item, ...cache.filter((m) => m.id !== item.id)]);
+  status = "ready";
+  errorMessage = null;
+  notify();
+}
+
 export function useMenu() {
-  const [items, setItems] = useState<EditableMenuItem[]>(cache);
+  const [snapshot, setSnapshot] = useState<MenuSnapshot>(getSnapshot);
 
   useEffect(() => {
     ensureStreaming();
-    const fn = (it: EditableMenuItem[]) => setItems(it);
-    listeners.add(fn);
-    setItems(cache);
+    listeners.add(setSnapshot);
+    setSnapshot(getSnapshot());
     return () => {
-      listeners.delete(fn);
+      listeners.delete(setSnapshot);
     };
   }, []);
 
   const addItem = useCallback(async (data: Omit<EditableMenuItem, "id">) => {
     const row = itemToInsert(data);
-    const { error } = await supabase.from("menu_items").insert(row);
+    const { data: inserted, error } = await supabase.from("menu_items").insert(row).select(MENU_SELECT).single();
     if (error) {
       console.error("[menu] addItem failed", error);
       throw error;
     }
-    return { ...data, id: row.id } as EditableMenuItem;
+    upsertCached(inserted as unknown as DbRow);
+    return rowToItem(inserted as unknown as DbRow);
   }, []);
 
   const updateItem = useCallback(async (id: string, patch: Partial<EditableMenuItem>) => {
@@ -147,13 +194,23 @@ export function useMenu() {
     if ("stock" in patch) dbPatch.stock = patch.stock ?? null;
     if (patch.badges !== undefined) dbPatch.badges = patch.badges ?? [];
     if (patch.prepMinutes !== undefined) dbPatch.prep_minutes = patch.prepMinutes ?? null;
-    const { error } = await supabase.from("menu_items").update(dbPatch).eq("id", id);
-    if (error) console.error("[menu] updateItem failed", error);
+    const { data, error } = await supabase.from("menu_items").update(dbPatch).eq("id", id).select(MENU_SELECT).single();
+    if (error) {
+      console.error("[menu] updateItem failed", error);
+      throw error;
+    }
+    upsertCached(data as unknown as DbRow);
   }, []);
 
   const removeItem = useCallback(async (id: string) => {
     const { error } = await supabase.from("menu_items").delete().eq("id", id);
-    if (error) console.error("[menu] removeItem failed", error);
+    if (error) {
+      console.error("[menu] removeItem failed", error);
+      throw error;
+    }
+    cacheOrder.delete(id);
+    cache = cache.filter((m) => m.id !== id);
+    notify();
   }, []);
 
   const toggleSoldOut = useCallback(
@@ -184,7 +241,7 @@ export function useMenu() {
     const { error: delErr } = await supabase.from("menu_items").delete().neq("id", "__never__");
     if (delErr) {
       console.error("[menu] reset delete failed", delErr);
-      return;
+      throw delErr;
     }
     const rows = SEED.map((m, i) => ({
       id: m.id,
@@ -200,12 +257,19 @@ export function useMenu() {
       badges: [],
       prep_minutes: null,
     }));
-    const { error } = await supabase.from("menu_items").insert(rows);
-    if (error) console.error("[menu] reset insert failed", error);
+    const { data, error } = await supabase.from("menu_items").insert(rows).select(MENU_SELECT);
+    if (error) {
+      console.error("[menu] reset insert failed", error);
+      throw error;
+    }
+    applyRows(data as unknown as DbRow[]);
   }, []);
 
   return {
-    items,
+    items: snapshot.items,
+    isLoading: snapshot.status === "loading",
+    isReady: snapshot.status === "ready",
+    error: snapshot.error,
     addItem,
     updateItem,
     removeItem,
