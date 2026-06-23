@@ -740,7 +740,54 @@ export function TableQRGenerator() {
         <div className="text-[11px] uppercase tracking-widest font-black text-muted-foreground mb-2">
           Pré-visualização (Mesa 1) — 1 placa por folha A4
         </div>
-        {isPoster ? (
+        {isTent ? (
+          <div
+            className="mx-auto rounded-lg overflow-hidden shadow-2xl relative"
+            style={{ width: 210, aspectRatio: "210 / 297", background: "#FBF7EE", fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+          >
+            {[1, 0].map((rot) => (
+              <div
+                key={rot}
+                style={{
+                  position: "absolute", left: 0, right: 0, height: "50%",
+                  top: rot ? 0 : "50%",
+                  transform: rot ? "rotate(180deg)" : "none",
+                  display: "flex", alignItems: "center", justifyContent: "center", padding: 6,
+                }}
+              >
+                <div style={{
+                  position: "relative", width: "92%", height: "88%", padding: "8px 10px",
+                  display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "space-between",
+                }}>
+                  <div style={{ position: "absolute", inset: 4, border: "1px solid #B8924A", borderRadius: 4 }} />
+                  <div style={{ position: "absolute", inset: 6, border: "0.5px solid #B8924A", borderRadius: 3 }} />
+                  <div style={{ position: "relative", zIndex: 2, textAlign: "center" }}>
+                    <div style={{ color: "#B8924A", fontSize: 9, letterSpacing: "0.3em" }}>❦ ❧ ❦</div>
+                    <div style={{ fontSize: 5.5, letterSpacing: "0.4em", color: "#8a6a2e", fontWeight: 700, marginTop: 2, fontFamily: "ui-sans-serif" }}>{tpl.topLabel}</div>
+                    <div style={{ fontWeight: 600, fontSize: 14, color: "#2a1d0c", lineHeight: 1, marginTop: 2, letterSpacing: "0.04em" }}>{brand}</div>
+                  </div>
+                  <div style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", gap: 6 }}>
+                    <div style={{ background: "#fff", padding: 2, border: "0.5px solid #B8924A", borderRadius: 2 }}>
+                      {previewUrl && <QRCode value={previewUrl} size={48} level="M" />}
+                    </div>
+                    <div style={{ textAlign: "left" }}>
+                      <div style={{ fontSize: 5, letterSpacing: "0.35em", color: "#8a6a2e", fontWeight: 700, fontFamily: "ui-sans-serif" }}>MESA Nº</div>
+                      <div style={{ fontSize: 26, fontWeight: 700, color: "#2a1d0c", lineHeight: 0.9 }}>1</div>
+                    </div>
+                  </div>
+                  <div style={{ position: "relative", zIndex: 2, fontSize: 5, color: "#5a4a2a", textAlign: "center", fontFamily: "ui-sans-serif" }}>{tpl.hint}</div>
+                </div>
+              </div>
+            ))}
+            <div style={{
+              position: "absolute", top: "50%", left: 8, right: 8,
+              borderTop: "0.5px dashed #B8924A", transform: "translateY(-50%)",
+              textAlign: "center",
+            }}>
+              <span style={{ position: "relative", top: -5, background: "#FBF7EE", padding: "0 6px", fontSize: 5, letterSpacing: "0.4em", color: "#B8924A", fontWeight: 700, fontFamily: "ui-sans-serif" }}>DOBRE AQUI</span>
+            </div>
+          </div>
+        ) : isPoster ? (
           <div
             className="mx-auto rounded-lg overflow-hidden shadow-2xl"
             style={{ width: 210, aspectRatio: "210 / 297", background: themePreview.dark, color: "#fff", fontFamily: "Inter, sans-serif" }}
