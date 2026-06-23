@@ -418,69 +418,144 @@ export function TableQRGenerator() {
     const tentCSS = `
   @page { size: A4 portrait; margin: 0; }
   * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  body { font-family: "Cormorant Garamond", "Playfair Display", Georgia, serif; margin: 0; padding: 0; background: #FBF7EE; }
-  .page { width: 210mm; height: 297mm; position: relative; background: #FBF7EE; page-break-after: always; display: flex; flex-direction: column; }
+  body {
+    font-family: "Cormorant Garamond", "Playfair Display", Georgia, serif;
+    margin: 0; padding: 0;
+    background:
+      radial-gradient(ellipse at center, #fbf4e3 0%, #f3e6c8 60%, #ead8af 100%);
+  }
+  .page {
+    width: 210mm; height: 297mm; position: relative;
+    page-break-after: always; display: flex; flex-direction: column;
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.6), transparent 55%),
+      radial-gradient(ellipse at 70% 80%, rgba(184,146,74,0.12), transparent 60%),
+      linear-gradient(180deg, #fbf4e3 0%, #f3e6c8 100%);
+  }
   .page:last-child { page-break-after: auto; }
-  .half { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; padding: 10mm; }
+  .half { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; padding: 8mm; }
   .half.top { transform: rotate(180deg); }
   .fold {
-    position: absolute; left: 6mm; right: 6mm; top: 50%; height: 0;
-    border-top: 1px dashed #B8924A; opacity: 0.55; transform: translateY(-50%);
+    position: absolute; left: 8mm; right: 8mm; top: 50%; height: 0;
+    border-top: 0.4pt dashed #B8924A; opacity: 0.6; transform: translateY(-50%);
     text-align: center;
   }
   .fold span {
-    position: relative; top: -2.5mm; background: #FBF7EE; padding: 0 4mm;
-    font-family: ui-sans-serif, sans-serif; font-size: 7pt; letter-spacing: 0.4em;
-    color: #B8924A; font-weight: 700;
+    position: relative; top: -2.5mm; background: #f7eccf; padding: 0 4mm;
+    font-family: "Cinzel", "Cormorant Garamond", serif; font-size: 7pt;
+    letter-spacing: 0.5em; color: #8a6a2e; font-weight: 600;
   }
   .tent-card {
-    width: 175mm; height: 122mm; position: relative;
-    background: #FBF7EE;
-    padding: 8mm 10mm;
+    width: 188mm; height: 132mm; position: relative;
+    padding: 9mm 12mm 8mm;
     display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+    color: #2a1d0c;
   }
-  /* Moldura dupla dourada */
+  /* Moldura tripla art-déco */
   .tent-card::before {
-    content: ""; position: absolute; inset: 4mm;
-    border: 1.2pt solid #B8924A; border-radius: 2mm;
+    content: ""; position: absolute; inset: 3mm;
+    border: 1.4pt solid #B8924A; border-radius: 1mm;
+    box-shadow: inset 0 0 0 0.4mm #fbf4e3, inset 0 0 0 0.7mm #B8924A;
   }
   .tent-card::after {
-    content: ""; position: absolute; inset: 5.5mm;
-    border: 0.4pt solid #B8924A; border-radius: 1.5mm;
+    content: ""; position: absolute; inset: 6mm;
+    border: 0.3pt solid #B8924A; border-radius: 0.5mm; opacity: 0.7;
   }
+  .corner {
+    position: absolute; width: 22mm; height: 22mm; z-index: 3;
+    pointer-events: none;
+  }
+  .corner.tl { top: 1mm; left: 1mm; }
+  .corner.tr { top: 1mm; right: 1mm; transform: scaleX(-1); }
+  .corner.bl { bottom: 1mm; left: 1mm; transform: scaleY(-1); }
+  .corner.br { bottom: 1mm; right: 1mm; transform: scale(-1,-1); }
+
+  .head { position: relative; z-index: 2; text-align: center; margin-top: 1mm; }
   .ornament {
-    font-size: 22pt; color: #B8924A; line-height: 1; margin-top: 1mm;
-    letter-spacing: 0.3em; position: relative; z-index: 2;
+    font-family: "Cormorant Garamond", serif;
+    font-size: 18pt; color: #B8924A; line-height: 1;
+    letter-spacing: 0.5em;
   }
   .toplabel {
-    font-family: ui-sans-serif, sans-serif; font-size: 8pt; letter-spacing: 0.45em;
-    color: #8a6a2e; font-weight: 700; margin-top: 2mm; position: relative; z-index: 2;
+    font-family: "Cinzel", "Cormorant Garamond", serif;
+    font-size: 7.5pt; letter-spacing: 0.55em;
+    color: #8a6a2e; font-weight: 600; margin-top: 2mm;
   }
+  .brand-wrap { display: flex; align-items: center; justify-content: center; gap: 4mm; margin-top: 1.5mm; }
+  .brand-rule { height: 0; flex: 0 0 18mm; border-top: 0.5pt solid #B8924A; opacity: 0.6; }
   .brand {
-    font-family: "Cormorant Garamond", "Playfair Display", Georgia, serif;
-    font-weight: 600; font-size: 34pt; color: #2a1d0c; letter-spacing: 0.04em;
-    line-height: 1; margin-top: 2mm; position: relative; z-index: 2;
-    text-align: center;
+    font-family: "Cinzel", "Playfair Display", serif;
+    font-weight: 700; font-size: 28pt; color: #2a1d0c; letter-spacing: 0.08em;
+    line-height: 1; text-transform: uppercase;
   }
   .slogan {
     font-style: italic; color: #8a6a2e; font-size: 10pt; margin-top: 1.5mm;
+    letter-spacing: 0.04em;
+  }
+  .smart {
+    font-family: "Cinzel", serif; font-size: 8pt; letter-spacing: 0.45em;
+    color: #B8924A; font-weight: 600; margin-top: 1mm;
+  }
+
+  .row {
+    display: flex; align-items: center; gap: 8mm; margin-top: 2mm;
     position: relative; z-index: 2;
   }
-  .row { display: flex; align-items: center; gap: 7mm; margin-top: 3mm; position: relative; z-index: 2; }
-  .qr-box { background: #fff; padding: 2.5mm; border: 0.6pt solid #B8924A; border-radius: 1.5mm; }
-  .qr-box svg { width: 38mm; height: 38mm; display: block; }
+  .qr-box {
+    background: #fff; padding: 3mm;
+    border: 0.5pt solid #B8924A; border-radius: 1mm;
+    box-shadow: 0 0.8mm 2mm rgba(184,146,74,0.18);
+  }
+  .qr-box svg { width: 40mm; height: 40mm; display: block; }
   .mesa { text-align: left; }
-  .mesa .lbl { font-family: ui-sans-serif, sans-serif; font-size: 9pt; letter-spacing: 0.4em; color: #8a6a2e; font-weight: 700; }
-  .mesa .num { font-family: "Cormorant Garamond", "Playfair Display", Georgia, serif; font-weight: 700; font-size: 56pt; color: #2a1d0c; line-height: 0.9; }
-  .hint { font-family: ui-sans-serif, sans-serif; font-size: 8.5pt; color: #5a4a2a; margin-top: 1mm; position: relative; z-index: 2; text-align: center; max-width: 130mm; }
+  .mesa .lbl {
+    font-family: "Cinzel", serif; font-size: 8pt; letter-spacing: 0.45em;
+    color: #8a6a2e; font-weight: 600;
+  }
+  .mesa .num {
+    font-family: "Cormorant Garamond", "Playfair Display", serif;
+    font-weight: 700; font-size: 64pt; color: #2a1d0c; line-height: 0.9;
+    text-shadow: 0 0.3mm 0 #B8924A;
+  }
+
+  .project {
+    position: relative; z-index: 2; text-align: center; margin-top: 1mm;
+    max-width: 150mm;
+  }
+  .project .pmark {
+    font-family: "Cormorant Garamond", serif; color: #B8924A;
+    font-size: 11pt; letter-spacing: 0.5em;
+  }
+  .project .pline {
+    font-family: "Cinzel", serif; font-size: 7pt; letter-spacing: 0.4em;
+    color: #5a4a2a; font-weight: 600; margin-top: 1mm; line-height: 1.5;
+  }
+  .project .pclass {
+    font-family: "Cormorant Garamond", serif; font-style: italic;
+    font-size: 9.5pt; color: #2a1d0c; margin-top: 0.5mm; letter-spacing: 0.06em;
+  }
 `;
 
+    // SVG ornamental art-déco corner (folha dourada)
+    const cornerSVG = `
+      <svg class="corner tl" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#B8924A" stroke-width="1.2">
+        <path d="M8 8 L8 60 M8 8 L60 8" stroke-width="1.6"/>
+        <path d="M14 14 L14 48 M14 14 L48 14" opacity="0.7"/>
+        <path d="M14 48 Q22 48 22 40 Q22 32 30 32 Q38 32 38 24 Q38 16 48 14" stroke-width="0.9" opacity="0.85"/>
+        <circle cx="14" cy="48" r="1.6" fill="#B8924A" stroke="none"/>
+        <circle cx="48" cy="14" r="1.6" fill="#B8924A" stroke="none"/>
+        <circle cx="30" cy="30" r="1" fill="#B8924A" stroke="none"/>
+        <path d="M22 22 L26 26 M30 18 L34 22 M18 30 L22 34" stroke-width="0.6" opacity="0.7"/>
+      </svg>
+    `;
+
     const css = isPoster ? posterCSS : (isTent ? tentCSS : cardCSS);
+    const tentCorners = isTent ? `<style>.corner-src{display:none}</style>` : "";
     const html = `<!doctype html><html><head><title>QR Codes — Mesas (${tpl.label})</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-<style>${css}</style></head><body>${node.innerHTML}</body></html>`;
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>${css}</style>${tentCorners}</head><body>${node.innerHTML.replace(/__CORNER__/g, cornerSVG)}</body></html>`;
     const w = window.open("", "_blank", "width=900,height=1200");
     if (!w) return;
     w.document.write(html);
@@ -548,12 +623,24 @@ export function TableQRGenerator() {
     const url = buildTableMenuUrl(n);
     return (
       <div className="tent-card">
-        <div style={{ position: "relative", zIndex: 2, textAlign: "center" }}>
-          <div className="ornament">❦ ❧ ❦</div>
+        {/* Cantos ornamentais — substituídos por SVG no print */}
+        <span className="corner tl" dangerouslySetInnerHTML={{ __html: "__CORNER__" }} />
+        <span className="corner tr" dangerouslySetInnerHTML={{ __html: "__CORNER__" }} />
+        <span className="corner bl" dangerouslySetInnerHTML={{ __html: "__CORNER__" }} />
+        <span className="corner br" dangerouslySetInnerHTML={{ __html: "__CORNER__" }} />
+
+        <div className="head">
+          <div className="ornament">❦ · ❦ · ❦</div>
           <div className="toplabel">{tpl.topLabel}</div>
-          <div className="brand">{brand}</div>
+          <div className="brand-wrap">
+            <span className="brand-rule" />
+            <span className="brand">{brand}</span>
+            <span className="brand-rule" />
+          </div>
+          <div className="smart">· SISTEMA INTELIGENTE ·</div>
           {branding.slogan && <div className="slogan">— {branding.slogan} —</div>}
         </div>
+
         <div className="row">
           <div className="qr-box">{url && <QRCode value={url} size={160} level="M" />}</div>
           <div className="mesa">
@@ -561,7 +648,13 @@ export function TableQRGenerator() {
             <div className="num">{n}</div>
           </div>
         </div>
-        <div className="hint">{tpl.hint}</div>
+
+        <div className="project">
+          <div className="pmark">· ❦ ·</div>
+          <div className="pline">CRIADO PELOS ALUNOS DO</div>
+          <div className="pline">TÉCNICO EM DESENVOLVIMENTO DE SISTEMAS</div>
+          <div className="pclass">Turmas 2º Ano “A” e “B” — SENAI</div>
+        </div>
       </div>
     );
   };
