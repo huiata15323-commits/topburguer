@@ -341,26 +341,44 @@ function Landing() {
               os depoimentos dos alunos do 2º Ano A & B. Em breve, cada voz da turma terá seu lugar aqui.
             </p>
 
-            {/* Cards de depoimento — placeholders aguardando preenchimento */}
+            {/* Cards de depoimento */}
             <div className="mt-10 grid md:grid-cols-3 gap-5">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
+              {[
+                {
+                  quote: "Fazer o curso de Desenvolvimento de Sistemas tem sido uma experiência muito boa. Mesmo sem toda a estrutura que o curso precisa, a gente consegue aprender bastante. O professor Huiatã Ribeiro sempre prepara as aulas e ajuda a gente a desenvolver novas habilidades. Nesse tempo de curso, aprendi muitas coisas que vão me ajudar no futuro e na minha entrada no mercado de trabalho.",
+                  name: "Nivia Vitória",
+                  info: '2º Ano "A" TDS · SENAI',
+                  real: true,
+                },
+                ...[2, 3, 4, 5, 6].map((i) => ({
+                  quote: "Espaço reservado para o depoimento de um aluno da turma.",
+                  name: "Aluno(a)",
+                  info: "2º Ano · SENAI",
+                  real: false,
+                  num: i,
+                })),
+              ].map((item, idx) => (
                 <motion.div
-                  key={i}
+                  key={idx}
                   initial={{ opacity: 0, y: 24 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: i * 0.08, duration: 0.5 }}
-                  className="group rounded-2xl border border-dashed border-white/15 bg-black/30 backdrop-blur p-6 hover:border-amber-warm/40 hover:bg-black/50 transition min-h-[200px] flex flex-col"
+                  transition={{ delay: idx * 0.08, duration: 0.5 }}
+                  className={`group rounded-2xl border p-6 transition min-h-[200px] flex flex-col ${
+                    item.real
+                      ? "border-amber-warm/30 bg-black/50 backdrop-blur hover:border-amber-warm/60 hover:bg-black/60"
+                      : "border-dashed border-white/15 bg-black/30 backdrop-blur hover:border-amber-warm/40 hover:bg-black/50"
+                  }`}
                 >
-                  <div className="text-3xl text-amber-warm/60">“ ”</div>
+                  <div className={`text-3xl ${item.real ? "text-amber-warm" : "text-amber-warm/60"}`}>“ ”</div>
                   <div className="mt-3 text-[10px] uppercase tracking-[0.3em] text-gold/70 font-black">
-                    Depoimento #{String(i).padStart(2, "0")}
+                    {item.real ? "Depoimento" : `Depoimento #${String((item as any).num).padStart(2, "0")}`}
                   </div>
-                  <p className="mt-3 text-sm text-white/40 italic leading-relaxed flex-1">
-                    Espaço reservado para o depoimento de um aluno da turma.
+                  <p className={`mt-3 text-sm leading-relaxed flex-1 ${item.real ? "text-white/80" : "text-white/40 italic"}`}>
+                    {item.quote}
                   </p>
-                  <div className="mt-4 pt-3 border-t border-white/10 text-xs text-white/30">
-                    — Aluno(a) · 2º Ano · SENAI
+                  <div className="mt-4 pt-3 border-t border-white/10 text-xs text-white/50">
+                    — {item.name} · {item.info}
                   </div>
                 </motion.div>
               ))}
