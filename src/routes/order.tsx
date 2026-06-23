@@ -43,7 +43,7 @@ function OrderPage() {
   const { mesa } = useSearch({ from: "/order" });
   const { addOrder, orders } = useOrders();
   const waitMin = useMemo(() => estimateWaitMinutes(orders), [orders]);
-  const { items: menu, decrementStock } = useMenu();
+  const { items: menu, isLoading: menuLoading, error: menuError, decrementStock } = useMenu();
   const navigate = useNavigate();
   const { t } = useLang();
   const { branding } = useBranding();
@@ -220,6 +220,43 @@ function OrderPage() {
         </div>
       </header>
 
+      {menuLoading && (
+        <section className="mx-auto max-w-6xl px-3 sm:px-4 py-6" aria-live="polite">
+          <div className="rounded-3xl border border-amber-warm/30 bg-card p-5 shadow-card-soft">
+            <div className="flex items-center gap-3">
+              <span className="h-10 w-10 shrink-0 rounded-2xl bg-gradient-ember grid place-items-center shadow-ember">🍔</span>
+              <div>
+                <h2 className="font-black text-lg">Carregando cardápio atualizado</h2>
+                <p className="text-sm text-muted-foreground">Aguarde só um instante.</p>
+              </div>
+            </div>
+            <div className="mt-5 grid gap-3 grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="rounded-3xl border border-border bg-background overflow-hidden">
+                  <div className="aspect-[4/3] bg-muted animate-pulse" />
+                  <div className="p-3 space-y-2">
+                    <div className="h-4 w-3/4 rounded-full bg-muted animate-pulse" />
+                    <div className="h-3 w-full rounded-full bg-muted animate-pulse" />
+                    <div className="h-5 w-20 rounded-full bg-muted animate-pulse" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {!menuLoading && menuError && menu.length === 0 && (
+        <section className="mx-auto max-w-6xl px-3 sm:px-4 py-6">
+          <div className="rounded-3xl border border-red-500/30 bg-red-500/10 p-5 text-sm">
+            <div className="font-black text-red-600 dark:text-red-300">Cardápio indisponível no momento</div>
+            <p className="mt-1 text-muted-foreground">Recarregue a página para tentar novamente.</p>
+          </div>
+        </section>
+      )}
+
+      {!menuLoading && menu.length > 0 && (
+      <>
       {/* Estimativa de tempo de espera */}
       <div className="mx-auto max-w-6xl px-3 sm:px-4 pt-4 space-y-3">
         <div className="rounded-2xl border border-amber-warm/30 bg-gradient-to-r from-amber-warm/10 via-ember/5 to-transparent px-4 py-3 flex items-center gap-3">
@@ -482,6 +519,8 @@ function OrderPage() {
         onClose={() => setPayOpen(false)}
         onConfirmed={confirmPaymentAndSubmit}
       />
+      </>
+      )}
     </main>
   );
 }
