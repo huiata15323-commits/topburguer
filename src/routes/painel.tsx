@@ -994,7 +994,11 @@ function TVFooter({
             transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
             className="bg-white p-2 rounded-xl shadow-[0_0_30px_rgba(255,180,80,0.35)]"
           >
-            <QRCode value={orderUrl} size={tvMode ? 88 : 64} level="M" />
+            {orderUrl ? (
+              <QRCode value={orderUrl} size={tvMode ? 88 : 64} level="M" />
+            ) : (
+              <div style={{ width: tvMode ? 88 : 64, height: tvMode ? 88 : 64 }} />
+            )}
           </motion.div>
         </div>
       </div>
