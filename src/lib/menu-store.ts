@@ -30,9 +30,7 @@ type DbRow = {
 type MenuStatus = "loading" | "ready" | "error";
 type MenuSnapshot = { items: EditableMenuItem[]; status: MenuStatus; error: string | null };
 
-const MENU_BASE_SELECT = "id,name,price,category,emoji,description,sold_out,stock,sort_order,badges,prep_minutes";
-const MENU_SELECT = `${MENU_BASE_SELECT},image`;
-const MENU_IMAGE_SELECT = "id,image,sort_order";
+const MENU_SELECT = "id,name,price,category,emoji,description,sold_out,stock,sort_order,badges,prep_minutes,image";
 const MENU_FRESH_MS = 3_000;
 const SEED_IMAGE_BY_ID = new Map(SEED.map((m) => [m.id, m.image]));
 
