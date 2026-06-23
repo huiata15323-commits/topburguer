@@ -16,6 +16,48 @@ import { VoiceOrderButton } from "@/components/VoiceOrderButton";
 import { useComboSuggestions } from "@/lib/combos";
 import { useBranding } from "@/lib/branding";
 
+function SmartDishImage({ src, alt, emoji, soldOut }: { src?: string; alt: string; emoji: string; soldOut?: boolean }) {
+  const [failed, setFailed] = useState(false);
+  if (!src || failed) {
+    return (
+      <div className={`w-full h-full grid place-items-center bg-gradient-to-br from-amber-warm/15 via-card to-ember/10 text-5xl ${soldOut ? "grayscale" : ""}`}>
+        {emoji}
+      </div>
+    );
+  }
+  return (
+    <img
+      src={src}
+      alt={alt}
+      loading="lazy"
+      width={512}
+      height={384}
+      onError={() => setFailed(true)}
+      className={`w-full h-full object-cover transition-transform duration-500 ${soldOut ? "grayscale" : "group-hover:scale-105"}`}
+    />
+  );
+}
+
+function SmartThumb({ src, alt, emoji }: { src?: string; alt: string; emoji: string }) {
+  const [failed, setFailed] = useState(false);
+  if (!src || failed) {
+    return (
+      <div className="w-10 h-10 rounded-md grid place-items-center bg-muted text-xl flex-shrink-0" aria-label={alt}>
+        {emoji}
+      </div>
+    );
+  }
+  return (
+    <img
+      src={src}
+      alt={alt}
+      onError={() => setFailed(true)}
+      className="w-10 h-10 rounded-md object-cover flex-shrink-0"
+    />
+  );
+}
+
+
 const search = z.object({
   mesa: z.coerce.number().int().positive().max(999).optional().catch(undefined),
 });
@@ -338,22 +380,13 @@ function OrderPage() {
                       }`}
                     >
                       <div className="aspect-[4/3] bg-muted overflow-hidden relative">
-                        {m.image ? (
-                          <img
-                            src={m.image}
-                            alt={m.name}
-                            loading="lazy"
-                            width={512}
-                            height={384}
-                            className={`w-full h-full object-cover transition-transform duration-500 ${
-                              soldOut ? "grayscale" : "group-hover:scale-105"
-                            }`}
-                          />
-                        ) : (
-                          <div className="w-full h-full grid place-items-center bg-gradient-to-br from-amber-warm/15 via-card to-ember/10 text-5xl">
-                            {m.emoji}
-                          </div>
-                        )}
+                        <SmartDishImage
+                          src={m.image}
+                          alt={m.name}
+                          emoji={m.emoji}
+                          soldOut={soldOut}
+                        />
+
                         {soldOut && (
                           <div className="absolute inset-0 bg-black/55 grid place-items-center">
                             <span className="px-3 py-1 rounded-full bg-red-500 text-white text-xs font-black uppercase tracking-widest">
@@ -619,7 +652,7 @@ function CartCard({
               exit={{ opacity: 0, x: -20 }}
               className="flex items-center gap-2 text-sm"
             >
-              <img src={i.image} alt="" className="w-10 h-10 rounded-md object-cover flex-shrink-0" />
+              <SmartThumb src={i.image} alt={i.name} emoji={i.emoji} />
               <div className="flex-1 min-w-0">
                 <div className="truncate"><span className="font-bold text-ember">{i.quantity}×</span> {i.name}</div>
                 {i.notes && <div className="text-[10px] text-amber-warm truncate">📝 {i.notes}</div>}
