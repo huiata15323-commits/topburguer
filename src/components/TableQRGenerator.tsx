@@ -544,6 +544,36 @@ export function TableQRGenerator() {
     );
   };
 
+  const renderTentFace = (n: number) => {
+    const url = buildTableMenuUrl(n);
+    return (
+      <div className="tent-card">
+        <div style={{ position: "relative", zIndex: 2, textAlign: "center" }}>
+          <div className="ornament">❦ ❧ ❦</div>
+          <div className="toplabel">{tpl.topLabel}</div>
+          <div className="brand">{brand}</div>
+          {branding.slogan && <div className="slogan">— {branding.slogan} —</div>}
+        </div>
+        <div className="row">
+          <div className="qr-box">{url && <QRCode value={url} size={160} level="M" />}</div>
+          <div className="mesa">
+            <div className="lbl">MESA Nº</div>
+            <div className="num">{n}</div>
+          </div>
+        </div>
+        <div className="hint">{tpl.hint}</div>
+      </div>
+    );
+  };
+
+  const renderTentPage = (n: number) => (
+    <div key={n} className="page">
+      <div className="half top">{renderTentFace(n)}</div>
+      <div className="fold"><span>DOBRE AQUI</span></div>
+      <div className="half">{renderTentFace(n)}</div>
+    </div>
+  );
+
   // Preview do pôster (escala reduzida)
   const previewUrl = buildTableMenuUrl(1);
   const themePreview = poster.useThemeColors ? themeColors() : { accent: tpl.accent, dark: tpl.bg, cream: "#FBEFD8" };
