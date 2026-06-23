@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import {
   ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid,
-  PieChart, Pie, Cell, BarChart, Bar, Legend,
+  PieChart, Pie, Cell, BarChart, Bar,
 } from "recharts";
 import { useOrders, type Order } from "@/lib/orders-store";
 import { useExpenses } from "@/lib/expenses-store";
@@ -245,30 +245,50 @@ function DashboardPage() {
             {pieData.length === 0 ? (
               <EmptyHint label="Sem vendas." />
             ) : (
-              <div className="h-64">
-                <ResponsiveContainer>
-                  <PieChart>
-                    <Pie
-                      data={pieData} dataKey="value" nameKey="name"
-                      innerRadius={50} outerRadius={90} paddingAngle={2}
-                      onClick={(d: { name: string }) => setSelectedItem((cur) => (cur === d.name ? null : d.name))}
-                    >
-                      {pieData.map((_, i) => (
-                        <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]}
-                          stroke={selectedItem === pieData[i].name ? "#fff" : "transparent"}
-                          strokeWidth={2}
-                          style={{ cursor: "pointer", opacity: selectedItem && selectedItem !== pieData[i].name ? 0.4 : 1 }}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{ background: "#0a0a0a", border: "1px solid #ffffff20", borderRadius: 8, fontSize: 12 }}
-                      formatter={(v: number, n: string) => [`${v} un.`, n]}
-                    />
-                    <Legend wrapperStyle={{ fontSize: 11, color: "#ffffff80" }} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
+              <>
+                <div className="h-56">
+                  <ResponsiveContainer>
+                    <PieChart>
+                      <Pie
+                        data={pieData} dataKey="value" nameKey="name"
+                        innerRadius={50} outerRadius={85} paddingAngle={2}
+                        onClick={(d: { name: string }) => setSelectedItem((cur) => (cur === d.name ? null : d.name))}
+                      >
+                        {pieData.map((_, i) => (
+                          <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]}
+                            stroke={selectedItem === pieData[i].name ? "#fff" : "transparent"}
+                            strokeWidth={2}
+                            style={{ cursor: "pointer", opacity: selectedItem && selectedItem !== pieData[i].name ? 0.4 : 1 }}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{ background: "#0a0a0a", border: "1px solid #ffffff20", borderRadius: 8, fontSize: 12 }}
+                        formatter={(v: number, n: string) => [`${v} un.`, n]}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <ul className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1.5 text-xs">
+                  {pieData.map((p, i) => {
+                    const color = PIE_COLORS[i % PIE_COLORS.length];
+                    const active = selectedItem === p.name;
+                    return (
+                      <li key={p.name}>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedItem((cur) => (cur === p.name ? null : p.name))}
+                          className="inline-flex items-center gap-1.5 hover:opacity-80 transition"
+                          style={{ color, opacity: selectedItem && !active ? 0.45 : 1, fontWeight: active ? 700 : 500 }}
+                        >
+                          <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: color }} />
+                          {p.name}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
             )}
             {selectedItem && (
               <p className="text-xs text-amber-warm mt-2">Selecionado: <b>{selectedItem}</b> (clique novamente para limpar)</p>
