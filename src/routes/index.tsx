@@ -113,7 +113,7 @@ function Landing() {
 
             <motion.div
               initial="hidden" animate="show" variants={fadeUp} custom={3}
-              className="mt-10 flex flex-wrap gap-3"
+              className="mt-10 flex flex-wrap gap-3 justify-center"
             >
               <Link
                 to="/order"
