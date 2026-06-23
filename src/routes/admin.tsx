@@ -459,8 +459,7 @@ function AdminPage() {
             </div>
           )}
 
-          {!menuLoading &&
-          {CATS.map((cat) => {
+          {!menuLoading && CATS.map((cat) => {
             const list = items.filter((m) => m.category === cat.key);
             return (
               <div key={cat.key}>
