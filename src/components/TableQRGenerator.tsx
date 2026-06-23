@@ -62,7 +62,8 @@ type TemplateId =
   | "junina"
   | "carnival"
   | "newyear"
-  | "student";
+  | "student"
+  | "tent";
 
 type Template = {
   id: TemplateId;
@@ -76,7 +77,7 @@ type Template = {
   decor?: string;
   topLabel?: string;
   hint: string;
-  layout?: "card" | "poster"; // poster = 1 por página A4 cheia
+  layout?: "card" | "poster" | "tent"; // poster = 1 por A4; tent = cavalete dobrável
 };
 
 const TEMPLATES: Template[] = [
@@ -93,6 +94,20 @@ const TEMPLATES: Template[] = [
     topLabel: "APONTE A CÂMERA",
     hint: "Faça seu pedido direto pelo celular",
     layout: "poster",
+  },
+  {
+    id: "tent",
+    label: "Cavalete de Mesa",
+    emoji: "⛺",
+    occasion: "A4 dobrável — moldura elegante",
+    bg: "#FBF7EE",
+    color: "#1a1a1a",
+    accent: "#B8924A",
+    border: "0",
+    decor: "❦",
+    topLabel: "ESCANEIE PARA PEDIR",
+    hint: "Aponte a câmera e faça seu pedido",
+    layout: "tent",
   },
   {
     id: "classic",
