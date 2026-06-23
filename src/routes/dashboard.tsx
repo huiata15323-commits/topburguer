@@ -441,7 +441,7 @@ function KpiCard({
     <motion.div
       initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -2 }}
-      className={`group relative rounded-2xl border bg-neutral-900/80 backdrop-blur p-4 overflow-hidden text-left transition-all hover:shadow-lg ${active ? `border-amber-warm/60 shadow-tv-glow ring-1 ${ringCls}` : "border-white/10 hover:border-white/20"}`}
+      className={`group relative rounded-2xl border-2 bg-black backdrop-blur p-4 overflow-hidden text-left transition-all ${active ? `border-[#FF4500] shadow-[0_0_24px_rgba(255,69,0,0.8)] ring-1 ${ringCls}` : "border-[#FF4500]/70 shadow-[0_0_14px_rgba(255,69,0,0.45)] hover:border-[#FF4500] hover:shadow-[0_0_22px_rgba(255,69,0,0.75)]"}`}
     >
       <Comp onClick={onClick} className="block w-full text-left">
         <div className={`absolute inset-0 bg-gradient-to-br ${accentCls} opacity-60 pointer-events-none group-hover:opacity-90 transition-opacity`} />
