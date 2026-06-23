@@ -141,28 +141,27 @@ function StatusPage() {
               className="space-y-6"
             >
               {/* Order header card */}
-              <div className="rounded-3xl bg-gradient-night text-white p-6 shadow-card-soft overflow-hidden relative">
-                <div className="absolute inset-0 bg-grain" />
+              <div className="rounded-3xl bg-white border border-[#E5E7EB] p-6 shadow-xl shadow-black/5 overflow-hidden relative">
+                <div className="absolute -top-12 -right-12 w-40 h-40 rounded-full bg-gradient-to-br from-[#FF7A00]/20 to-[#FFC93C]/10 blur-2xl" />
                 <div className="relative">
-                  <div className="text-xs uppercase tracking-widest text-amber-warm font-bold">Pedido</div>
+                  <div className="text-xs uppercase tracking-widest text-[#6B7280] font-bold">Pedido</div>
                   <div className="flex items-baseline gap-3 mt-1 flex-wrap">
-                    <div className="text-6xl font-black">#{order.number}</div>
-                    <div className="text-white/60">{order.customer}</div>
+                    <div className="text-6xl font-black bg-gradient-to-br from-[#FF7A00] to-[#FFC93C] bg-clip-text text-transparent drop-shadow-sm">
+                      #{order.number}
+                    </div>
+                    <div className="text-[#4B5563] font-medium">{order.customer}</div>
                     {order.tableNumber && (
                       <Link
                         to="/mesa"
                         search={{ n: order.tableNumber }}
-                        className="px-3 py-1 rounded-full bg-amber-warm text-charcoal text-sm font-black hover:scale-105 transition"
+                        className="px-3 py-1 rounded-full bg-gradient-to-r from-[#FF7A00] to-[#FFC93C] text-black text-sm font-black hover:scale-105 transition shadow-md"
                         title="Abrir comanda da mesa"
                       >
                         🪑 MESA {order.tableNumber} →
                       </Link>
                     )}
                   </div>
-                  <div className="mt-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-sm">
-                    <span className="w-2 h-2 rounded-full bg-amber-warm animate-live" />
-                    {STEPS[stepIndex]?.label ?? "Atualizando…"}
-                  </div>
+                  <StatusBadge status={order.status} />
                 </div>
               </div>
 
