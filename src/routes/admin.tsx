@@ -15,6 +15,32 @@ import { BrandingAdmin } from "@/components/BrandingAdmin";
 import { AdminHeroHeader } from "@/components/AdminHeroHeader";
 import { StockInput } from "@/components/StockInput";
 import { generateDishImage } from "@/lib/ai-image.functions";
+import { supabase } from "@/integrations/supabase/client";
+
+const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
+
+/** Faz upload de uma data-url (base64) para o bucket `menu-images` e devolve um Signed URL de 1 ano.
+ *  Evita salvar base64 gigante no Postgres (que causava timeout no fetch do cardápio). */
+async function uploadDataUrlToStorage(dataUrl: string, idHint = "item"): Promise<string> {
+  const match = /^data:(image\/[a-z+]+);base64,(.+)$/i.exec(dataUrl);
+  if (!match) throw new Error("Imagem inválida");
+  const mime = match[1];
+  const ext = mime.split("/")[1].replace("+xml", "").replace("jpeg", "jpg");
+  const bin = atob(match[2]);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  const blob = new Blob([bytes], { type: mime });
+  const path = `${idHint}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}.${ext}`;
+  const { error: upErr } = await supabase.storage.from("menu-images").upload(path, blob, {
+    contentType: mime,
+    upsert: true,
+  });
+  if (upErr) throw upErr;
+  const { data, error } = await supabase.storage.from("menu-images").createSignedUrl(path, ONE_YEAR_SECONDS);
+  if (error || !data?.signedUrl) throw error ?? new Error("Falha ao assinar URL");
+  return data.signedUrl;
+}
+
 
 export const Route = createFileRoute("/admin")({
   head: () => ({
