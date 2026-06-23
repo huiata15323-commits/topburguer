@@ -165,9 +165,16 @@ function AdminPage() {
       else if (r.error === "no_credits") toast.error("💳 Sem créditos de IA", { id: tid });
       else if (r.error || !r.dataUrl) toast.error("Falhou. Tente novamente.", { id: tid });
       else {
-        setForm((f) => ({ ...f, image: r.dataUrl! }));
-        toast.success("✨ Foto gerada!", { id: tid });
+        try {
+          const url = await uploadDataUrlToStorage(r.dataUrl, "new");
+          setForm((f) => ({ ...f, image: url }));
+          toast.success("✨ Foto gerada!", { id: tid });
+        } catch (e) {
+          console.error("[admin] upload failed", e);
+          toast.error("Foto gerada mas falhou ao salvar.", { id: tid });
+        }
       }
+
     } finally {
       setGeneratingImg(false);
     }
