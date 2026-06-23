@@ -30,9 +30,7 @@ type DbRow = {
 type MenuStatus = "loading" | "ready" | "error";
 type MenuSnapshot = { items: EditableMenuItem[]; status: MenuStatus; error: string | null };
 
-const MENU_BASE_SELECT = "id,name,price,category,emoji,description,sold_out,stock,sort_order,badges,prep_minutes";
-const MENU_SELECT = `${MENU_BASE_SELECT},image`;
-const MENU_IMAGE_SELECT = "id,image,sort_order";
+const MENU_SELECT = "id,name,price,category,emoji,description,sold_out,stock,sort_order,badges,prep_minutes,image";
 const MENU_FRESH_MS = 3_000;
 const SEED_IMAGE_BY_ID = new Map(SEED.map((m) => [m.id, m.image]));
 
@@ -107,7 +105,7 @@ async function fetchAll({ hideDuringFetch = false }: { hideDuringFetch?: boolean
   fetchPromise = (async () => {
     const { data, error } = await supabase
       .from("menu_items")
-      .select(MENU_BASE_SELECT)
+      .select(MENU_SELECT)
       .order("sort_order", { ascending: true });
     if (error) {
       console.error("[menu] fetch failed", error);
@@ -117,28 +115,10 @@ async function fetchAll({ hideDuringFetch = false }: { hideDuringFetch?: boolean
       return;
     }
     applyRows(data as unknown as DbRow[]);
-    void fetchImages();
   })().finally(() => {
     fetchPromise = null;
   });
   return fetchPromise;
-}
-
-async function fetchImages() {
-  const { data, error } = await supabase
-    .from("menu_items")
-    .select(MENU_IMAGE_SELECT)
-    .order("sort_order", { ascending: true });
-  if (error) {
-    console.error("[menu] image fetch failed", error);
-    return;
-  }
-  const imageById = new Map((data as unknown as Pick<DbRow, "id" | "image">[]).map((r) => [r.id, r.image ?? ""]));
-  cache = cache.map((item) => {
-    const image = imageById.get(item.id);
-    return image && image.length > 0 ? { ...item, image } : item;
-  });
-  notify();
 }
 
 function applyRealtimePayload(payload: { eventType: string; new?: Record<string, unknown>; old?: Record<string, unknown> }) {
