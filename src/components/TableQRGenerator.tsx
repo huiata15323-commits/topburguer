@@ -419,62 +419,60 @@ export function TableQRGenerator() {
   @page { size: A4 portrait; margin: 0; }
   * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   body {
-    font-family: "Cormorant Garamond", "Playfair Display", Georgia, serif;
+    font-family: "Inter", "Bricolage Grotesque", ui-sans-serif, system-ui, sans-serif;
     margin: 0; padding: 0;
-    background:
-      radial-gradient(ellipse at center, #fbf4e3 0%, #f3e6c8 60%, #ead8af 100%);
+    background: #0a0a0c;
   }
   .page {
     width: 210mm; height: 297mm; position: relative;
     page-break-after: always; display: flex; flex-direction: column;
     background:
-      radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.6), transparent 55%),
-      radial-gradient(ellipse at 70% 80%, rgba(184,146,74,0.12), transparent 60%),
-      linear-gradient(180deg, #fbf4e3 0%, #f3e6c8 100%);
+      radial-gradient(ellipse at 20% 10%, rgba(232,93,58,0.10), transparent 55%),
+      radial-gradient(ellipse at 80% 90%, rgba(232,93,58,0.06), transparent 60%),
+      linear-gradient(180deg, #0f0f12 0%, #0a0a0c 100%);
   }
   .page:last-child { page-break-after: auto; }
   .half { flex: 1; position: relative; display: flex; align-items: center; justify-content: center; padding: 8mm; }
   .half.top { transform: rotate(180deg); }
   .fold {
     position: absolute; left: 8mm; right: 8mm; top: 50%; height: 0;
-    border-top: 0.4pt dashed #B8924A; opacity: 0.6; transform: translateY(-50%);
+    border-top: 0.4pt dashed #E85D3A; opacity: 0.5; transform: translateY(-50%);
     text-align: center;
   }
   .fold span {
-    position: relative; top: -2.5mm; background: #f7eccf; padding: 0 4mm;
-    font-family: "Cinzel", "Cormorant Garamond", serif; font-size: 7pt;
-    letter-spacing: 0.5em; color: #8a6a2e; font-weight: 600;
+    position: relative; top: -2.5mm; background: #0f0f12; padding: 0 4mm;
+    font-family: "Inter", ui-sans-serif, sans-serif; font-size: 7pt;
+    letter-spacing: 0.4em; color: #E85D3A; font-weight: 700;
   }
   .tent-card {
     width: 188mm; height: 132mm; position: relative;
     padding: 9mm 12mm 8mm;
     display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-    color: #2a1d0c;
+    color: #f2f2f2;
   }
-  /* Moldura tripla art-déco */
+  /* Moldura tech glow */
   .tent-card::before {
-    content: ""; position: absolute; inset: 3mm;
-    border: 1.4pt solid #B8924A; border-radius: 1mm;
-    box-shadow: inset 0 0 0 0.4mm #fbf4e3, inset 0 0 0 0.7mm #B8924A;
+    content: ""; position: absolute; inset: 2.5mm;
+    border: 1.2pt solid #E85D3A; border-radius: 2mm;
+    box-shadow: 0 0 0 0.3mm #0f0f12, inset 0 0 8mm rgba(232,93,58,0.08), 0 0 4mm rgba(232,93,58,0.15);
   }
   .tent-card::after {
-    content: ""; position: absolute; inset: 6mm;
-    border: 0.3pt solid #B8924A; border-radius: 0.5mm; opacity: 0.7;
+    content: ""; position: absolute; inset: 5.5mm;
+    border: 0.3pt solid rgba(232,93,58,0.4); border-radius: 1mm;
   }
-  .corner {
-    position: absolute; width: 22mm; height: 22mm; z-index: 3;
-    pointer-events: none;
+
+  .tech-lines {
+    position: absolute; left: 0; right: 0; top: 10mm; height: 0.3pt;
+    background: linear-gradient(90deg, transparent 5%, rgba(232,93,58,0.35) 40%, rgba(232,93,58,0.35) 60%, transparent 95%);
+    pointer-events: none; z-index: 1;
   }
-  .corner.tl { top: 1mm; left: 1mm; }
-  .corner.tr { top: 1mm; right: 1mm; transform: scaleX(-1); }
-  .corner.bl { bottom: 1mm; left: 1mm; transform: scaleY(-1); }
-  .corner.br { bottom: 1mm; right: 1mm; transform: scale(-1,-1); }
+  .tech-lines.bottom { top: auto; bottom: 10mm; }
 
   .head { position: relative; z-index: 2; text-align: center; margin-top: 1mm; }
   .ornament {
-    font-family: "Cormorant Garamond", serif;
-    font-size: 18pt; color: #B8924A; line-height: 1;
-    letter-spacing: 0.5em;
+    font-family: "Inter", ui-sans-serif, sans-serif;
+    font-size: 16pt; color: #E85D3A; line-height: 1;
+    letter-spacing: 0.25em; font-weight: 800;
   }
   .toplabel {
     font-family: "Cinzel", "Cormorant Garamond", serif;
