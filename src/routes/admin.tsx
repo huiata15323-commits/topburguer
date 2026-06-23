@@ -442,6 +442,24 @@ function AdminPage() {
 
         {/* List */}
         <section className="space-y-8">
+          {menuLoading && (
+            <div className="rounded-3xl border border-border bg-card p-5 shadow-card-soft">
+              <div className="font-black">Carregando cardápio atualizado…</div>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="rounded-2xl border border-border overflow-hidden">
+                    <div className="aspect-[5/3] bg-muted animate-pulse" />
+                    <div className="p-3 space-y-2">
+                      <div className="h-4 w-2/3 rounded-full bg-muted animate-pulse" />
+                      <div className="h-3 w-full rounded-full bg-muted animate-pulse" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {!menuLoading &&
           {CATS.map((cat) => {
             const list = items.filter((m) => m.category === cat.key);
             return (
