@@ -120,9 +120,9 @@ function StatusPage() {
             onChange={(e) => setInput(e.target.value.replace(/\D/g, "").slice(0, 6))}
             inputMode="numeric"
             placeholder="Nº do pedido"
-            className="flex-1 min-w-0 px-4 py-3 rounded-xl border border-border bg-card focus:border-ember focus:outline-none font-semibold text-lg"
+            className="flex-1 min-w-0 px-4 py-3 rounded-2xl border border-[#E5E7EB] bg-white focus:border-[#FF7A00] focus:ring-2 focus:ring-[#FF7A00]/20 focus:outline-none font-semibold text-lg shadow-sm transition"
           />
-          <button className="shrink-0 px-4 py-3 rounded-xl bg-gradient-ember text-ember-foreground font-bold shadow-ember">
+          <button className="shrink-0 px-5 py-3 rounded-2xl bg-gradient-to-r from-[#FF7A00] to-[#FFC93C] text-black font-black shadow-lg shadow-[#FF7A00]/30 hover:shadow-xl hover:shadow-[#FF7A00]/40 transition">
             Buscar
           </button>
         </form>
