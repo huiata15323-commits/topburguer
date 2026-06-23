@@ -105,7 +105,7 @@ function Landing() {
 
             <motion.p
               initial="hidden" animate="show" variants={fadeUp} custom={2}
-              className="mt-6 text-lg md:text-xl text-white/70 max-w-xl text-balance"
+              className="mt-6 text-lg md:text-xl text-white/70 max-w-xl text-balance mx-auto"
             >
               O Top Burguer conecta o cliente, o painel de status e a cozinha
               numa única experiência. Pediu, fritou, entregou.
