@@ -86,7 +86,15 @@ function Landing() {
               initial="hidden" animate="show" variants={fadeUp} custom={1}
               className="mt-6 text-display text-balance text-[clamp(3.5rem,9vw,7.5rem)]"
             >
-              <span className="block">DO TOQUE</span>
+              <span className="block">
+                DO TO
+                <img
+                  src={fryingPanQ}
+                  alt="Q"
+                  className="inline-block align-middle h-[0.85em] w-[0.85em] mx-[0.02em] -mt-[0.08em]"
+                />
+                UE
+              </span>
               <span className="block">
                 <span className="text-outline">À</span>{" "}
                 <span className="bg-gradient-to-br from-amber-warm via-gold to-ember bg-clip-text text-transparent">CHAPA</span>
