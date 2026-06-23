@@ -93,18 +93,19 @@ function StatusPage() {
   const stepIndex = order ? STEPS.findIndex((s) => s.key === order.status) : -1;
 
   return (
-    <main className="min-h-screen bg-background">
-      <header className="bg-gradient-night text-white">
+    <main className="min-h-screen bg-[#F4F5F7] relative overflow-hidden">
+      <FoodCornerAnimations />
+      <header className="bg-gradient-to-r from-[#0a0a0a] via-[#1a1a1a] to-[#0a0a0a] text-white relative z-10">
         <div className="mx-auto max-w-3xl px-4 py-5 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 font-bold">
-            <div className="w-8 h-8 rounded-lg bg-gradient-ember grid place-items-center text-sm">T</div>
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#FF7A00] to-[#FFC93C] grid place-items-center text-sm text-black font-black">T</div>
             Top Burguer
           </Link>
-          <Link to="/order" className="text-xs text-amber-warm hover:underline">Novo pedido</Link>
+          <Link to="/order" className="text-xs text-[#FFC93C] hover:underline">Novo pedido</Link>
         </div>
       </header>
 
-      <div className="mx-auto max-w-3xl px-4 py-8">
+      <div className="mx-auto max-w-3xl px-4 py-8 relative z-10">
         {/* Lookup form */}
         <form
           onSubmit={(e) => {
