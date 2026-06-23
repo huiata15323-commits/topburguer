@@ -362,7 +362,13 @@ function Landing() {
                   info: '2º Ano "A" TDS · SENAI',
                   real: true,
                 },
-                ...[4, 5, 6].map((i) => ({
+                {
+                  quote: "Fazer parte do curso de Desenvolvimento de Sistemas está sendo uma experiência muito especial para mim. Além dos conhecimentos que estou aprendendo, também estou aprendendo lições que vou levar para a vida. O professor Huiatã não ensina apenas a matéria, ele se preocupa com cada aluno, incentiva, orienta e sempre procura o melhor para todos nós. Quando precisamos de ajuda, ele está disposto a ouvir e apoiar, e quando é necessário, também nos corrige para que possamos crescer e evoluir. Sua dedicação, paciência e carinho com a turma faz toda a diferença. Sou muito grata pela oportunidade de aprender com um professor tão especial e por tudo o que esse curso está me ensinando.",
+                  name: "Thárcila da Silva Dias",
+                  info: '2º Ano "A" TDS · SENAI',
+                  real: true,
+                },
+                ...[5, 6].map((i) => ({
                   quote: "Espaço reservado para o depoimento de um aluno da turma.",
                   name: "Aluno(a)",
                   info: "2º Ano · SENAI",
