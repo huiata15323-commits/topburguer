@@ -338,16 +338,22 @@ function OrderPage() {
                       }`}
                     >
                       <div className="aspect-[4/3] bg-muted overflow-hidden relative">
-                        <img
-                          src={m.image}
-                          alt={m.name}
-                          loading="lazy"
-                          width={512}
-                          height={384}
-                          className={`w-full h-full object-cover transition-transform duration-500 ${
-                            soldOut ? "grayscale" : "group-hover:scale-105"
-                          }`}
-                        />
+                        {m.image ? (
+                          <img
+                            src={m.image}
+                            alt={m.name}
+                            loading="lazy"
+                            width={512}
+                            height={384}
+                            className={`w-full h-full object-cover transition-transform duration-500 ${
+                              soldOut ? "grayscale" : "group-hover:scale-105"
+                            }`}
+                          />
+                        ) : (
+                          <div className="w-full h-full grid place-items-center bg-gradient-to-br from-amber-warm/15 via-card to-ember/10 text-5xl">
+                            {m.emoji}
+                          </div>
+                        )}
                         {soldOut && (
                           <div className="absolute inset-0 bg-black/55 grid place-items-center">
                             <span className="px-3 py-1 rounded-full bg-red-500 text-white text-xs font-black uppercase tracking-widest">
