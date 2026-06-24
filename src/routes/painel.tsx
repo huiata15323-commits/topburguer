@@ -704,8 +704,8 @@ function FeaturedReady({ featured, big, onReannounce, onDelivered }: { featured?
             <motion.div
               animate={{ scale: [1, 1.04, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
-              className={`font-black tabular-nums leading-none mt-3 sm:mt-4 bg-gradient-to-br from-white via-amber-warm to-ember bg-clip-text text-transparent drop-shadow-2xl ${
-                big ? "text-[clamp(8rem,22vw,26rem)]" : "text-[clamp(6rem,16vw,18rem)]"
+              className={`font-black tabular-nums leading-none mt-3 sm:mt-4 bg-gradient-to-br from-white via-amber-warm to-ember bg-clip-text text-transparent drop-shadow-2xl max-w-full ${
+                big ? "text-[clamp(5rem,12vw,14rem)]" : "text-[clamp(4rem,10vw,12rem)]"
               }`}
               style={{ textShadow: "0 0 80px rgba(245, 166, 35, 0.4)" }}
             >
