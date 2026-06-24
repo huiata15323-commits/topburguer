@@ -505,7 +505,9 @@ function OrderPage() {
               </div>
             </div>
           ))}
+          </div>
         </section>
+
 
         {/* Sidebar cart (desktop) */}
         <aside className="hidden lg:block lg:sticky lg:top-32 lg:self-start">
