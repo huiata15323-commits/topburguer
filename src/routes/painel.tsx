@@ -352,7 +352,14 @@ function PainelPage() {
                     : "bg-white/5 border-white/10 text-white/40"
                 }`}
               >
-                {voiceOn ? "🔊" : "🔇"}
+              {voiceOn ? "🔊" : "🔇"}
+              </button>
+              <button
+                onClick={markAllReady}
+                title="Marcar todos os pedidos em preparo como prontos"
+                className="px-2 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-[10px] font-black uppercase tracking-wider text-emerald-300 transition active:scale-95"
+              >
+                ✓ Todos prontos
               </button>
               <div className="hidden md:flex items-center gap-3 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10">
                 <div className="text-center">
