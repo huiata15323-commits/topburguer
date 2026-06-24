@@ -317,40 +317,6 @@ function SobrePage() {
         </p>
       </section>
 
-      {/* Depoimentos */}
-      <section className="relative z-10 mx-auto max-w-6xl px-6 py-20">
-        <motion.div
-          initial="hidden" whileInView="show" viewport={{ once: true }}
-          variants={fade} custom={0}
-          className="text-center mb-12"
-        >
-          <h2 className="text-3xl md:text-5xl font-black text-balance">
-            O que dizem <span className="text-amber-warm">nossos clientes</span>
-          </h2>
-        </motion.div>
-        <div className="grid md:grid-cols-3 gap-5">
-          {[
-            { quote: "O sistema revolucionou nossa operação. Pedidos chegam organizados na cozinha e o painel de chamadas eliminou a confusão no balcão.", name: "Mariana L.", role: "Dona · Burguer Studio" },
-            { quote: "Implantação em 1 dia. O cardápio QR já estava funcionando e os clientes adoraram fazer pedido pelo celular.", name: "Carlos R.", role: "Gerente · Fire Burguer" },
-            { quote: "O resumo do dia por IA me ajuda a saber exatamente o que produzir amanhã. Reduzi o desperdício em 30%.", name: "Ana P.", role: "Sócia · Smash House" },
-          ].map((t, i) => (
-            <motion.div
-              key={t.name}
-              initial="hidden" whileInView="show" viewport={{ once: true }}
-              variants={fade} custom={i}
-              className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 hover:border-amber-warm/30 transition-colors"
-            >
-              <div className="text-2xl text-amber-warm mb-3">"</div>
-              <p className="text-sm text-white/75 leading-relaxed">{t.quote}</p>
-              <div className="mt-4 pt-3 border-t border-white/10">
-                <div className="font-bold text-sm">{t.name}</div>
-                <div className="text-xs text-white/50">{t.role}</div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
       {/* Agradecimento ao Professor */}
       <section className="relative z-10 mx-auto max-w-4xl px-6 py-20 text-center overflow-hidden">
         <motion.div
