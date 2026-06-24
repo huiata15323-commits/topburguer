@@ -58,6 +58,36 @@ function SmartThumb({ src, alt, emoji }: { src?: string; alt: string; emoji: str
   );
 }
 
+function FoodRain() {
+  const foods = ["🍔", "🥤", "🧃", "🍟", "🍔", "🥤", "🍟", "🧃", "🍔", "🥤", "🍟", "🧃", "🍔", "🥤", "🍟", "🧃", "🍔", "🥤"];
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+      {foods.map((f, i) => {
+        const left = (i * 5.5) % 100;
+        const duration = 6 + ((i * 1.37) % 6);
+        const delay = (i * 0.45) % 7;
+        const size = 28 + ((i * 7) % 28);
+        return (
+          <span
+            key={i}
+            className="absolute -top-12 select-none animate-food-fall"
+            style={{
+              left: `${left}%`,
+              fontSize: `${size}px`,
+              animationDuration: `${duration}s`,
+              animationDelay: `-${delay}s`,
+              filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))",
+            }}
+          >
+            {f}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
+
 
 const search = z.object({
   mesa: z.coerce.number().int().positive().max(999).optional().catch(undefined),
