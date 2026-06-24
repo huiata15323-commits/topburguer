@@ -292,86 +292,87 @@ function Landing() {
             <p className="mt-3 text-white/70 leading-relaxed">
               Este projeto é parte desse caminho — código, sonho e gratidão impressos em cada tela. As turmas <strong>2º Ano A e B</strong> assinam, com orgulho, este projeto.
             </p>
-            <div className="mt-6 grid grid-cols-1 gap-4">
-              {[
-                { src: turmaFull.url, label: "Turma 2º Ano A — Técnico em Desenvolvimento de Sistemas" },
-                { src: visitaTecnica.url, label: "Turma 2º Ano B — Técnico em Desenvolvimento de Sistemas" },
-              ].map((t) => (
-                <figure key={t.label} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/40">
-                  <img
-                    src={t.src}
-                    alt={t.label}
-                    className="w-full h-auto object-contain group-hover:scale-[1.02] transition-transform duration-700"
-                  />
-                  <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-3 text-xs font-bold text-white">
-                    {t.label}
-                  </figcaption>
-                </figure>
-              ))}
+            <div className="mt-6 grid md:grid-cols-2 gap-6">
+              {/* Fotos da turma */}
+              <div className="grid grid-cols-1 gap-4">
+                {[
+                  { src: turmaFull.url, label: "Turma 2º Ano A — Técnico em Desenvolvimento de Sistemas" },
+                  { src: visitaTecnica.url, label: "Turma 2º Ano B — Técnico em Desenvolvimento de Sistemas" },
+                ].map((t) => (
+                  <figure key={t.label} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/40">
+                    <img
+                      src={t.src}
+                      alt={t.label}
+                      className="w-full h-auto object-contain group-hover:scale-[1.02] transition-transform duration-700"
+                    />
+                    <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent p-3 text-xs font-bold text-white">
+                      {t.label}
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+
+              {/* Agradecimento ao Professor */}
+              <motion.div
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="relative rounded-3xl border border-amber-warm/20 bg-gradient-to-br from-amber-warm/10 via-ember/10 to-red-600/10 p-6 md:p-8 backdrop-blur-sm text-center overflow-hidden"
+              >
+                {/* Floating hearts */}
+                {[...Array(12)].map((_, i) => {
+                  const positions = [
+                    { top: "8%", left: "5%" }, { top: "12%", right: "8%" },
+                    { top: "5%", left: "45%" }, { top: "25%", left: "2%" },
+                    { top: "20%", right: "3%" }, { top: "50%", left: "8%" },
+                    { top: "55%", right: "6%" }, { top: "75%", left: "4%" },
+                    { top: "80%", right: "10%" }, { bottom: "10%", left: "30%" },
+                    { bottom: "8%", right: "25%" }, { top: "40%", right: "2%" },
+                  ];
+                  const delays = [0, 0.5, 1, 1.5, 0.3, 0.8, 1.2, 0.2, 1.4, 0.6, 1.1, 0.9];
+                  const scales = [1, 0.8, 1.2, 0.9, 1.1, 0.7, 1.3, 0.85, 1.15, 0.75, 1.05, 0.95];
+                  return (
+                    <motion.span
+                      key={i}
+                      className="absolute text-xl md:text-2xl select-none pointer-events-none"
+                      style={positions[i]}
+                      animate={{
+                        y: [0, -12, 0, 8, 0],
+                        opacity: [0.4, 0.9, 0.5, 0.8, 0.4],
+                        scale: [scales[i], scales[i] * 1.15, scales[i] * 0.9, scales[i] * 1.05, scales[i]],
+                      }}
+                      transition={{
+                        duration: 3 + (i % 3),
+                        repeat: Infinity,
+                        delay: delays[i],
+                        ease: "easeInOut",
+                      }}
+                    >
+                      ❤️
+                    </motion.span>
+                  );
+                })}
+
+                <div className="relative z-10">
+                  <h3 className="text-xl md:text-2xl font-black mb-4 text-balance">
+                    Obrigado, <span className="text-amber-warm">Huiatã Ribeiro</span>!
+                  </h3>
+                  <p className="text-sm md:text-base text-white/80 leading-relaxed text-balance">
+                    Agradecemos muito ao nosso querido professor, que teve paciência e dedicação com nossas turmas
+                    mesmo diante das dificuldades. Obrigada por todos os ensinamentos, puxões de orelhas e feedbacks.
+                    Você foi um pilar importantíssimo no nosso crescimento, tanto pessoal quanto profissional,
+                    e sabemos que sem sua ajuda não poderíamos conseguir metade das coisas que hoje conseguimos fazer,
+                    pois você sempre incentivou a sermos cada vez melhores. Obrigado por tudo!
+                  </p>
+                  <div className="mt-4 text-amber-warm font-bold tracking-wide text-xs uppercase">
+                    — Turmas 2A e 2B • CEPI Elberto Alves
+                  </div>
+                </div>
+              </motion.div>
             </div>
           </motion.div>
         </div>
-      </section>
-
-      {/* Agradecimento ao Professor */}
-      <section className="relative z-10 mx-auto max-w-4xl px-6 pt-20 pb-10 text-center overflow-hidden">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="relative rounded-3xl border border-amber-warm/20 bg-gradient-to-br from-amber-warm/10 via-ember/10 to-red-600/10 p-8 md:p-14 backdrop-blur-sm"
-        >
-          {/* Floating hearts */}
-          {[...Array(12)].map((_, i) => {
-            const positions = [
-              { top: "8%", left: "5%" }, { top: "12%", right: "8%" },
-              { top: "5%", left: "45%" }, { top: "25%", left: "2%" },
-              { top: "20%", right: "3%" }, { top: "50%", left: "8%" },
-              { top: "55%", right: "6%" }, { top: "75%", left: "4%" },
-              { top: "80%", right: "10%" }, { bottom: "10%", left: "30%" },
-              { bottom: "8%", right: "25%" }, { top: "40%", right: "2%" },
-            ];
-            const delays = [0, 0.5, 1, 1.5, 0.3, 0.8, 1.2, 0.2, 1.4, 0.6, 1.1, 0.9];
-            const scales = [1, 0.8, 1.2, 0.9, 1.1, 0.7, 1.3, 0.85, 1.15, 0.75, 1.05, 0.95];
-            return (
-              <motion.span
-                key={i}
-                className="absolute text-2xl md:text-3xl select-none pointer-events-none"
-                style={positions[i]}
-                animate={{
-                  y: [0, -12, 0, 8, 0],
-                  opacity: [0.4, 0.9, 0.5, 0.8, 0.4],
-                  scale: [scales[i], scales[i] * 1.15, scales[i] * 0.9, scales[i] * 1.05, scales[i]],
-                }}
-                transition={{
-                  duration: 3 + (i % 3),
-                  repeat: Infinity,
-                  delay: delays[i],
-                  ease: "easeInOut",
-                }}
-              >
-                ❤️
-              </motion.span>
-            );
-          })}
-
-          <div className="relative z-10">
-            <h3 className="text-2xl md:text-4xl font-black mb-6 text-balance">
-              Obrigado, <span className="text-amber-warm">Huiatã Ribeiro</span>!
-            </h3>
-            <p className="text-base md:text-lg text-white/80 leading-relaxed text-balance max-w-2xl mx-auto">
-              Agradecemos muito ao nosso querido professor, que teve paciência e dedicação com nossas turmas
-              mesmo diante das dificuldades. Obrigada por todos os ensinamentos, puxões de orelhas e feedbacks.
-              Você foi um pilar importantíssimo no nosso crescimento, tanto pessoal quanto profissional,
-              e sabemos que sem sua ajuda não poderíamos conseguir metade das coisas que hoje conseguimos fazer,
-              pois você sempre incentivou a sermos cada vez melhores. Obrigado por tudo!
-            </p>
-            <div className="mt-6 text-amber-warm font-bold tracking-wide text-sm uppercase">
-              — Turmas 2A e 2B • CEPI Elberto Alves
-            </div>
-          </div>
-        </motion.div>
       </section>
 
       {/* Momentos — memorial aberto para depoimentos */}
