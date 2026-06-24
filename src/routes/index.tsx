@@ -141,7 +141,7 @@ function Landing() {
             >
               {[
                 { k: "<3s", v: "Sincronização" },
-                { k: "10+", v: "Itens no cardápio" },
+                { k: "5+", v: "Itens no cardápio" },
                 { k: "TV", v: "Display cozinha" },
               ].map((s) => (
                 <div key={s.v}>
@@ -368,13 +368,18 @@ function Landing() {
                   info: '2º Ano "A" TDS · SENAI',
                   real: true,
                 },
-                ...[5, 6].map((i) => ({
-                  quote: "Espaço reservado para o depoimento de um aluno da turma.",
-                  name: "Aluno(a)",
-                  info: "2º Ano · SENAI",
-                  real: false,
-                  num: i,
-                })),
+                {
+                  quote: "quando comecei o curso Técnico em Desenvolvimento de Sistemas, não imaginava o quanto essa experiência iria contribuir para o meu crescimento. Ao longo dessa jornada, aprendi muito sobre tecnologia, programação e trabalho em equipe, desenvolvendo habilidades que levarei para a vida toda. Além das aulas, tivemos experiências incríveis, como as visitas técnicas aos data centers, que nos permitiram conhecer na prática como funciona a área de tecnologia e ampliar nossa visão sobre o mercado de trabalho. Também gostaria de agradecer ao professor Huiatá Ribeiro, que sempre nos incentivou a buscar mais conhecimento, enfrentar desafios e acreditar no nosso potencial. Sua dedicação fez toda a diferença na nossa formação. Hoje tenho a certeza de que escolher esse curso foi uma decisão muito importante para o meu futuro, e sou grata por todas as oportunidades, aprendizados e experiências que vivi durante essa trajetória.",
+                  name: "Ana Beatriz dos Santos Filgueiras",
+                  info: '2º Ano "B" TDS · SENAI',
+                  real: true,
+                },
+                {
+                  quote: "quando comecei o curso Técnico em Desenvolvimento de Sistemas, não imaginava o quanto essa experiência iria contribuir para o meu crescimento. Ao longo dessa jornada, aprendi muito sobre tecnologia, programação e trabalho em equipe, desenvolvendo habilidades que levarei para a vida toda. Além das aulas, tivemos experiências incríveis, como as visitas técnicas aos data centers, que nos permitiram conhecer na prática como funciona a área de tecnologia e ampliar nossa visão sobre o mercado de trabalho. Também gostaria de agradecer ao professor Huiatá Ribeiro, que sempre nos incentivou a buscar mais conhecimento, enfrentar desafios e acreditar no nosso potencial. Sua dedicação fez toda a diferença na nossa formação. Hoje tenho a certeza de que escolher esse curso foi uma decisão muito importante para o meu futuro, e sou grata por todas as oportunidades, aprendizados e experiências que vivi durante essa trajetória.",
+                  name: "Samuel Vitor Alves Silva",
+                  info: '2º Ano "B" TDS · SENAI',
+                  real: true,
+                },
               ].map((item, idx) => (
                 <motion.div
                   key={idx}
