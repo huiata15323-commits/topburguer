@@ -99,6 +99,7 @@ function PainelPage() {
   const [, force] = useState(0);
   const [now, setNow] = useState<Date | null>(null);
   const [voiceOn, setVoiceOn] = useState(true);
+  const [showThanks, setShowThanks] = useState(false);
 
   const markAllReady = useCallback(async () => {
     const preparing = orders.filter((o) => o.status === "preparing");
