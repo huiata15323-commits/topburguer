@@ -329,6 +329,26 @@ function PainelPage() {
         />
       </div>
 
+      {/* Mensagem de carinho — uma única vez */}
+      <AnimatePresence>
+        {showThanks && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.85 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.05 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+          >
+            <div className="relative px-10 py-8 rounded-3xl bg-gradient-to-br from-amber-warm/90 via-ember/90 to-red-600/90 border-2 border-white/30 shadow-2xl text-center">
+              <div className="text-4xl sm:text-5xl font-black text-white drop-shadow-lg tracking-tight">
+                OBRIGADO HUIATÃ RIBEIRO!!
+              </div>
+              <div className="mt-3 text-6xl sm:text-7xl animate-pulse">❤️</div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* conteúdo acima da aurora */}
       <div className="relative z-10 flex flex-col flex-1 min-h-0">
       {!tvMode && (
