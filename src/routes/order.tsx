@@ -487,6 +487,7 @@ function OrderPage() {
                             </button>
                           </div>
                         </div>
+                        <p className="mt-2 text-[11px] sm:text-xs font-bold text-red-500 uppercase tracking-wide">promoção apenas hoje</p>
                         {q > 0 && (
                           <motion.input
                             initial={{ opacity: 0, height: 0 }}
