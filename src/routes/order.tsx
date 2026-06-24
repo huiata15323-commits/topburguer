@@ -598,7 +598,11 @@ function OrderPage() {
       />
       </>
       )}
+      <footer className="mt-10 border-t border-border py-6 px-4 text-center text-xs text-muted-foreground">
+        Desenvolvido por <span className="font-black text-ember">Samuel Vitor Alves Silva</span>
+      </footer>
     </main>
+
   );
 }
 
