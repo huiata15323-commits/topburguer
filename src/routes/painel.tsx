@@ -705,15 +705,17 @@ function FeaturedReady({ featured, big, onReannounce, onDelivered }: { featured?
               animate={{ scale: [1, 1.04, 1] }}
               transition={{ duration: 2, repeat: Infinity }}
               className={`font-black tabular-nums leading-none mt-3 sm:mt-4 bg-gradient-to-br from-white via-amber-warm to-ember bg-clip-text text-transparent drop-shadow-2xl max-w-full ${
-                big ? "text-[clamp(5rem,12vw,14rem)]" : "text-[clamp(4rem,10vw,12rem)]"
+                big ? "text-[clamp(4rem,9vw,10rem)]" : "text-[clamp(3rem,7vw,8rem)]"
               }`}
               style={{ textShadow: "0 0 80px rgba(245, 166, 35, 0.4)" }}
             >
               #{featured.number}
             </motion.div>
-            <div className="mt-4 text-3xl sm:text-5xl font-black text-white truncate max-w-[80vw] mx-auto tracking-tight">
-              {featured.customer}
-            </div>
+            {featured.customer && featured.customer !== `Mesa ${featured.tableNumber ?? ""}` && (
+              <div className="mt-4 text-3xl sm:text-5xl font-black text-white truncate max-w-[80vw] mx-auto tracking-tight">
+                {featured.customer}
+              </div>
+            )}
             {featured.tableNumber && (
               <motion.div
                 animate={{ scale: [1, 1.05, 1] }}
