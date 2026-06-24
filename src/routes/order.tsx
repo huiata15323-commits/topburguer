@@ -386,7 +386,10 @@ function OrderPage() {
 
       <div className="mx-auto max-w-6xl px-3 sm:px-4 py-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_400px]">
 
-        <section className="space-y-10 min-w-0">
+        <section className="space-y-10 min-w-0 relative rounded-3xl overflow-hidden p-4 sm:p-6 isolate" style={{ backgroundColor: "#FF4500" }}>
+          <FoodRain />
+          <div className="relative z-10 space-y-10">
+
           {CATEGORIES.map((cat) => (
             <div key={cat.key} id={`cat-${cat.key}`} className="scroll-mt-32">
               <h2 className="text-lg sm:text-xl font-black mb-4 flex items-center gap-2">
