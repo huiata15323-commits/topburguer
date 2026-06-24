@@ -87,7 +87,7 @@ function useDeliveredHidden() {
 function PainelPage() {
   const { view } = useSearch({ from: "/painel" });
   const navigate = useNavigate({ from: "/painel" });
-  const { orders: allOrders, clearWaiterCall } = useOrders();
+  const { orders: allOrders, clearWaiterCall, updateStatus } = useOrders();
   const { items: menu } = useMenu();
   const { hidden: deliveredHidden, hide: markDelivered } = useDeliveredHidden();
   const orders = useMemo(
@@ -99,6 +99,16 @@ function PainelPage() {
   const [, force] = useState(0);
   const [now, setNow] = useState<Date | null>(null);
   const [voiceOn, setVoiceOn] = useState(true);
+
+  const markAllReady = useCallback(async () => {
+    const preparing = orders.filter((o) => o.status === "preparing");
+    if (preparing.length === 0) {
+      toast.info("Nenhum pedido em preparo.");
+      return;
+    }
+    await Promise.all(preparing.map((o) => updateStatus(o.id, "done")));
+    toast.success(`${preparing.length} pedido(s) marcado(s) como pronto(s).`);
+  }, [orders, updateStatus]);
   // Fila de pedidos a exibir em tela cheia (takeover cinematográfico)
   const [spotlightQueue, setSpotlightQueue] = useState<Order[]>([]);
   const currentSpotlight = spotlightQueue[0];
@@ -342,7 +352,14 @@ function PainelPage() {
                     : "bg-white/5 border-white/10 text-white/40"
                 }`}
               >
-                {voiceOn ? "🔊" : "🔇"}
+              {voiceOn ? "🔊" : "🔇"}
+              </button>
+              <button
+                onClick={markAllReady}
+                title="Marcar todos os pedidos em preparo como prontos"
+                className="px-2 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/40 text-[10px] font-black uppercase tracking-wider text-emerald-300 transition active:scale-95"
+              >
+                ✓ Todos prontos
               </button>
               <div className="hidden md:flex items-center gap-3 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10">
                 <div className="text-center">
