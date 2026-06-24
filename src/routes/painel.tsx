@@ -164,6 +164,18 @@ function PainelPage() {
       localStorage.setItem("painel.voice", voiceOn ? "on" : "off");
   }, [voiceOn]);
 
+  // Mensagem de carinho — aparece uma única vez
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (localStorage.getItem("painel.thanksShown") === "1") return;
+    setShowThanks(true);
+    const t = setTimeout(() => {
+      setShowThanks(false);
+      localStorage.setItem("painel.thanksShown", "1");
+    }, 4500);
+    return () => clearTimeout(t);
+  }, []);
+
   // tick para timer
   useEffect(() => {
     setNow(new Date());
