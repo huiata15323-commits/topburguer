@@ -552,7 +552,7 @@ function SpotlightTakeover({ order }: { order?: Order }) {
             <motion.div
               animate={{ scale: [1, 1.03, 1] }}
               transition={{ duration: 1.6, repeat: Infinity }}
-              className="font-black tabular-nums leading-none text-[clamp(6rem,18vw,22rem)] bg-gradient-to-br from-amber-200 via-amber-warm to-ember bg-clip-text text-transparent"
+              className="font-black tabular-nums leading-none max-w-full text-[clamp(4rem,10vw,12rem)] bg-gradient-to-br from-amber-200 via-amber-warm to-ember bg-clip-text text-transparent"
               style={{
                 textShadow: "0 0 120px rgba(255,180,80,0.7)",
                 filter: "drop-shadow(0 0 40px rgba(255,200,100,0.5))",
