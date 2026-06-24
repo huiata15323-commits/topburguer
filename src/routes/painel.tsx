@@ -172,7 +172,7 @@ function PainelPage() {
     const t = setTimeout(() => {
       setShowThanks(false);
       localStorage.setItem("painel.thanksShown", "1");
-    }, 4500);
+    }, 30000);
     return () => clearTimeout(t);
   }, []);
 
