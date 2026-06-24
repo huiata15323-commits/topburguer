@@ -58,6 +58,36 @@ function SmartThumb({ src, alt, emoji }: { src?: string; alt: string; emoji: str
   );
 }
 
+function FoodRain() {
+  const foods = ["🍔", "🥤", "🧃", "🍟", "🍔", "🥤", "🍟", "🧃", "🍔", "🥤", "🍟", "🧃", "🍔", "🥤", "🍟", "🧃", "🍔", "🥤"];
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+      {foods.map((f, i) => {
+        const left = (i * 5.5) % 100;
+        const duration = 6 + ((i * 1.37) % 6);
+        const delay = (i * 0.45) % 7;
+        const size = 28 + ((i * 7) % 28);
+        return (
+          <span
+            key={i}
+            className="absolute -top-12 select-none animate-food-fall"
+            style={{
+              left: `${left}%`,
+              fontSize: `${size}px`,
+              animationDuration: `${duration}s`,
+              animationDelay: `-${delay}s`,
+              filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.25))",
+            }}
+          >
+            {f}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
+
 
 const search = z.object({
   mesa: z.coerce.number().int().positive().max(999).optional().catch(undefined),
@@ -356,7 +386,10 @@ function OrderPage() {
 
       <div className="mx-auto max-w-6xl px-3 sm:px-4 py-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_400px]">
 
-        <section className="space-y-10 min-w-0">
+        <section className="space-y-10 min-w-0 relative rounded-3xl overflow-hidden p-4 sm:p-6 isolate" style={{ backgroundColor: "#FF4500" }}>
+          <FoodRain />
+          <div className="relative z-10 space-y-10">
+
           {CATEGORIES.map((cat) => (
             <div key={cat.key} id={`cat-${cat.key}`} className="scroll-mt-32">
               <h2 className="text-lg sm:text-xl font-black mb-4 flex items-center gap-2">
@@ -472,7 +505,9 @@ function OrderPage() {
               </div>
             </div>
           ))}
+          </div>
         </section>
+
 
         {/* Sidebar cart (desktop) */}
         <aside className="hidden lg:block lg:sticky lg:top-32 lg:self-start">
@@ -563,7 +598,11 @@ function OrderPage() {
       />
       </>
       )}
+      <footer className="mt-10 border-t border-border py-6 px-4 text-center text-xs text-muted-foreground">
+        Desenvolvido por <span className="font-black text-ember">Samuel Vitor Alves Silva</span>
+      </footer>
     </main>
+
   );
 }
 

@@ -545,3 +545,17 @@
   --gradient-ember: linear-gradient(135deg, oklch(0.62 0.22 var(--brand-hue)), oklch(0.5 0.2 calc(var(--brand-hue) + 15)));
   --shadow-ember: 0 20px 50px -20px color-mix(in oklab, oklch(0.62 0.22 var(--brand-hue)) 55%, transparent);
 }
+
+/* Food rain animation for /order menu background */
+@keyframes food-fall {
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(120vh) rotate(360deg); opacity: 0; }
+}
+.animate-food-fall {
+  animation-name: food-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
