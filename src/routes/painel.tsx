@@ -87,7 +87,7 @@ function useDeliveredHidden() {
 function PainelPage() {
   const { view } = useSearch({ from: "/painel" });
   const navigate = useNavigate({ from: "/painel" });
-  const { orders: allOrders, clearWaiterCall } = useOrders();
+  const { orders: allOrders, clearWaiterCall, updateStatus } = useOrders();
   const { items: menu } = useMenu();
   const { hidden: deliveredHidden, hide: markDelivered } = useDeliveredHidden();
   const orders = useMemo(
@@ -99,6 +99,16 @@ function PainelPage() {
   const [, force] = useState(0);
   const [now, setNow] = useState<Date | null>(null);
   const [voiceOn, setVoiceOn] = useState(true);
+
+  const markAllReady = useCallback(async () => {
+    const preparing = orders.filter((o) => o.status === "preparing");
+    if (preparing.length === 0) {
+      toast.info("Nenhum pedido em preparo.");
+      return;
+    }
+    await Promise.all(preparing.map((o) => updateStatus(o.id, "done")));
+    toast.success(`${preparing.length} pedido(s) marcado(s) como pronto(s).`);
+  }, [orders, updateStatus]);
   // Fila de pedidos a exibir em tela cheia (takeover cinematográfico)
   const [spotlightQueue, setSpotlightQueue] = useState<Order[]>([]);
   const currentSpotlight = spotlightQueue[0];
