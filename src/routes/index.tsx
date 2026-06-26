@@ -6,14 +6,13 @@ import QRCode from "react-qr-code";
 import topBacon from "@/assets/menu/top-bacon.jpg";
 import topCheddar from "@/assets/menu/top-cheddar.jpg";
 import topClassic from "@/assets/menu/top-classic.jpg";
-import whatsappPreview from "@/assets/topburguer-whatsapp-preview-v4.jpg.asset.json";
 import turmaFull from "@/assets/turma-2a-new.jpg.asset.json";
 import visitaTecnica from "@/assets/turma-2b-new.jpg.asset.json";
 import { useBranding } from "@/lib/branding";
 
 const DRIVE_ACERVO_URL = "https://drive.google.com/drive/folders/1Wv8JwaqaLX1Awhp_HPAC_hjb1Pz1YBPu?usp=drive_link";
 const SITE_URL = "https://topburguer.lovable.app";
-const SOCIAL_IMAGE_URL = `${SITE_URL}${whatsappPreview.url}`;
+const SOCIAL_IMAGE_URL = `${SITE_URL}/topburguer-social-2026.jpg`;
 const SOCIAL_DESCRIPTION = "Sistema inteligente de pedidos da Top Burguer: cliente, status e cozinha conectados em tempo real.";
 
 export const Route = createFileRoute("/")({
