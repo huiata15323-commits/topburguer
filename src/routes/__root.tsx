@@ -75,9 +75,6 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-const SITE_URL = "https://topburguer.lovable.app";
-const SOCIAL_IMAGE_URL = `${SITE_URL}/og-image.jpg`;
-
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   head: () => ({
     meta: [
@@ -85,27 +82,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: "TOP BURGUER" },
       { name: "description", content: "TOP BURGUER conecta o cliente, o painel de status e a cozinha numa única experiência. Pediu, fritou, entregou." },
-      { name: "author", content: "Lovable" },
+      { name: "author", content: "Top Burguer" },
       { property: "og:title", content: "TOP BURGUER" },
       { property: "og:description", content: "TOP BURGUER conecta o cliente, o painel de status e a cozinha numa única experiência. Pediu, fritou, entregou." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: `${SITE_URL}/` },
       { property: "og:site_name", content: "TOP BURGUER" },
-      { property: "og:image", content: SOCIAL_IMAGE_URL },
-      { property: "og:image:secure_url", content: SOCIAL_IMAGE_URL },
-      { property: "og:image:type", content: "image/jpeg" },
-      { property: "og:image:width", content: "1200" },
-      { property: "og:image:height", content: "630" },
-      { property: "og:image:alt", content: "TOP BURGUER — Pediu, fritou, entregou." },
-      { itemProp: "image", content: SOCIAL_IMAGE_URL },
+      { property: "og:locale", content: "pt_BR" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "TOP BURGUER" },
       { name: "twitter:description", content: "TOP BURGUER conecta o cliente, o painel de status e a cozinha numa única experiência. Pediu, fritou, entregou." },
-      { name: "twitter:image", content: SOCIAL_IMAGE_URL },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "image_src", href: SOCIAL_IMAGE_URL },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {

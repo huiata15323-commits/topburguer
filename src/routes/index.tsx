@@ -6,17 +6,41 @@ import QRCode from "react-qr-code";
 import topBacon from "@/assets/menu/top-bacon.jpg";
 import topCheddar from "@/assets/menu/top-cheddar.jpg";
 import topClassic from "@/assets/menu/top-classic.jpg";
+import whatsappPreview from "@/assets/topburguer-whatsapp-preview-v4.jpg.asset.json";
 import turmaFull from "@/assets/turma-2a-new.jpg.asset.json";
 import visitaTecnica from "@/assets/turma-2b-new.jpg.asset.json";
 import { useBranding } from "@/lib/branding";
 
 const DRIVE_ACERVO_URL = "https://drive.google.com/drive/folders/1Wv8JwaqaLX1Awhp_HPAC_hjb1Pz1YBPu?usp=drive_link";
+const SITE_URL = "https://topburguer.lovable.app";
+const SOCIAL_IMAGE_URL = `${SITE_URL}${whatsappPreview.url}`;
+const SOCIAL_DESCRIPTION = "Sistema inteligente de pedidos da Top Burguer: cliente, status e cozinha conectados em tempo real.";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Top Burguer" },
-      { name: "description", content: "Sistema inteligente de pedidos da Top Burguer: cliente, status e cozinha conectados em tempo real." },
+      { title: "Top Burguer — Sistema inteligente" },
+      { name: "description", content: SOCIAL_DESCRIPTION },
+      { property: "og:title", content: "Top Burguer — Sistema inteligente" },
+      { property: "og:description", content: SOCIAL_DESCRIPTION },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: `${SITE_URL}/` },
+      { property: "og:image", content: SOCIAL_IMAGE_URL },
+      { property: "og:image:url", content: SOCIAL_IMAGE_URL },
+      { property: "og:image:secure_url", content: SOCIAL_IMAGE_URL },
+      { property: "og:image:type", content: "image/jpeg" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: "Top Burguer — sistema inteligente criado pelos alunos do técnico." },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Top Burguer — Sistema inteligente" },
+      { name: "twitter:description", content: SOCIAL_DESCRIPTION },
+      { name: "twitter:image", content: SOCIAL_IMAGE_URL },
+      { itemProp: "image", content: SOCIAL_IMAGE_URL },
+    ],
+    links: [
+      { rel: "canonical", href: `${SITE_URL}/` },
+      { rel: "image_src", href: SOCIAL_IMAGE_URL },
     ],
   }),
   component: Landing,
