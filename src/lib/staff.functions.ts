@@ -6,8 +6,6 @@ import { z } from "zod";
 
 const PIN_BY_ROLE: Record<string, string> = {
   admin: "9999",
-  cozinha: "2113",
-  caixa: "4554",
 };
 
 function assertStaff(pin: string, allowed: ReadonlyArray<keyof typeof PIN_BY_ROLE>) {

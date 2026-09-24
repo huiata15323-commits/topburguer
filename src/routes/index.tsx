@@ -6,8 +6,6 @@ import QRCode from "react-qr-code";
 import topBacon from "@/assets/menu/top-bacon.jpg";
 import topCheddar from "@/assets/menu/top-cheddar.jpg";
 import topClassic from "@/assets/menu/top-classic.jpg";
-import turmaFull from "@/assets/turma-2a-new.jpg.asset.json";
-import visitaTecnica from "@/assets/turma-2b-new.jpg.asset.json";
 import { useBranding } from "@/lib/branding";
 
 const DRIVE_ACERVO_URL = "https://drive.google.com/drive/folders/1Wv8JwaqaLX1Awhp_HPAC_hjb1Pz1YBPu?usp=drive_link";
@@ -319,8 +317,8 @@ function Landing() {
               {/* Fotos da turma */}
               <div className="grid grid-cols-1 gap-4">
                 {[
-                  { src: turmaFull.url, label: "Turma 2º Ano A — Técnico em Desenvolvimento de Sistemas" },
-                  { src: visitaTecnica.url, label: "Turma 2º Ano B — Técnico em Desenvolvimento de Sistemas" },
+                  { src: "/fotos/turma-2a-new.jpg", label: "Turma 2º Ano A — Técnico em Desenvolvimento de Sistemas" },
+                  { src: "/fotos/turma-2b-new.jpg", label: "Turma 2º Ano B — Técnico em Desenvolvimento de Sistemas" },
                 ].map((t) => (
                   <figure key={t.label} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-black/40">
                     <img
