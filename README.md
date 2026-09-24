@@ -54,3 +54,12 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+
+## Deploy na Vercel
+
+O projeto usa TanStack Start + Nitro. Na Vercel o Nitro escolhe o preset `vercel` sozinho, então
+não precisa de configuração extra: `npm run build` gera `.vercel/output`.
+
+1. Em https://vercel.com/new, importe este repositório (branch `main`).
+2. Em **Environment Variables**, cadastre as variáveis listadas em `.env.example`.
+3. Clique em **Deploy**. Cada `git push` na `main` publica uma nova versão automaticamente.
