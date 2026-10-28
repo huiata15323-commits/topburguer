@@ -371,9 +371,9 @@ function PainelPage() {
             </Link>
 
             <nav className="flex items-center gap-1.5 sm:gap-2 bg-white/5 rounded-xl p-1">
-              <FilterChip active={view === "all"} onClick={() => setView("all")} label="Tudo" count={ready.length + preparing.length} />
-              <FilterChip active={view === "ready"} onClick={() => setView("ready")} label="Prontos" count={ready.length} tone="emerald" />
-              <FilterChip active={view === "preparing"} onClick={() => setView("preparing")} label="Em preparo" count={preparing.length} tone="amber" />
+              <FilterChip active={chipActive.all} onClick={() => setView("all")} label="Tudo" count={ready.length + preparing.length} />
+              <FilterChip active={chipActive.ready} onClick={() => setView("ready")} label="Prontos" count={ready.length} tone="emerald" />
+              <FilterChip active={chipActive.preparing} onClick={() => setView("preparing")} label="Em preparo" count={preparing.length} tone="amber" />
             </nav>
 
             <div className="flex items-center gap-3 shrink-0">
