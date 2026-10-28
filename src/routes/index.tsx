@@ -308,7 +308,7 @@ function Landing() {
               Somos alunos do <strong className="text-amber-warm">Curso Técnico em Desenvolvimento de Sistemas — SENAI</strong>, do <strong>CEPI Elberto Alves</strong>. Mesmo sem a infraestrutura adequada, mesmo sem computadores em sala, nunca nos faltou o que mais importa: <em className="text-white/90">vontade de aprender</em>.
             </p>
             <p className="mt-3 text-white/70 leading-relaxed">
-              Junto com o professor <strong className="text-amber-warm">Huiatã Ribeiro</strong>, formamos uma equipe que, aula após aula, foi virando muito mais do que uma turma — virou uma <strong>identidade de família</strong>. Do ano passado até agora, foram momentos intensos de aprendizagem para a vida: erros, acertos, risadas, descobertas e a certeza de que, juntos, a gente vai longe. 💛
+              Junto com o nosso professor, formamos uma equipe que, aula após aula, foi virando muito mais do que uma turma — virou uma <strong>identidade de família</strong>. Do ano passado até agora, foram momentos intensos de aprendizagem para a vida: erros, acertos, risadas, descobertas e a certeza de que, juntos, a gente vai longe. 💛
             </p>
             <p className="mt-3 text-white/70 leading-relaxed">
               Este projeto é parte desse caminho — código, sonho e gratidão impressos em cada tela. As turmas <strong>2º Ano A e B</strong> assinam, com orgulho, este projeto.
@@ -377,7 +377,7 @@ function Landing() {
 
                 <div className="relative z-10">
                   <h3 className="text-xl md:text-2xl font-black mb-4 text-balance">
-                    Obrigado, <span className="text-amber-warm">Huiatã Ribeiro</span>!
+                    Obrigado, <span className="text-amber-warm">Professor</span>!
                   </h3>
                   <p className="text-sm md:text-base text-white/80 leading-relaxed text-balance">
                     Agradecemos muito ao nosso querido professor, que teve paciência e dedicação com nossas turmas

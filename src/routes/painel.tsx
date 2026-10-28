@@ -341,7 +341,7 @@ function PainelPage() {
           >
             <div className="relative px-16 py-12 rounded-3xl bg-gradient-to-br from-amber-warm/90 via-ember/90 to-red-600/90 border-2 border-white/30 shadow-2xl text-center">
               <div className="text-6xl sm:text-8xl font-black text-white drop-shadow-lg tracking-tight">
-                OBRIGADO HUIATÃ RIBEIRO!!
+                OBRIGADO, PROFESSOR!!
               </div>
               <div className="mt-6 text-8xl sm:text-9xl animate-pulse">❤️</div>
             </div>
