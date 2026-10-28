@@ -282,6 +282,11 @@ function PainelPage() {
 
   const featured = ready[0];
   const tvMode = view === "ready";
+  const chipActive = {
+    all: view === "all",
+    ready: view === "ready",
+    preparing: view === "preparing",
+  };
 
   // Atalho: F = fullscreen, H = alterna TV puro
   useEffect(() => {
