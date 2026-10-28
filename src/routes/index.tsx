@@ -308,7 +308,7 @@ function Landing() {
               Somos alunos do <strong className="text-amber-warm">Curso Técnico em Desenvolvimento de Sistemas — SENAI</strong>, do <strong>CEPI Elberto Alves</strong>. Mesmo sem a infraestrutura adequada, mesmo sem computadores em sala, nunca nos faltou o que mais importa: <em className="text-white/90">vontade de aprender</em>.
             </p>
             <p className="mt-3 text-white/70 leading-relaxed">
-              Junto com o nosso professor, formamos uma equipe que, aula após aula, foi virando muito mais do que uma turma — virou uma <strong>identidade de família</strong>. Do ano passado até agora, foram momentos intensos de aprendizagem para a vida: erros, acertos, risadas, descobertas e a certeza de que, juntos, a gente vai longe. 💛
+              Junto com o professor <strong className="text-amber-warm">Sandro Gouvê</strong>, formamos uma equipe que, aula após aula, foi virando muito mais do que uma turma — virou uma <strong>identidade de família</strong>. Do ano passado até agora, foram momentos intensos de aprendizagem para a vida: erros, acertos, risadas, descobertas e a certeza de que, juntos, a gente vai longe. 💛
             </p>
             <p className="mt-3 text-white/70 leading-relaxed">
               Este projeto é parte desse caminho — código, sonho e gratidão impressos em cada tela. As turmas <strong>2º Ano A e B</strong> assinam, com orgulho, este projeto.
@@ -377,7 +377,7 @@ function Landing() {
 
                 <div className="relative z-10">
                   <h3 className="text-xl md:text-2xl font-black mb-4 text-balance">
-                    Obrigado, <span className="text-amber-warm">Professor</span>!
+                    Obrigado, <span className="text-amber-warm">Sandro Gouvê</span>!
                   </h3>
                   <p className="text-sm md:text-base text-white/80 leading-relaxed text-balance">
                     Agradecemos muito ao nosso querido professor, que teve paciência e dedicação com nossas turmas
@@ -428,37 +428,37 @@ function Landing() {
             <div className="mt-10 grid md:grid-cols-3 gap-5">
               {[
                 {
-                  quote: "Fazer o curso de Desenvolvimento de Sistemas tem sido uma experiência muito boa. Mesmo sem toda a estrutura que o curso precisa, a gente consegue aprender bastante. O professor Huiatã Ribeiro sempre prepara as aulas e ajuda a gente a desenvolver novas habilidades. Nesse tempo de curso, aprendi muitas coisas que vão me ajudar no futuro e na minha entrada no mercado de trabalho.",
+                  quote: "Fazer o curso de Desenvolvimento de Sistemas tem sido uma experiência muito boa. Mesmo sem toda a estrutura que o curso precisa, a gente consegue aprender bastante. O professor Sandro Gouvê sempre prepara as aulas e ajuda a gente a desenvolver novas habilidades. Nesse tempo de curso, aprendi muitas coisas que vão me ajudar no futuro e na minha entrada no mercado de trabalho.",
                   name: "Nivia Vitória",
                   info: '2º Ano "A" TDS · SENAI',
                   real: true,
                 },
                 {
-                  quote: "Durante o curso aprendi várias coisas que não fazia ideia que conseguia, com o auxílio do professor Huiatã Ribeiro aprendemos não só a lidar com os desafios dentro de sala de aula, mais também com os desafios da vida, vou sempre levar comigo a certeza de que fazer o curso foi a minha melhor escolha.",
+                  quote: "Durante o curso aprendi várias coisas que não fazia ideia que conseguia, com o auxílio do professor Sandro Gouvê aprendemos não só a lidar com os desafios dentro de sala de aula, mais também com os desafios da vida, vou sempre levar comigo a certeza de que fazer o curso foi a minha melhor escolha.",
                   name: "Izabelly Ramos",
                   info: '2º Ano "A" TDS · SENAI',
                   real: true,
                 },
                 {
-                  quote: "Ter a oportunidade de fazer o curso de Desenvolvimento de Sistemas juntamente ao professor Huiatã Ribeiro não foi somente um aprendizado escolar, mas são lições que eu vou levar para vida, ele não é apenas um professor para nossa turma, mas também é um pai. Ele ensina, educa, pega no pé sempre que necessário e é nosso amigo que sempre estará ali caso a gente precise de apoio ou qualquer ajuda. Ter a oportunidade de ter um professor igual a ele foi a melhor coisa que me aconteceu, sou muito grata por tudo.",
+                  quote: "Ter a oportunidade de fazer o curso de Desenvolvimento de Sistemas juntamente ao professor Sandro Gouvê não foi somente um aprendizado escolar, mas são lições que eu vou levar para vida, ele não é apenas um professor para nossa turma, mas também é um pai. Ele ensina, educa, pega no pé sempre que necessário e é nosso amigo que sempre estará ali caso a gente precise de apoio ou qualquer ajuda. Ter a oportunidade de ter um professor igual a ele foi a melhor coisa que me aconteceu, sou muito grata por tudo.",
                   name: "Isadora Gomes Lima",
                   info: '2º Ano "A" TDS · SENAI',
                   real: true,
                 },
                 {
-                  quote: "Fazer parte do curso de Desenvolvimento de Sistemas está sendo uma experiência muito especial para mim. Além dos conhecimentos que estou aprendendo, também estou aprendendo lições que vou levar para a vida. O professor Huiatã não ensina apenas a matéria, ele se preocupa com cada aluno, incentiva, orienta e sempre procura o melhor para todos nós. Quando precisamos de ajuda, ele está disposto a ouvir e apoiar, e quando é necessário, também nos corrige para que possamos crescer e evoluir. Sua dedicação, paciência e carinho com a turma faz toda a diferença. Sou muito grata pela oportunidade de aprender com um professor tão especial e por tudo o que esse curso está me ensinando.",
+                  quote: "Fazer parte do curso de Desenvolvimento de Sistemas está sendo uma experiência muito especial para mim. Além dos conhecimentos que estou aprendendo, também estou aprendendo lições que vou levar para a vida. O professor Sandro Gouvê não ensina apenas a matéria, ele se preocupa com cada aluno, incentiva, orienta e sempre procura o melhor para todos nós. Quando precisamos de ajuda, ele está disposto a ouvir e apoiar, e quando é necessário, também nos corrige para que possamos crescer e evoluir. Sua dedicação, paciência e carinho com a turma faz toda a diferença. Sou muito grata pela oportunidade de aprender com um professor tão especial e por tudo o que esse curso está me ensinando.",
                   name: "Thárcila da Silva Dias",
                   info: '2º Ano "A" TDS · SENAI',
                   real: true,
                 },
                 {
-                  quote: "quando comecei o curso Técnico em Desenvolvimento de Sistemas, não imaginava o quanto essa experiência iria contribuir para o meu crescimento. Ao longo dessa jornada, aprendi muito sobre tecnologia, programação e trabalho em equipe, desenvolvendo habilidades que levarei para a vida toda. Além das aulas, tivemos experiências incríveis, como as visitas técnicas aos data centers, que nos permitiram conhecer na prática como funciona a área de tecnologia e ampliar nossa visão sobre o mercado de trabalho. Também gostaria de agradecer ao professor Huiatá Ribeiro, que sempre nos incentivou a buscar mais conhecimento, enfrentar desafios e acreditar no nosso potencial. Sua dedicação fez toda a diferença na nossa formação. Hoje tenho a certeza de que escolher esse curso foi uma decisão muito importante para o meu futuro, e sou grata por todas as oportunidades, aprendizados e experiências que vivi durante essa trajetória.",
+                  quote: "quando comecei o curso Técnico em Desenvolvimento de Sistemas, não imaginava o quanto essa experiência iria contribuir para o meu crescimento. Ao longo dessa jornada, aprendi muito sobre tecnologia, programação e trabalho em equipe, desenvolvendo habilidades que levarei para a vida toda. Além das aulas, tivemos experiências incríveis, como as visitas técnicas aos data centers, que nos permitiram conhecer na prática como funciona a área de tecnologia e ampliar nossa visão sobre o mercado de trabalho. Também gostaria de agradecer ao professor Sandro Gouvê, que sempre nos incentivou a buscar mais conhecimento, enfrentar desafios e acreditar no nosso potencial. Sua dedicação fez toda a diferença na nossa formação. Hoje tenho a certeza de que escolher esse curso foi uma decisão muito importante para o meu futuro, e sou grata por todas as oportunidades, aprendizados e experiências que vivi durante essa trajetória.",
                   name: "Ana Beatriz dos Santos Filgueiras",
                   info: '2º Ano "B" TDS · SENAI',
                   real: true,
                 },
                 {
-                  quote: "Ter a oportunidade de ser aluno do professor Huiatã foi um privilégio. Seu impacto vai muito além do conteúdo do curso, pois ele contribui diretamente para a formação de pessoas melhores e mais preparadas para o futuro. Sou extremamente grato por tudo o que aprendi e tenho certeza de que essa experiência marcará minha vida para sempre.",
+                  quote: "Ter a oportunidade de ser aluno do professor Sandro Gouvê foi um privilégio. Seu impacto vai muito além do conteúdo do curso, pois ele contribui diretamente para a formação de pessoas melhores e mais preparadas para o futuro. Sou extremamente grato por tudo o que aprendi e tenho certeza de que essa experiência marcará minha vida para sempre.",
                   name: "Samuel Vitor Alves Silva",
                   info: '2º Ano "B" TDS · SENAI',
                   real: true,
