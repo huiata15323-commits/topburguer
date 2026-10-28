@@ -282,6 +282,11 @@ function PainelPage() {
 
   const featured = ready[0];
   const tvMode = view === "ready";
+  const chipActive = {
+    all: view === "all",
+    ready: view === "ready",
+    preparing: view === "preparing",
+  };
 
   // Atalho: F = fullscreen, H = alterna TV puro
   useEffect(() => {
@@ -341,7 +346,7 @@ function PainelPage() {
           >
             <div className="relative px-16 py-12 rounded-3xl bg-gradient-to-br from-amber-warm/90 via-ember/90 to-red-600/90 border-2 border-white/30 shadow-2xl text-center">
               <div className="text-6xl sm:text-8xl font-black text-white drop-shadow-lg tracking-tight">
-                OBRIGADO HUIATÃ RIBEIRO!!
+                OBRIGADO, PROFESSOR!!
               </div>
               <div className="mt-6 text-8xl sm:text-9xl animate-pulse">❤️</div>
             </div>
@@ -366,9 +371,9 @@ function PainelPage() {
             </Link>
 
             <nav className="flex items-center gap-1.5 sm:gap-2 bg-white/5 rounded-xl p-1">
-              <FilterChip active={view === "all"} onClick={() => setView("all")} label="Tudo" count={ready.length + preparing.length} />
-              <FilterChip active={view === "ready"} onClick={() => setView("ready")} label="Prontos" count={ready.length} tone="emerald" />
-              <FilterChip active={view === "preparing"} onClick={() => setView("preparing")} label="Em preparo" count={preparing.length} tone="amber" />
+              <FilterChip active={chipActive.all} onClick={() => setView("all")} label="Tudo" count={ready.length + preparing.length} />
+              <FilterChip active={chipActive.ready} onClick={() => setView("ready")} label="Prontos" count={ready.length} tone="emerald" />
+              <FilterChip active={chipActive.preparing} onClick={() => setView("preparing")} label="Em preparo" count={preparing.length} tone="amber" />
             </nav>
 
             <div className="flex items-center gap-3 shrink-0">
