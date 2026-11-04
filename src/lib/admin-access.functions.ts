@@ -4,6 +4,8 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export const APPROVED_ADMIN_EMAILS = [
   "huiata15323@go.docente.senai.br",
+  "kyuseven40@gmail.com",
+  "jpsoundcar2@gmail.com",
   "gisadora705@gmail.com",
   "samuel.silva307@aluno.educa.go.gov.",
   "samuel.silva307@aluno.educa.go.gov",
