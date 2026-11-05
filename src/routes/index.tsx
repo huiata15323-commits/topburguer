@@ -7,6 +7,7 @@ import topBacon from "@/assets/menu/top-bacon.jpg";
 import topCheddar from "@/assets/menu/top-cheddar.jpg";
 import topClassic from "@/assets/menu/top-classic.jpg";
 import { useBranding } from "@/lib/branding";
+import { FeedbackSection } from "@/components/FeedbackSection";
 
 const DRIVE_ACERVO_URL = "https://drive.google.com/drive/folders/1Wv8JwaqaLX1Awhp_HPAC_hjb1Pz1YBPu?usp=drive_link";
 const SITE_URL = "https://topburguer.lovable.app";
@@ -507,6 +508,8 @@ function Landing() {
           </div>
         </motion.div>
       </section>
+
+      <FeedbackSection />
 
       <footer className="relative z-10 border-t border-white/5 py-6 text-center text-xs text-white/40">
         <div>Top Burguer — feito pra hamburgueria que voa.</div>
