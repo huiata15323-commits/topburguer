@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      feedback: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          name: string | null
+          presentation_rating: number
+          system_rating: number
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          name?: string | null
+          presentation_rating: number
+          system_rating: number
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          name?: string | null
+          presentation_rating?: number
+          system_rating?: number
+        }
+        Relationships: []
+      }
       menu_items: {
         Row: {
           badges: string[]
