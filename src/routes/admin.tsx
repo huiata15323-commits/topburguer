@@ -11,6 +11,7 @@ import { StaffGate } from "@/components/StaffGate";
 import { RoleGate } from "@/components/RoleGate";
 import { PromosAdmin } from "@/components/PromosAdmin";
 import { TableHeatmap } from "@/components/TableHeatmap";
+import { FeedbackAdmin } from "@/components/FeedbackAdmin";
 import { BrandingAdmin } from "@/components/BrandingAdmin";
 import { AdminHeroHeader } from "@/components/AdminHeroHeader";
 import { StockInput } from "@/components/StockInput";
@@ -285,6 +286,7 @@ function AdminPage() {
         <EndOfDayCard />
         <PromosAdmin />
         <TableHeatmap />
+        <FeedbackAdmin />
         <TableQRGenerator />
 
 
